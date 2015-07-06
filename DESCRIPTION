@@ -1,8 +1,11 @@
 Package: pcev
-Title: Principal components of explained variance
+Title: Principal components of explained variance (PCEV)
 Version: 0.0.0.9000
 Authors@R: person("Maxime", "Turgeon", email = "maxime.turgeon@mail.mcgill.ca", role = c("aut", "cre"))
-Description: What the package does (one paragraph).
+Description: PCEV is a statistical tool for the analysis of a mutivariate response vector.
+    It is a dimension-reduction technique, similar to Principal Components
+    Analysis (PCA), which seeks the maximize the proportion of variance
+    (in the response vector) being explained by a set of covariates.
 Depends: R (>= 3.1.2)
 License: GPL (>=2)
 LazyData: true
