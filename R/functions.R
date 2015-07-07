@@ -16,10 +16,13 @@
 #' @return A list containing the variance components, the first PCEV, the
 #'   p-value, etc.
 WilksLambda <- function(Y, x, shrink = FALSE) {
+  #initializing parameters
   rho <- NULL
   N <- nrow(Y)
   p <- ncol(Y)
   bar.Y <- colMeans(Y)
+
+  #Variance decomposition
   fit <- lm.fit(cbind(rep_len(1, N), x), Y)
   Y.fit <- fit$fitted.values
   res <- Y - Y.fit
@@ -36,6 +39,7 @@ WilksLambda <- function(Y, x, shrink = FALSE) {
     Vr <- rho*mu.E*diag(p)+(1-rho)*Vr
     Vr <- Vr*(N-2)
   }
+  #Computing PCEV
   temp <- eigen(Vr, symmetric=TRUE)
   Ur <- temp$vectors
   diagD <- temp$values
@@ -44,7 +48,7 @@ WilksLambda <- function(Y, x, shrink = FALSE) {
   m <- root.Vr %*% Vg %*% root.Vr
   temp1 <- eigen(m, symmetric=TRUE)
   PCEV <- root.Vr %*% temp1$vectors
-
+  #Computing Wilks Lambda test statistic
   d <- temp1$values
   wilks.lambda <- (N-p-1)/p * d[1]
   #wilks.lambda = d[1]
@@ -55,9 +59,9 @@ WilksLambda <- function(Y, x, shrink = FALSE) {
   return(list("environment" = Vr,
               "genetic" = Vg,
               "PCEV"=PCEV,
-              "root.Vr"=root.Vr,
+              "rootVr"=root.Vr,
               "values"=d,
-              "p.value"=p.value,
+              "pvalue"=p.value,
               "rho"=rho))
 }
 
@@ -72,7 +76,7 @@ WilksLambda <- function(Y, x, shrink = FALSE) {
 #' @seealso \code{\link{WilksLambda}}
 #' @param Y Matrix of values for a multivariate response.
 #' @param x Vector of values for a covariate.
-#' @param type Character string specifying which method to use: "all" or
+#' @param method Character string specifying which method to use: "all" or
 #'   "block". Default value is "all".
 #' @param index If type = "block", index is a vector describing the block to
 #'   which the columns of Y correspond.
@@ -82,9 +86,20 @@ WilksLambda <- function(Y, x, shrink = FALSE) {
 #'   shrinkage factor, etc.
 
 
-computePCEV <- function(Y, x, type = "all", index, shrink = FALSE) {
-  if (type == "block") {
-    if (ncol(Y) != length(index)) {
+computePCEV <- function(Y, x, method = "all", index=NULL, shrink = FALSE) {
+  #Check input
+  if (!method %in% c("all", "block")){
+    stop("Method should be \"all\" or \"block\"")
+  }
+  if (!is.numeric(index)) index <- NULL
+  if(!is.numeric(Y) || !is.numeric(x)) {
+    stop("Y and x should be numeric")
+  }
+  if (!is.logical(shrink)) shrink <- FALSE
+
+  #Method by block
+  if (method == "block") {
+    if (is.null(index) || ncol(Y) != length(index)) {
       stop("index should have length equal to ncol(Y)")
     }
 
@@ -103,17 +118,21 @@ computePCEV <- function(Y, x, type = "all", index, shrink = FALSE) {
       weights[index==i] <- weights[index==i]*weight.step2[i]
     }
     Y.PCH <- Y %*% weights
-    pvalue <- result$p.value
+    pvalue <- result$pvalue
     rho <- result$rho
   }
-  if (type == "all") {
+
+  #Classical method
+  if (method == "all") {
     result <- WilksLambda(Y, x, shrink)
     weights <- result$PCEV[,1]
     Y.PCH <- Y %*% weights
-    pvalue <- result$p.value
+    pvalue <- result$pvalue
     rho <- result$rho
   }
-  return(list("PCH.values" = Y.PCH,
+
+  #return results
+  return(list("PCHvalues" = Y.PCH,
               "weights" = weights,
               "Pval"= pvalue,
               "rho"= rho))
