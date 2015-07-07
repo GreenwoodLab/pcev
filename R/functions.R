@@ -1,4 +1,20 @@
-# Works for x in 1 dimension
+#' Wilks Lambda test.
+#'
+#' \code{WilksLambda} computes a p-value for the classical PCEV.
+#'
+#' The Wilks Lambda essentially tests whether the proportion of variance being
+#' explained by the covariates is zero. This function computes the variance
+#' decomposition which is used to compute the first PCEV. Note that this method
+#' is currently only implemented for the case where there is only one covariate.
+#'
+#' @seealso \code{\link{computePCEV}}
+#' @aliases wilkslambda wilksLambda Wilkslambda Wilks wilks
+#' @param Y Matrix of values for a multivariate response.
+#' @param x Vector of values for a covariate.
+#' @param shrink Should we use a shrinkage estimate of the residual variance?
+#'   Default value is FALSE.
+#' @return A list containing the variance components, the first PCEV, the
+#'   p-value, etc.
 WilksLambda <- function(Y, x, shrink = FALSE) {
   rho <- NULL
   N <- nrow(Y)
@@ -20,7 +36,6 @@ WilksLambda <- function(Y, x, shrink = FALSE) {
     Vr <- rho*mu.E*diag(p)+(1-rho)*Vr
     Vr <- Vr*(N-2)
   }
-
   temp <- eigen(Vr, symmetric=TRUE)
   Ur <- temp$vectors
   diagD <- temp$values
@@ -29,6 +44,7 @@ WilksLambda <- function(Y, x, shrink = FALSE) {
   m <- root.Vr %*% Vg %*% root.Vr
   temp1 <- eigen(m, symmetric=TRUE)
   PCEV <- root.Vr %*% temp1$vectors
+
   d <- temp1$values
   wilks.lambda <- (N-p-1)/p * d[1]
   #wilks.lambda = d[1]
@@ -45,16 +61,32 @@ WilksLambda <- function(Y, x, shrink = FALSE) {
               "rho"=rho))
 }
 
+#' Principal Components of Explained Variance.
+#'
+#' \code{computePCEV} compute the first PCEV and tests its significance.
+#'
+#' This is the main function. It computes the PCEV using either the classical
+#' method or the block-method. A p-value is also computed, testing the
+#' significance of the PCEV. Note that the classical method is currently only
+#' implemented for use with a single covariate.
+#' @seealso \code{\link{WilksLambda}}
+#' @param Y Matrix of values for a multivariate response.
+#' @param x Vector of values for a covariate.
+#' @param type Character string specifying which method to use: "all" or
+#'   "block". Default value is "all".
+#' @param index If type = "block", index is a vector describing the block to
+#'   which the columns of Y correspond.
+#' @param shrink Should we use a shrinkage estimate of the residual variance?
+#'   Default value is FALSE.
+#' @return A list containing the first PCEV, the p-value, the estimate of the
+#'   shrinkage factor, etc.
 
-# The following function computes the PCEV in two stages.
-# The index parameter indicates to which cluster each responses belong.
-# Type = "all" or "block"
-# Works only for one covariate x
-# Shrinkage = TRUE if we want to use shrinkage for the environmental variance matrix
 
-PCEV <- function(Y, x, index, type = "all", shrink = FALSE) {
+computePCEV <- function(Y, x, type = "all", index, shrink = FALSE) {
   if (type == "block") {
-    if (ncol(Y) != length(index)) stop("index should have length equal to ncol(Y)")
+    if (ncol(Y) != length(index)) {
+      stop("index should have length equal to ncol(Y)")
+    }
 
     d <- length(unique(index))
     Y.PCH <- matrix(NA, nrow=nrow(Y), ncol=d)
