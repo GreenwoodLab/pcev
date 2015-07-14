@@ -6,7 +6,9 @@ PCEV is a statistical tool for the analysis of a mutivariate response vector. It
 
 ## Installation
 
-<pre>
->library(devtools)
->install_github('GreenwoodLab/pcev')
-</pre>
+You can install from GitHub using the [devtools](http://cran.r-project.org/web/packages/devtools/index.html) package:
+
+``` r
+library(devtools)
+devtools::install_github('GreenwoodLab/pcev')
+```
