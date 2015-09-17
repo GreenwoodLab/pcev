@@ -4,14 +4,14 @@
 \alias{computePCEV}
 \title{Principal Components of Explained Variance.}
 \usage{
-computePCEV(Y, x, type = "all", index, shrink = FALSE)
+computePCEV(Y, x, method = "all", index = NULL, shrink = FALSE)
 }
 \arguments{
 \item{Y}{Matrix of values for a multivariate response.}
 
 \item{x}{Vector of values for a covariate.}
 
-\item{type}{Character string specifying which method to use: "all" or
+\item{method}{Character string specifying which method to use: "all" or
 "block". Default value is "all".}
 
 \item{index}{If type = "block", index is a vector describing the block to
@@ -25,11 +25,11 @@ A list containing the first PCEV, the p-value, the estimate of the
   shrinkage factor, etc.
 }
 \description{
-\code{computePCEV} compute the first PCEV and tests its significance.
+\code{computePCEV} computes the first PCEV and tests its significance.
 }
 \details{
 This is the main function. It computes the PCEV using either the classical
-method or the block-method. A p-value is also computed, testing the
+method or the block approach A p-value is also computed, testing the
 significance of the PCEV. Note that the classical method is currently only
 implemented for use with a single covariate.
 }

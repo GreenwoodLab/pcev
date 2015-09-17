@@ -67,10 +67,10 @@ WilksLambda <- function(Y, x, shrink = FALSE) {
 
 #' Principal Components of Explained Variance.
 #'
-#' \code{computePCEV} compute the first PCEV and tests its significance.
+#' \code{computePCEV} computes the first PCEV and tests its significance.
 #'
 #' This is the main function. It computes the PCEV using either the classical
-#' method or the block-method. A p-value is also computed, testing the
+#' method or the block approach A p-value is also computed, testing the
 #' significance of the PCEV. Note that the classical method is currently only
 #' implemented for use with a single covariate.
 #' @seealso \code{\link{WilksLambda}}
