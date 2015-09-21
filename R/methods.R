@@ -20,12 +20,64 @@ permutePval.default <- function(pcevObj) {
 
 #' @describeIn permutePval
 permutePval.PcevClassical <- function(pcevObj, shrink, index, nperm) {
+  results <- estimatePcev(pcevObj, shrink)
+  N <- nrow(pcevObj$Y)
   
+  PCEV <- pcevObj$Y %*% results$weights
+  initFit <- lm.fit(pcevObj$X, PCEV)
+  df1 <- nrow(pcevObj$X) - 1
+  df2 <- N - df1 + 1
+  initFstat <- (sum((mean(PCEV) - fit$fitted.values)^2)/df1)/(sum(fit$residuals^2)/df2)
+  initPval <- pf(initFstat, df1, df2, lower.tail = FALSE)
+  
+  permutationPvalues <- replicate(nperm, expr = {
+    tmp <- pcevObj
+    tmp$Y <- tmp$Y[sample(N), ]
+    
+    tmpRes <- estimatePcev(tmpRes, shrink)
+    tmpPCEV <- tmp$Y %*% tmpRes$weights
+    
+    tmpFit <- lm.fit(tmp$X, tmpPCEV)
+    tmpFstat <- (sum((mean(tmpPCEV) - tmpFit$fitted.values)^2)/df1)/(sum(tmpFit$residuals^2)/df2)
+    return(pf(tmpFstat, df1, df2, lower.tail = FALSE))
+  })
+  
+  pvalue <- mean(permutationPvalues < initPval)
+  
+  results$pvalue <- pvalue
+  
+  return(results)
 }
 
 #' @describeIn permutePval
 permutePval.PcevBlock <- function(pcevObj, shrink, index, nperm) {
+  results <- estimatePcev(pcevObj, shrink)
+  N <- nrow(pcevObj$Y)
   
+  PCEV <- pcevObj$Y %*% results$weights
+  initFit <- lm.fit(pcevObj$X, PCEV)
+  df1 <- nrow(pcevObj$X) - 1
+  df2 <- N - df1 + 1
+  initFstat <- (sum((mean(PCEV) - fit$fitted.values)^2)/df1)/(sum(fit$residuals^2)/df2)
+  initPval <- pf(initFstat, df1, df2, lower.tail = FALSE)
+  
+  permutationPvalues <- replicate(nperm, expr = {
+    tmp <- pcevObj
+    tmp$Y <- tmp$Y[sample(N), ]
+    
+    tmpRes <- estimatePcev(tmpRes, shrink)
+    tmpPCEV <- tmp$Y %*% tmpRes$weights
+    
+    tmpFit <- lm.fit(tmp$X, tmpPCEV)
+    tmpFstat <- (sum((mean(tmpPCEV) - tmpFit$fitted.values)^2)/df1)/(sum(tmpFit$residuals^2)/df2)
+    return(pf(tmpFstat, df1, df2, lower.tail = FALSE))
+  })
+  
+  pvalue <- mean(permutationPvalues < initPval)
+  
+  results$pvalue <- pvalue
+  
+  return(results)
 }
 
 # Wilks methods----
