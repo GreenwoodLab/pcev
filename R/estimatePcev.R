@@ -83,6 +83,8 @@ estimatePcev.PcevBlock <- function(pcevObj, shrink, index) {
   d <- length(unique(index))
   Ypcev <- matrix(NA, nrow = N, ncol = d)
   weights <- rep_len(0, p)
+  rootVr <- list("first" = vector("list", d), 
+                 "second" = NA)
   
   for (i in 1:d) {
     pcevObj_red <- pcevObj 
@@ -91,16 +93,19 @@ estimatePcev.PcevBlock <- function(pcevObj, shrink, index) {
     result <- estimatePcev(pcevObj_red, shrink)
     weights[index==i] <- result$weights
     Ypcev[,i] <- Y.red %*% weights[index==i]
+    rootVr$first[[i]] <- result$rootVr
   }
   pcevObj_total <- pcevObj
   pcevObj_total$Y <- Ypcev
   class(pcevObj_total) <- "PcevClassical"
   result <- estimatePcev(pcevObj_total, shrink)
-  weight.step2 <- result$weights
+  weight_step2 <- result$weights
   for (i in 1:d) {
-    weights[index==i] <- weights[index==i]*weight.step2[i]
+    weights[index==i] <- weights[index==i]*weight_step2[i]
   }
-  Y.PCH <- Y %*% weights
-  pvalue <- result$pvalue
-  rho <- result$rho
+  
+  rootVr$second <- result$rootVr
+  
+  return(list("weights" = weights,
+              "rootVr" = rootVr))
 }

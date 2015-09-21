@@ -63,46 +63,24 @@ computePCEV <- function(response, covariate, confounder = NULL,
       # Need to implement this
     }
   }
-
-  # Method by block
-  if (method == "block") {
-    if (is.null(index) || ncol(Y) != length(index)) {
-      stop("index should have length equal to ncol(Y)")
-    }
-
-    d <- length(unique(index))
-    Y.PCH <- matrix(NA, nrow=nrow(Y), ncol=d)
-    weights <- rep_len(0,ncol(Y))
-    for (i in 1:d) {
-      Y.red <- Y[, index==i, drop = FALSE]
-      result <- WilksLambda(Y.red, x, shrink)
-      weights[index==i] <- result$PCEV[,1]
-      Y.PCH[,i] <- Y.red %*% weights[index==i]
-    }
-    result <- WilksLambda(Y.PCH, x, shrink)
-    weight.step2 <- result$PCEV[,1]
-    for (i in 1:d) {
-      weights[index==i] <- weights[index==i]*weight.step2[i]
-    }
-    Y.PCH <- Y %*% weights
-    pvalue <- result$pvalue
-    rho <- result$rho
-  }
-
-  # Classical method
-  if (method == "all") {
-    result <- WilksLambda(Y, x, shrink)
-    weights <- result$PCEV[,1]
-    Y.PCH <- Y %*% weights
-    pvalue <- result$pvalue
-    rho <- result$rho
-  }
+  
+  # Compute PCEV
+  pcevRes$PCEV <- pcevObj$Y %*% pcevRes$weights
+  
+  # Compute variable importance
+  pcevRes$VIMP <- computeVIMP(pcevObj, pcevRes)
+  
+  class(pcevRes) <- "Pcev"
 
   # return results
-  return(list("PCHvalues" = Y.PCH,
-              "weights" = weights,
-              "Pval"= pvalue,
-              "rho"= rho))
+  return(pcevRes)
+}
+
+computeVIMP <- function(pcevObj, list) {
+  
+  VIMP <- cor(pcevObj$Y, list$PCEV)
+  
+  return(VIMP)
 }
 
 # Constructor functions----
