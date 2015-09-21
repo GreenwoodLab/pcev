@@ -53,11 +53,11 @@ wilksPval.PcevClassical <- function(pcevObj, shrink, index) {
   N <- nrow(pcevObj$Y)
   p <- ncol(pcevObj$Y)
   d <- results$largestRoot
-  wilks.lambda <- (N-p-1)/p * d
-  #wilks.lambda = d[1]
+  wilksLambda <- (N-p-1)/p * d
+  
   df1 <- p
   df2 <- N-p-1
-  p.value <- pf(wilks.lambda, df1, df2, lower.tail = FALSE)
+  pvalue <- pf(wilksLambda, df1, df2, lower.tail = FALSE)
   results$pvalue <- pvalue
   
   return(results)
@@ -66,6 +66,17 @@ wilksPval.PcevClassical <- function(pcevObj, shrink, index) {
 #' @describeIn wilksPval
 wilksPval.PcevBlock <- function(pcevObj, shrink, index) {
   results <- estimatePcev(pcevObj, shrink, index)
+  N <- nrow(pcevObj$Y)
+  p <- ncol(pcevObj$Y)
+  PCEV <- pcevObj$Y %*% results$weights
+  
+  fit <- lm.fit(pcevObj$X, PCEV)
+  beta <- fit$coefficients[2]
+  h2Hat <- beta^2/(1 + beta^2)
+  
+  df1 <- p
+  df2 <- N-p-1
+  pvalue <- pf((N-p-1) * N * h2Hat/p, df1, df2, lower.tail = FALSE)
   
   results$pvalue <- pvalue
   
