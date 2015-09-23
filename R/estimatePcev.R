@@ -36,7 +36,6 @@ estimatePcev.PcevClassical <- function(pcevObj, shrink) {
   Yfit_confounder <- fit_confounder$fitted.values
   
   Vr <- crossprod(res, Y)
-  # Vm needs to be defined differently... depending only on covariates
   Vm <- crossprod(Yfit - Yfit_confounder, Y)
   
   # Shrinkage estimate of Vr

@@ -68,7 +68,7 @@ computePCEV <- function(response, covariate, confounder = NULL,
   pcevRes$PCEV <- pcevObj$Y %*% pcevRes$weights
   
   # Compute variable importance
-  pcevRes$VIMP <- computeVIMP(pcevObj, pcevRes)
+  pcevRes$VIMP <- .computeVIMP(pcevObj, pcevRes)
   
   class(pcevRes) <- "Pcev"
 
@@ -76,19 +76,11 @@ computePCEV <- function(response, covariate, confounder = NULL,
   return(pcevRes)
 }
 
-computeVIMP <- function(pcevObj, list) {
+.computeVIMP <- function(pcevObj, list) {
   
   VIMP <- cor(pcevObj$Y, list$PCEV)
   
   return(VIMP)
-}
-
-colMeans2 <- function(x, na.rm = FALSE, dims=1) {
-  if(is.null(dim(x))) {
-    mean(x, na.rm=na.rm)
-  } else {
-    colMeans(x, na.rm, dims)
-  }
 }
 
 # Constructor functions----
@@ -140,3 +132,30 @@ PcevBlock <- function(response, covariate, confounder) {
   }
   
 }
+
+# Documentation for the datasets----
+
+#' Methylation values around BLK gene
+#' 
+#' A dataset containing methylation values for cell-separated samples. The 
+#' methylation was measured using bisulfite sequencing. The data also contains 
+#' the genomic position of these CpG sites, as well as a binary phenotype 
+#' (whether the sample comes from a B cell).
+#' 
+#' Methylation was first measured at 24,068 sites, on 40 samples. Filtering was
+#' performed to keep the 25\% most variable sites. See the vignette for more detail.
+#' 
+#' @format The data comes in three objects:
+#' \describe{
+#' \item{methylation}{Matrix of methylation values at 6,000 sites measured on 40 samples}
+#' \item{pheno}{Vector of phenotype, indicating whether the sample comes from a B cell}
+#' \item{position2}{Data frame recording the position of each CpG site along the BLK region}
+#' }
+#' @source Tomi Pastinen, McGill University
+"methylation"
+
+#' @rdname methylation
+"pheno"
+
+#' @rdname methylation
+"position2"

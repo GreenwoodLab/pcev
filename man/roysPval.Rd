@@ -7,11 +7,11 @@
 \alias{roysPval.default}
 \title{Roy's largest root exact test}
 \usage{
-roysPval(pcevObj)
+roysPval(pcevObj, ...)
 
-\method{roysPval}{default}(pcevObj)
+\method{roysPval}{default}(pcevObj, ...)
 
-\method{roysPval}{PcevClassical}(PcevObj, shrink, index)
+\method{roysPval}{PcevClassical}(pcevObj, shrink, index)
 
 \method{roysPval}{PcevBlock}(PcevObj, shrink, index)
 }

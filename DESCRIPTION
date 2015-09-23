@@ -19,6 +19,6 @@ URL: http://github.com/GreenwoodLab/pcev
 BugReports: http://github.com/GreenwoodLab/pcev/issues
 Suggests: 
     knitr,
-    testthat,
-    RMTstat
+    RMTstat,
+    testthat
 VignetteBuilder: knitr

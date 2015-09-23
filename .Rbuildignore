@@ -1,2 +1,6 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
+\data\*.txt
+\inst\*
+\tests\*
+\vignettes\*
