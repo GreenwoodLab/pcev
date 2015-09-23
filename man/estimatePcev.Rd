@@ -7,9 +7,9 @@
 \alias{estimatePcev.default}
 \title{Estimation of PCEV}
 \usage{
-estimatePcev(pcevObj)
+estimatePcev(pcevObj, ...)
 
-\method{estimatePcev}{default}(pcevObj)
+\method{estimatePcev}{default}(pcevObj, ...)
 
 \method{estimatePcev}{PcevClassical}(pcevObj, shrink)
 

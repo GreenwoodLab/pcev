@@ -15,7 +15,6 @@ response vector) being explained by a set of covariates.
 
 \code{\link{estimatePcev}}
 \code{\link{computePCEV}}
-\code{\link{computeVIMP}}
 \code{\link{PcevObj}}
 \code{\link{permutePval}}
 \code{\link{wilksPval}}

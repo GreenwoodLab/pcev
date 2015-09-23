@@ -7,9 +7,9 @@
 \alias{wilksPval.default}
 \title{Wilks' lambda exact test}
 \usage{
-wilksPval(pcevObj)
+wilksPval(pcevObj, ...)
 
-\method{wilksPval}{default}(pcevObj)
+\method{wilksPval}{default}(pcevObj, ...)
 
 \method{wilksPval}{PcevClassical}(pcevObj, shrink, index)
 

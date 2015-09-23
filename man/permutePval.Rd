@@ -7,9 +7,9 @@
 \alias{permutePval.default}
 \title{Permutation p-value}
 \usage{
-permutePval(pcevObj)
+permutePval(pcevObj, ...)
 
-\method{permutePval}{default}(pcevObj)
+\method{permutePval}{default}(pcevObj, ...)
 
 \method{permutePval}{PcevClassical}(pcevObj, shrink, index, nperm)
 
