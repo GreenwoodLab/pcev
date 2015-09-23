@@ -29,7 +29,7 @@ estimatePcev.PcevClassical <- function(pcevObj, shrink) {
   bar.Y <- colMeans(Y)
   
   # Variance decomposition
-  fit <- lm.fit(cbind(pcevObj$X, pcevObj$Z[,-1]), Y)
+  fit <- lm.fit(cbind(pcevObj$X, pcevObj$Z), Y)
   Y.fit <- fit$fitted.values
   res <- Y - Y.fit
   Vr <- crossprod(res, Y)

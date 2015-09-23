@@ -103,16 +103,32 @@ NULL
 
 #' @rdname PcevObj
 PcevClassical <- function(response, covariate, confounder) {
-  structure(list(Y = response, 
-                 X = model.matrix(~., covariate), 
-                 Z = model.matrix(~., confounder)), 
-            class = "PcevClassical")
+  if(is.null(confounder)) {
+    structure(list(Y = response, 
+                   X = model.matrix(~., covariate),
+                   Z = c()), 
+              class = "PcevClassical")
+  } else {
+    structure(list(Y = response, 
+                   X = model.matrix(~., covariate), 
+                   Z = model.matrix(~., confounder)[,-1]), 
+              class = "PcevClassical")
+  }
+  
 }
 
 #' @rdname PcevObj
 PcevBlock <- function(response, covariate, confounder) {
-  structure(list(Y = response, 
-                 X = model.matrix(~., covariate), 
-                 Z = model.matrix(~., confounder)), 
-            class = "PcevBlock")
+  if(is.null(confounder)) {
+    structure(list(Y = response, 
+                   X = model.matrix(~., covariate), 
+                   Z = c()), 
+              class = "PcevBlock")
+  } else {
+    structure(list(Y = response, 
+                   X = model.matrix(~., covariate), 
+                   Z = model.matrix(~., confounder)[,-1]), 
+              class = "PcevBlock")
+  }
+  
 }
