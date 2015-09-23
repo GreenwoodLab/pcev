@@ -62,7 +62,7 @@ permutePval.PcevBlock <- function(pcevObj, shrink, index, nperm) {
   initFit <- lm.fit(pcevObj$X, PCEV)
   df1 <- nrow(pcevObj$X) - 1
   df2 <- N - df1 + 1
-  initFstat <- (sum((mean(PCEV) - initfit$fitted.values)^2)/df1)/(sum(initfit$residuals^2)/df2)
+  initFstat <- (sum((mean(PCEV) - initFit$fitted.values)^2)/df1)/(sum(initFit$residuals^2)/df2)
   initPval <- pf(initFstat, df1, df2, lower.tail = FALSE)
   
   permutationPvalues <- replicate(nperm, expr = {
