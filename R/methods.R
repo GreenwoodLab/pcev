@@ -10,10 +10,10 @@
 #' @param index If \code{pcevObj} is of class \code{PcevBlock}, index is a vector
 #'   describing the block to which individual response variables correspond.
 #' @param nperm The number of permutations to perform.
-permutePval <- function(pcevObj) UseMethod("permutePval")
+permutePval <- function(pcevObj, ...) UseMethod("permutePval")
 
 #' @describeIn permutePval
-permutePval.default <- function(pcevObj) {
+permutePval.default <- function(pcevObj, ...) {
   stop(strwrap("This function should be used with a Pcev object of class 
                PcevClassical or PcevBlock"))
 }
@@ -91,10 +91,10 @@ permutePval.PcevBlock <- function(pcevObj, shrink, index, nperm) {
 #' @param shrink Should we use a shrinkage estimate of the residual variance? 
 #' @param index If \code{pcevObj} is of class \code{PcevBlock}, index is a vector
 #'   describing the block to which individual response variables correspond.
-wilksPval <- function(pcevObj) UseMethod("wilksPval")
+wilksPval <- function(pcevObj, ...) UseMethod("wilksPval")
 
 #' @describeIn wilksPval
-wilksPval.default <- function(pcevObj) {
+wilksPval.default <- function(pcevObj, ...) {
   stop(strwrap("This function should be used with a Pcev object of class 
                PcevClassical or PcevBlock"))
 }
@@ -117,9 +117,10 @@ wilksPval.PcevClassical <- function(pcevObj, shrink, index) {
 
 #' @describeIn wilksPval
 wilksPval.PcevBlock <- function(pcevObj, shrink, index) {
-  results <- estimatePcev(pcevObj, shrink, index)
   N <- nrow(pcevObj$Y)
   p <- ncol(pcevObj$Y)
+  if (N - p <= 1) stop("To perform an exact test, we need N - p > 1")
+  results <- estimatePcev(pcevObj, shrink, index)
   PCEV <- pcevObj$Y %*% results$weights
   
   fit <- lm.fit(pcevObj$X, PCEV)

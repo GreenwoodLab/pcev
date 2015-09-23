@@ -54,7 +54,7 @@ computePCEV <- function(response, covariate, confounder = NULL,
   if (inference == "permutation") {
     pcevRes <- permutePval(pcevObj, shrink, index, nperm)
   } else {
-    if (ncol(covariate) == 1) {
+    if (is.null(dim(covariate)) || ncol(covariate) == 1) {
       # This condition is maybe too loose
       # What about categorical variables?
       pcevRes <- wilksPval(pcevObj, shrink, index)
@@ -83,6 +83,14 @@ computeVIMP <- function(pcevObj, list) {
   return(VIMP)
 }
 
+colMeans2 <- function(x, na.rm = FALSE, dims=1) {
+  if(is.null(dim(x))) {
+    mean(x, na.rm=na.rm)
+  } else {
+    colMeans(x, na.rm, dims)
+  }
+}
+
 # Constructor functions----
 
 #' Constructor functions for the different pcev objects
@@ -105,12 +113,12 @@ NULL
 PcevClassical <- function(response, covariate, confounder) {
   if(is.null(confounder)) {
     structure(list(Y = response, 
-                   X = model.matrix(~., covariate),
+                   X = model.matrix(~., as.data.frame(covariate)),
                    Z = c()), 
               class = "PcevClassical")
   } else {
     structure(list(Y = response, 
-                   X = model.matrix(~., covariate), 
+                   X = model.matrix(~., as.data.frame(covariate)), 
                    Z = model.matrix(~., confounder)[,-1]), 
               class = "PcevClassical")
   }
@@ -121,7 +129,7 @@ PcevClassical <- function(response, covariate, confounder) {
 PcevBlock <- function(response, covariate, confounder) {
   if(is.null(confounder)) {
     structure(list(Y = response, 
-                   X = model.matrix(~., covariate), 
+                   X = model.matrix(~., as.data.frame(covariate)), 
                    Z = c()), 
               class = "PcevBlock")
   } else {

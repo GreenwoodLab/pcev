@@ -11,10 +11,10 @@
 #' @return A list containing the variance components, the first PCEV, the 
 #'   eigenvalues of \eqn{V_R^{-1}V_G} and the estimate of the shrinkage 
 #'   parameter \eqn{\rho}
-estimatePcev <- function(pcevObj) UseMethod("estimatePcev")
+estimatePcev <- function(pcevObj, ...) UseMethod("estimatePcev")
 
 #' @describeIn  estimatePcev
-estimatePcev.default <- function(pcevObj) {
+estimatePcev.default <- function(pcevObj, ...) {
   stop(strwrap("This function should be used with a Pcev object of class 
                PcevClassical or PcevBlock"))
 }
@@ -26,7 +26,7 @@ estimatePcev.PcevClassical <- function(pcevObj, shrink) {
   Y <- pcevObj$Y
   N <- nrow(Y)
   p <- ncol(Y)
-  bar.Y <- colMeans(Y)
+  bar.Y <- colMeans2(Y)
   
   # Variance decomposition
   fit <- lm.fit(cbind(pcevObj$X, pcevObj$Z), Y)
@@ -57,7 +57,7 @@ estimatePcev.PcevClassical <- function(pcevObj, shrink) {
   Ur <- temp$vectors
   diagD <- temp$values
   value <- 1/sqrt(diagD)
-  root.Vr <- Ur %*% diag(value) %*% t(Ur)
+  root.Vr <- Ur %*% diag(value, nrow = length(value)) %*% t(Ur)
   mainMatrix <- root.Vr %*% Vm %*% root.Vr
   temp1 <- eigen(mainMatrix, symmetric=TRUE)
   weights <- root.Vr %*% temp1$vectors
@@ -65,7 +65,7 @@ estimatePcev.PcevClassical <- function(pcevObj, shrink) {
   
   return(list("residual" = Vr,
               "model" = Vm,
-              "weights" = weights[,1],
+              "weights" = weights[,1, drop=FALSE],
               "rootVr" = root.Vr,
               "largestRoot" = d[1],
               "rho" = rho))
@@ -92,19 +92,28 @@ estimatePcev.PcevBlock <- function(pcevObj, shrink, index) {
     class(pcevObj_red) <- "PcevClassical"
     result <- estimatePcev(pcevObj_red, shrink)
     weights[index==i] <- result$weights
-    Ypcev[,i] <- Y.red %*% weights[index==i]
+    Ypcev[,i] <- pcevObj_red$Y %*% weights[index==i]
     rootVr$first[[i]] <- result$rootVr
   }
+  
   pcevObj_total <- pcevObj
   pcevObj_total$Y <- Ypcev
   class(pcevObj_total) <- "PcevClassical"
-  result <- estimatePcev(pcevObj_total, shrink)
-  weight_step2 <- result$weights
+  
+  if (ncol(pcevObj_total$X) == 2) {
+    fit_total <- lm.fit(pcevObj_total$X, pcevObj_total$Y)
+    beta_total <- coefficients(fit_total)[2,]
+    weight_step2 <- beta_total/crossprod(beta_total)
+    
+  } else {
+    result <- estimatePcev(pcevObj_total, shrink)
+    weight_step2 <- result$weights
+    rootVr$second <- result$rootVr
+  }
+  
   for (i in 1:d) {
     weights[index==i] <- weights[index==i]*weight_step2[i]
   }
-  
-  rootVr$second <- result$rootVr
   
   return(list("weights" = weights,
               "rootVr" = rootVr))
