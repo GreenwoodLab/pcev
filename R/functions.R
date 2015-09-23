@@ -119,7 +119,7 @@ PcevClassical <- function(response, covariate, confounder) {
   } else {
     structure(list(Y = response, 
                    X = model.matrix(~., as.data.frame(covariate)), 
-                   Z = model.matrix(~., confounder)[,-1]), 
+                   Z = model.matrix(~., as.data.frame(confounder))[,-1]), 
               class = "PcevClassical")
   }
   
@@ -134,8 +134,8 @@ PcevBlock <- function(response, covariate, confounder) {
               class = "PcevBlock")
   } else {
     structure(list(Y = response, 
-                   X = model.matrix(~., covariate), 
-                   Z = model.matrix(~., confounder)[,-1]), 
+                   X = model.matrix(~., as.data.frame(covariate)), 
+                   Z = model.matrix(~., as.data.frame(confounder))[,-1]), 
               class = "PcevBlock")
   }
   

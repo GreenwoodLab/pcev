@@ -15,7 +15,8 @@ permutePval <- function(pcevObj, ...) UseMethod("permutePval")
 #' @describeIn permutePval
 permutePval.default <- function(pcevObj, ...) {
   stop(strwrap("This function should be used with a Pcev object of class 
-               PcevClassical or PcevBlock"))
+               PcevClassical or PcevBlock"),
+       call. = FALSE)
 }
 
 #' @describeIn permutePval
@@ -103,7 +104,8 @@ wilksPval <- function(pcevObj, ...) UseMethod("wilksPval")
 #' @describeIn wilksPval
 wilksPval.default <- function(pcevObj, ...) {
   stop(strwrap("This function should be used with a Pcev object of class 
-               PcevClassical or PcevBlock"))
+               PcevClassical or PcevBlock"),
+       call. = FALSE)
 }
 
 #' @describeIn wilksPval
@@ -126,7 +128,8 @@ wilksPval.PcevClassical <- function(pcevObj, shrink, index) {
 wilksPval.PcevBlock <- function(pcevObj, shrink, index) {
   N <- nrow(pcevObj$Y)
   p <- ncol(pcevObj$Y)
-  if (N - p <= 1) stop("To perform an exact test, we need N - p > 1")
+  if (N - p <= 1) stop("To perform an exact test, we need N - p > 1", 
+                       call. = FALSE)
   results <- estimatePcev(pcevObj, shrink, index)
   PCEV <- pcevObj$Y %*% results$weights
   
@@ -154,22 +157,56 @@ wilksPval.PcevBlock <- function(pcevObj, shrink, index) {
 #' @param shrink Should we use a shrinkage estimate of the residual variance? 
 #' @param index If \code{pcevObj} is of class \code{PcevBlock}, index is a vector
 #'   describing the block to which individual response variables correspond.
-roysPval <- function(pcevObj) UseMethod("roysPval")
+roysPval <- function(pcevObj, ...) UseMethod("roysPval")
 
 #' @describeIn roysPval
-roysPval.default <- function(pcevObj) {
-  stop(strwrap("Pcev is currently not implemented for 
-                   multiple covariates and an exact inference method"))
+roysPval.default <- function(pcevObj, ...) {
+  stop(strwrap("This function should be used with a Pcev object of class 
+               PcevClassical"),
+       call. = FALSE)
 }
 
 #' @describeIn roysPval
-roysPval.PcevClassical <- function(PcevObj, shrink, index) {
-  stop(strwrap("Pcev is currently not implemented for 
-                   multiple covariates and an exact inference method"))
+roysPval.PcevClassical <- function(pcevObj, shrink, index) {
+  
+  if (!requireNamespace("RMTstat", quietly = TRUE)) {
+    stop("RMTstat needs to be installed in order to use the exact method with multiple covariates.", 
+         call. = FALSE)
+  }
+  
+  results <- estimatePcev(pcevObj, shrink)
+  N <- nrow(pcevObj$Y)
+  p <- ncol(pcevObj$Y)
+  q <- ncol(pcevObj$X) - 1
+  d <- results$largestRoot
+  theta <- d / (1 + d)
+  
+  nuH <- q
+  nuE <- N - q - 1
+  s <- min(p, nuH)
+  m <- 0.5 * (abs(p - nuH) - 1)
+  n <- 0.5 * (nuE - p - 1)
+  one_third <- 1/3
+  
+  N <- 2 * (s + m + n) + 1 
+  gamma <- 2 * asin( sqrt( (s - 0.5)/N ) )
+  phi <- 2*asin( sqrt( (s + 2*m + 0.5)/N ) )
+  
+  mu <- 2 * log(tan( 0.5*(phi + gamma)))
+  sigma <- (16/N^2)^one_third * ( sin(phi+gamma)^2*sin(phi)*sin(gamma)) ^(-1*one_third)
+  
+  TW <- (log(theta/(1-theta)) - mu)/sigma
+  
+  pvalue <- RMTstat::ptw(TW, beta=1, lower.tail = FALSE, log.p = FALSE)
+  results$pvalue <- pvalue
+  
+  return(results)
+  
 }
 
 #' @describeIn roysPval
 roysPval.PcevBlock <- function(PcevObj, shrink, index) {
   stop(strwrap("Pcev is currently not implemented for 
-                   multiple covariates and an exact inference method"))
+                   multiple covariates, estimation with blocks and an exact inference method"),
+       call. = FALSE)
 }
