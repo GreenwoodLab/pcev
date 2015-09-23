@@ -34,12 +34,16 @@ permutePval.PcevClassical <- function(pcevObj, shrink, index, nperm) {
     tmp <- pcevObj
     tmp$Y <- tmp$Y[sample(N), ]
     
-    tmpRes <- estimatePcev(tmp, shrink, index)
-    tmpPCEV <- tmp$Y %*% tmpRes$weights
-    
-    tmpFit <- lm.fit(tmp$X, tmpPCEV)
-    tmpFstat <- (sum((mean(tmpPCEV) - tmpFit$fitted.values)^2)/df1)/(sum(tmpFit$residuals^2)/df2)
-    return(pf(tmpFstat, df1, df2, lower.tail = FALSE))
+    tmpRes <- try(estimatePcev(tmp, shrink, index), silent=TRUE)
+    if(inherits(tmpRes, "try-error")) {
+      return(NA)
+    } else {
+      tmpPCEV <- tmp$Y %*% tmpRes$weights
+      
+      tmpFit <- lm.fit(tmp$X, tmpPCEV)
+      tmpFstat <- (sum((mean(tmpPCEV) - tmpFit$fitted.values)^2)/df1)/(sum(tmpFit$residuals^2)/df2)
+      return(pf(tmpFstat, df1, df2, lower.tail = FALSE))
+    }
   })
   
   pvalue <- mean(permutationPvalues < initPval)
