@@ -85,7 +85,7 @@ estimatePcev.PcevBlock <- function(pcevObj, shrink, index, ...) {
   }
   
   d <- length(unique(index))
-  if(d > N && ncol(pcevObj$X) == 2) {
+  if(d > N && ncol(pcevObj$X) != 2) {
     warning("It is recommended to have a number of blocks smaller than the number of observations")
   }
   Ypcev <- matrix(NA, nrow = N, ncol = d)
@@ -93,14 +93,16 @@ estimatePcev.PcevBlock <- function(pcevObj, shrink, index, ...) {
   rootVr <- list("first" = vector("list", d), 
                  "second" = NA)
   
-  for (i in 1:d) {
+  counter <- 0
+  for (i in unique(index)) {
+    counter <- counter + 1
     pcevObj_red <- pcevObj 
     pcevObj_red$Y <- pcevObj$Y[, index == i, drop = FALSE]
     class(pcevObj_red) <- "PcevClassical"
     result <- estimatePcev(pcevObj_red, shrink)
     weights[index==i] <- result$weights
-    Ypcev[,i] <- pcevObj_red$Y %*% weights[index==i]
-    rootVr$first[[i]] <- result$rootVr
+    Ypcev[,counter] <- pcevObj_red$Y %*% weights[index==i]
+    rootVr$first[[counter]] <- result$rootVr
   }
   
   pcevObj_total <- pcevObj
@@ -118,8 +120,10 @@ estimatePcev.PcevBlock <- function(pcevObj, shrink, index, ...) {
     rootVr$second <- result$rootVr
   }
   
-  for (i in 1:d) {
-    weights[index==i] <- weights[index==i]*weight_step2[i]
+  counter <- 0
+  for (i in unique(index)) {
+    counter <- counter + 1
+    weights[index==i] <- weights[index==i]*weight_step2[counter]
   }
   
   return(list("weights" = weights,

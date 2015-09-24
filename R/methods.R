@@ -140,10 +140,11 @@ wilksPval.PcevBlock <- function(pcevObj, shrink, index, ...) {
   fit <- lm.fit(pcevObj$X, PCEV)
   beta <- fit$coefficients[2]
   h2Hat <- beta^2/(1 + beta^2)
+  lambda <- h2Hat/(1 - h2Hat)
   
   df1 <- p
   df2 <- N-p-1
-  pvalue <- pf((N-p-1) * N * h2Hat/p, df1, df2, lower.tail = FALSE)
+  pvalue <- pf((N-p-1) * lambda/p, df1, df2, lower.tail = FALSE)
   
   results$pvalue <- pvalue
   
