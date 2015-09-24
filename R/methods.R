@@ -10,6 +10,8 @@
 #' @param index If \code{pcevObj} is of class \code{PcevBlock}, index is a vector
 #'   describing the block to which individual response variables correspond.
 #' @param nperm The number of permutations to perform.
+#' @param ... Extra parameters.
+#' @export
 permutePval <- function(pcevObj, ...) UseMethod("permutePval")
 
 #' @describeIn permutePval
@@ -20,7 +22,7 @@ permutePval.default <- function(pcevObj, ...) {
 }
 
 #' @describeIn permutePval
-permutePval.PcevClassical <- function(pcevObj, shrink, index, nperm) {
+permutePval.PcevClassical <- function(pcevObj, shrink, index, nperm, ...) {
   results <- estimatePcev(pcevObj, shrink)
   N <- nrow(pcevObj$Y)
   
@@ -28,7 +30,7 @@ permutePval.PcevClassical <- function(pcevObj, shrink, index, nperm) {
   initFit <- lm.fit(pcevObj$X, PCEV)
   df1 <- nrow(pcevObj$X) - 1
   df2 <- N - df1 + 1
-  initFstat <- (sum((mean(PCEV) - fit$fitted.values)^2)/df1)/(sum(fit$residuals^2)/df2)
+  initFstat <- (sum((mean(PCEV) - initFit$fitted.values)^2)/df1)/(sum(initFit$residuals^2)/df2)
   initPval <- pf(initFstat, df1, df2, lower.tail = FALSE)
   
   permutationPvalues <- replicate(nperm, expr = {
@@ -55,7 +57,7 @@ permutePval.PcevClassical <- function(pcevObj, shrink, index, nperm) {
 }
 
 #' @describeIn permutePval
-permutePval.PcevBlock <- function(pcevObj, shrink, index, nperm) {
+permutePval.PcevBlock <- function(pcevObj, shrink, index, nperm, ...) {
   results <- estimatePcev(pcevObj, shrink, index)
   N <- nrow(pcevObj$Y)
   
@@ -99,6 +101,8 @@ permutePval.PcevBlock <- function(pcevObj, shrink, index, nperm) {
 #' @param shrink Should we use a shrinkage estimate of the residual variance? 
 #' @param index If \code{pcevObj} is of class \code{PcevBlock}, index is a vector
 #'   describing the block to which individual response variables correspond.
+#' @param ... Extra parameters.
+#' @export
 wilksPval <- function(pcevObj, ...) UseMethod("wilksPval")
 
 #' @describeIn wilksPval
@@ -109,7 +113,7 @@ wilksPval.default <- function(pcevObj, ...) {
 }
 
 #' @describeIn wilksPval
-wilksPval.PcevClassical <- function(pcevObj, shrink, index) {
+wilksPval.PcevClassical <- function(pcevObj, shrink, index, ...) {
   results <- estimatePcev(pcevObj, shrink)
   N <- nrow(pcevObj$Y)
   p <- ncol(pcevObj$Y)
@@ -125,7 +129,7 @@ wilksPval.PcevClassical <- function(pcevObj, shrink, index) {
 }
 
 #' @describeIn wilksPval
-wilksPval.PcevBlock <- function(pcevObj, shrink, index) {
+wilksPval.PcevBlock <- function(pcevObj, shrink, index, ...) {
   N <- nrow(pcevObj$Y)
   p <- ncol(pcevObj$Y)
   if (N - p <= 1) stop("To perform an exact test, we need N - p > 1", 
@@ -157,6 +161,8 @@ wilksPval.PcevBlock <- function(pcevObj, shrink, index) {
 #' @param shrink Should we use a shrinkage estimate of the residual variance? 
 #' @param index If \code{pcevObj} is of class \code{PcevBlock}, index is a vector
 #'   describing the block to which individual response variables correspond.
+#' @param ... Extra parameters.
+#' @export 
 roysPval <- function(pcevObj, ...) UseMethod("roysPval")
 
 #' @describeIn roysPval
@@ -167,7 +173,7 @@ roysPval.default <- function(pcevObj, ...) {
 }
 
 #' @describeIn roysPval
-roysPval.PcevClassical <- function(pcevObj, shrink, index) {
+roysPval.PcevClassical <- function(pcevObj, shrink, index, ...) {
   
   if (!requireNamespace("RMTstat", quietly = TRUE)) {
     stop("RMTstat needs to be installed in order to use the exact method with multiple covariates.", 
@@ -205,7 +211,7 @@ roysPval.PcevClassical <- function(pcevObj, shrink, index) {
 }
 
 #' @describeIn roysPval
-roysPval.PcevBlock <- function(PcevObj, shrink, index) {
+roysPval.PcevBlock <- function(pcevObj, shrink, index, ...) {
   stop(strwrap("Pcev is currently not implemented for 
                    multiple covariates, estimation with blocks and an exact inference method"),
        call. = FALSE)

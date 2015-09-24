@@ -8,9 +8,11 @@
 #' @param shrink Should we use a shrinkage estimate of the residual variance? 
 #' @param index If \code{pcevObj} is of class \code{PcevBlock}, index is a vector
 #'   describing the block to which individual response variables correspond.
+#' @param ... Extra parameters.
 #' @return A list containing the variance components, the first PCEV, the 
 #'   eigenvalues of \eqn{V_R^{-1}V_G} and the estimate of the shrinkage 
 #'   parameter \eqn{\rho}
+#' @export 
 estimatePcev <- function(pcevObj, ...) UseMethod("estimatePcev")
 
 #' @describeIn  estimatePcev
@@ -20,7 +22,7 @@ estimatePcev.default <- function(pcevObj, ...) {
 }
 
 #' @describeIn estimatePcev
-estimatePcev.PcevClassical <- function(pcevObj, shrink) {
+estimatePcev.PcevClassical <- function(pcevObj, shrink, ...) {
   #initializing parameters
   rho <- NULL
   Y <- pcevObj$Y
@@ -74,7 +76,7 @@ estimatePcev.PcevClassical <- function(pcevObj, shrink) {
 }
 
 #' @describeIn estimatePcev
-estimatePcev.PcevBlock <- function(pcevObj, shrink, index) {
+estimatePcev.PcevBlock <- function(pcevObj, shrink, index, ...) {
   p <- ncol(pcevObj$Y)
   N <- nrow(pcevObj$Y)
   

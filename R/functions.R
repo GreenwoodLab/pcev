@@ -23,8 +23,7 @@
 #'   "permutation"}
 #' @return A list containing the first PCEV, the p-value, the estimate of the 
 #'   shrinkage factor, etc.
-
-
+#' @export
 computePCEV <- function(response, covariate, confounder = NULL, 
                         estimation = "all", inference = "exact", 
                         index = NULL, shrink = FALSE, nperm = 1000) {
@@ -68,7 +67,7 @@ computePCEV <- function(response, covariate, confounder = NULL,
   pcevRes$PCEV <- pcevObj$Y %*% pcevRes$weights
   
   # Compute variable importance
-  pcevRes$VIMP <- .computeVIMP(pcevObj, pcevRes)
+  pcevRes$VIMP <- computeVIMP(pcevObj, pcevRes)
   
   class(pcevRes) <- "Pcev"
 
@@ -76,7 +75,7 @@ computePCEV <- function(response, covariate, confounder = NULL,
   return(pcevRes)
 }
 
-.computeVIMP <- function(pcevObj, list) {
+computeVIMP <- function(pcevObj, list) {
   
   VIMP <- cor(pcevObj$Y, list$PCEV)
   
@@ -102,6 +101,7 @@ computePCEV <- function(response, covariate, confounder = NULL,
 NULL
 
 #' @rdname PcevObj
+#' @export
 PcevClassical <- function(response, covariate, confounder) {
   if(is.null(confounder)) {
     structure(list(Y = response, 
@@ -118,6 +118,7 @@ PcevClassical <- function(response, covariate, confounder) {
 }
 
 #' @rdname PcevObj
+#' @export 
 PcevBlock <- function(response, covariate, confounder) {
   if(is.null(confounder)) {
     structure(list(Y = response, 

@@ -11,13 +11,15 @@ roysPval(pcevObj, ...)
 
 \method{roysPval}{default}(pcevObj, ...)
 
-\method{roysPval}{PcevClassical}(pcevObj, shrink, index)
+\method{roysPval}{PcevClassical}(pcevObj, shrink, index, ...)
 
-\method{roysPval}{PcevBlock}(PcevObj, shrink, index)
+\method{roysPval}{PcevBlock}(pcevObj, shrink, index, ...)
 }
 \arguments{
 \item{pcevObj}{A pcev object of class \code{PcevClassical} or
 \code{PcevBlock}}
+
+\item{...}{Extra parameters.}
 
 \item{shrink}{Should we use a shrinkage estimate of the residual variance?}
 

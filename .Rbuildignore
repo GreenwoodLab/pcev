@@ -1,6 +1,6 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
-\data\*.txt
-\inst\*
-\tests\*
-\vignettes\*
+^inst/*$
+^tests/*$
+^BLK3.pdf$
+^analysisScript.R$
