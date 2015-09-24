@@ -216,3 +216,35 @@ roysPval.PcevBlock <- function(pcevObj, shrink, index, ...) {
                    multiple covariates, estimation with blocks and an exact inference method"),
        call. = FALSE)
 }
+
+# Print method----
+
+print.Pcev <- function(pcevRes, ...) {
+  # Provide a summary of the results
+  N <- nrow(pcevRes$pcevObj$Y)
+  p <- ncol(pcevRes$pcevObj$Y)
+  q <- ncol(pcevRes$pcevObj$X)
+  if(q == 2) {
+    exact <- "Roy's largest root test)"
+  } else {
+    exact <- "Wilks' lambda test)"
+  }
+  
+  cat("\nPrincipal component of explained variance\n")
+  cat("\nEstimation method:", pcevRes$methods[1])
+  cat("\nInference method:", pcevRes$methods[2])
+  if(pcevRes$methods[2] == "exact") {
+    cat("\n(performed using", exact)
+  }
+  pvalue <- pcevRes$pvalue
+  if(pvalue == 0 && pcevRes$methods[2] == "permutation") {
+    pvalue <- paste0("< ", 1/pcevRes$nperm)
+  }
+  cat("\nP-value obtained:", pvalue, "\n")
+  
+  cat("\nVariable importance factors")
+  if(p > 10) cat(" (truncated)\n") else cat("\n")
+  cat(format(head(pcevRes$VIMP, n = 10), digits = 3), 
+      "\n\n")
+  
+}

@@ -53,13 +53,11 @@ computePCEV <- function(response, covariate, confounder = NULL,
   if (inference == "permutation") {
     pcevRes <- permutePval(pcevObj, shrink, index, nperm)
   } else {
-    if (is.null(dim(covariate)) || ncol(covariate) == 1) {
-      # This condition is maybe too loose
-      # What about categorical variables?
+    # 2 columns mean intercept + one other regression coefficient
+    if (ncol(pcevObj$X) == 2) {
       pcevRes <- wilksPval(pcevObj, shrink, index)
     } else {
       pcevRes <- roysPval(pcevObj, shrink, index)
-      # Need to implement this
     }
   }
   
@@ -69,15 +67,22 @@ computePCEV <- function(response, covariate, confounder = NULL,
   # Compute variable importance
   pcevRes$VIMP <- computeVIMP(pcevObj, pcevRes)
   
+  pcevRes$pcevObj <- pcevObj 
+  pcevRes$methods <- c(estimation, inference)
+  names(pcevRes$methods) <- c("Estimation", "Inference")
+  pcevRes$nperm <- nperm 
   class(pcevRes) <- "Pcev"
 
   # return results
   return(pcevRes)
 }
 
-computeVIMP <- function(pcevObj, list) {
+computeVIMP <- function(pcevObj, list, signed=FALSE) {
   
-  VIMP <- cor(pcevObj$Y, list$PCEV)
+  VIMP <- cor(pcevObj$Y, list$PCEV)[,1]
+  if(!signed) {
+    VIMP <- abs(VIMP)
+  }
   
   return(VIMP)
 }

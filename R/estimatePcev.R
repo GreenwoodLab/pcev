@@ -85,6 +85,9 @@ estimatePcev.PcevBlock <- function(pcevObj, shrink, index, ...) {
   }
   
   d <- length(unique(index))
+  if(d > N && ncol(pcevObj$X) == 2) {
+    warning("It is recommended to have a number of blocks smaller than the number of observations")
+  }
   Ypcev <- matrix(NA, nrow = N, ncol = d)
   weights <- rep_len(0, p)
   rootVr <- list("first" = vector("list", d), 
