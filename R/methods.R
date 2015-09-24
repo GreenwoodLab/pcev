@@ -220,6 +220,7 @@ roysPval.PcevBlock <- function(pcevObj, shrink, index, ...) {
 
 # Print method----
 
+#' @export
 print.Pcev <- function(pcevRes, ...) {
   # Provide a summary of the results
   N <- nrow(pcevRes$pcevObj$Y)
