@@ -28,8 +28,10 @@ permutePval.PcevClassical <- function(pcevObj, shrink, index, nperm, ...) {
   
   PCEV <- pcevObj$Y %*% results$weights
   initFit <- lm.fit(pcevObj$X, PCEV)
-  df1 <- nrow(pcevObj$X) - 1
-  df2 <- N - df1 + 1
+  df1 <- ncol(pcevObj$X) - 1
+  df2 <- N - ncol(pcevObj$X)
+  SS_R
+  SS_res
   initFstat <- (sum((mean(PCEV) - initFit$fitted.values)^2)/df1)/(sum(initFit$residuals^2)/df2)
   initPval <- pf(initFstat, df1, df2, lower.tail = FALSE)
   
@@ -240,8 +242,13 @@ print.Pcev <- function(pcevRes, ...) {
     cat("\n(performed using", exact)
   }
   pvalue <- pcevRes$pvalue
-  if(pvalue == 0 && pcevRes$methods[2] == "permutation") {
+  if(pvalue == 0) {
+    if(pcevRes$methods[2] == "permutation") {
     pvalue <- paste0("< ", 1/pcevRes$nperm)
+    }
+    if(pcevRes$methods[1] == "exact") {
+      pvalue <- "~ 0"
+    }
   }
   cat("\nP-value obtained:", pvalue, "\n")
   
