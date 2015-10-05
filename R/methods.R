@@ -30,8 +30,6 @@ permutePval.PcevClassical <- function(pcevObj, shrink, index, nperm, ...) {
   initFit <- lm.fit(pcevObj$X, PCEV)
   df1 <- ncol(pcevObj$X) - 1
   df2 <- N - ncol(pcevObj$X)
-  SS_R
-  SS_res
   initFstat <- (sum((mean(PCEV) - initFit$fitted.values)^2)/df1)/(sum(initFit$residuals^2)/df2)
   initPval <- pf(initFstat, df1, df2, lower.tail = FALSE)
   
