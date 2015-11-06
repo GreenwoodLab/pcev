@@ -2,23 +2,32 @@
 % Please edit documentation in R/functions.R
 \name{computePCEV}
 \alias{computePCEV}
-\title{Principal Components of Explained Variance.}
+\title{Principal Components of Explained Variance}
 \usage{
-computePCEV(Y, x, method = "all", index = NULL, shrink = FALSE)
+computePCEV(response, covariate, confounder = NULL, estimation = "all",
+  inference = "exact", index = NULL, shrink = FALSE, nperm = 1000)
 }
 \arguments{
-\item{Y}{Matrix of values for a multivariate response.}
+\item{response}{A matrix of response variables.}
 
-\item{x}{Vector of values for a covariate.}
+\item{covariate}{A matrix or a data frame of covariates.}
 
-\item{method}{Character string specifying which method to use: "all" or
-"block". Default value is "all".}
+\item{confounder}{A matrix or data frame of confounders}
 
-\item{index}{If type = "block", index is a vector describing the block to
-which the columns of Y correspond.}
+\item{estimation}{Character string specifying which estimation method to use:
+\code{"all"} or \code{"block"}. Default value is \code{"all"}.}
+
+\item{inference}{Character string specifying which inference method to use:
+\code{"exact"} or \code{"permutation"}. Default value is \code{"exact"}.}
+
+\item{index}{If \code{estimation = "block"}, index is a vector describing the block
+to which individual response variables correspond.}
 
 \item{shrink}{Should we use a shrinkage estimate of the residual variance?
-Default value is FALSE.}
+Default value is \code{FALSE}..}
+
+\item{nperm}{The number of permutations to perform if \code{inference =
+"permutation"}}
 }
 \value{
 A list containing the first PCEV, the p-value, the estimate of the
@@ -29,11 +38,11 @@ A list containing the first PCEV, the p-value, the estimate of the
 }
 \details{
 This is the main function. It computes the PCEV using either the classical
-method or the block approach A p-value is also computed, testing the
+method or the block approach. A p-value is also computed, testing the
 significance of the PCEV. Note that the classical method is currently only
 implemented for use with a single covariate.
 }
 \seealso{
-\code{\link{WilksLambda}}
+\code{\link{estimatePcev}}
 }
 

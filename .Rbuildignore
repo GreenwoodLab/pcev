@@ -1,2 +1,6 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
+^inst/*$
+^tests/*$
+^BLK3.pdf$
+^analysisScript.R$

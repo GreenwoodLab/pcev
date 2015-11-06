@@ -1,17 +1,24 @@
 Package: pcev
 Title: Principal components of explained variance (PCEV)
 Version: 0.0.0.9000
-Authors@R: person("Maxime", "Turgeon", email = "maxime.turgeon@mail.mcgill.ca",
-  role = c("aut", "cre"))
+Authors@R: c(
+  person("Maxime", "Turgeon", email = "maxime.turgeon@mail.mcgill.ca",
+  role = c("aut", "cre")),
+  person("Aurelie", "Labbe", email = "",
+  role = c("aut")),
+  person("Karim", "Oualkacha", email = "",
+  role = c("aut")))
 Description: PCEV is a statistical tool for the analysis of a mutivariate
     response vector. It is a dimension-reduction technique, similar to Principal
     Components Analysis (PCA), which seeks the maximize the proportion of
     variance (in the response vector) being explained by a set of covariates.
-Depends: R (>= 3.1.2)
+Depends: R (>= 3.1.0)
 License: GPL (>=2)
 LazyData: true
-URL: http://github.com/turgeonmaxime/pcev
-BugReports: http://github.com/turgeonmaxime/pcev/issues
-Suggests: knitr,
+URL: http://github.com/GreenwoodLab/pcev
+BugReports: http://github.com/GreenwoodLab/pcev/issues
+Suggests: 
+    knitr,
+    RMTstat,
     testthat
 VignetteBuilder: knitr

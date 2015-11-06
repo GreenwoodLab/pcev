@@ -6,8 +6,12 @@
 #' response vector) being explained by a set of covariates.
 #'
 #' @section pcev functions:
+#' \code{\link{estimatePcev}}
 #' \code{\link{computePCEV}}
-#' \code{\link{WilksLambda}}
+#' \code{\link{PcevObj}}
+#' \code{\link{permutePval}}
+#' \code{\link{wilksPval}}
+#' \code{\link{roysPval}}
 #'
 #' @docType package
 #' @name pcev
