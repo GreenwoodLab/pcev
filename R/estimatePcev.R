@@ -41,7 +41,7 @@ estimatePcev.PcevClassical <- function(pcevObj, shrink, ...) {
   Vm <- crossprod(Yfit - Yfit_confounder, Y)
   
   # Shrinkage estimate of Vr
-  if (shrink) Vr <- shrink(Vr)
+  if (shrink) Vr <- shrink(Vr, res)
   
   # Computing PCEV
   temp <- eigen(Vr, symmetric=TRUE)
