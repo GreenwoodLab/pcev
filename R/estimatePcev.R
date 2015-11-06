@@ -41,20 +41,7 @@ estimatePcev.PcevClassical <- function(pcevObj, shrink, ...) {
   Vm <- crossprod(Yfit - Yfit_confounder, Y)
   
   # Shrinkage estimate of Vr
-  if (shrink) {
-    # This computation needs to be checked...
-    # I don't think it corresponds to what is in Ibrahim et al.
-    Vr <- Vr/(N-2)
-    mu.E <- sum(diag(Vr))/p
-    # Can this apply be replaced by something vectorized...?
-    rho <- sum(apply(res, 1, function(a, b) {
-      sum(diag(crossprod(tcrossprod(a)-b)))
-    }, b=Vr))
-    rho <- rho/sum(diag(crossprod(Vr - diag(mu.E))))/N^2
-    rho <- min(1, rho)
-    Vr <- diag(rho * mu.E) + (1 - rho)*Vr
-    Vr <- Vr*(N - 2)
-  }
+  if (shrink) Vr <- shrink(Vr)
   
   # Computing PCEV
   temp <- eigen(Vr, symmetric=TRUE)
