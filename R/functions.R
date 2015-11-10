@@ -131,6 +131,7 @@ shrink <- function(Vr, res){
   
   # Compute the estimator
   sigma <- shrinkage * prior + (1 - shrinkage) * sample
+  sigma <- n * sigma
   # out <- list(cov=sigma, prior=prior, shrinkage=shrinkage)
   return(sigma)
 }
