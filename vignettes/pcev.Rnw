@@ -1,0 +1,10 @@
+\documentclass{article}
+%\VignetteIndexEntry{Principal Component of Explained Variance}
+%\VignetteEngine{knitr::latex}
+\usepackage[utf8]{inputenc}
+
+\begin{document}
+
+This is a latex document.
+
+\end{document}
