@@ -1,4 +1,6 @@
 # PCEV
+[![Build Status](https://travis-ci.org/GreenwoodLab/pcev.svg?branch=master)](https://travis-ci.org/GreenwoodLab/pcev)
+
 
 R package which implements Principal components of explained variance (PCEV).
 
