@@ -1,3 +1,5 @@
 language: r
 sudo: required
 
+r_binary_packages:
+  - knitr
