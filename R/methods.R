@@ -155,15 +155,17 @@ wilksPval.PcevBlock <- function(pcevObj, shrink, index, ...) {
 
 #' Roy's largest root exact test
 #' 
-#' sdf
+#' This function uses Johnstone's approximation using the Tracy-Wildom
+#' distribution
 #' 
 #' @param pcevObj A pcev object of class \code{PcevClassical} or 
 #'   \code{PcevBlock}
-#' @param shrink Should we use a shrinkage estimate of the residual variance? 
-#' @param index If \code{pcevObj} is of class \code{PcevBlock}, index is a vector
-#'   describing the block to which individual response variables correspond.
+#' @param shrink Should we use a shrinkage estimate of the residual variance?
+#' @param index If \code{pcevObj} is of class \code{PcevBlock}, index is a
+#'   vector describing the block to which individual response variables
+#'   correspond.
 #' @param ... Extra parameters.
-#' @export 
+#' @export
 roysPval <- function(pcevObj, ...) UseMethod("roysPval")
 
 #' @describeIn roysPval
@@ -213,8 +215,8 @@ roysPval.PcevClassical <- function(pcevObj, shrink, index, ...) {
 
 #' @describeIn roysPval
 roysPval.PcevBlock <- function(pcevObj, shrink, index, ...) {
-  stop(strwrap("Pcev is currently not implemented for 
-                   multiple covariates, estimation with blocks and an exact inference method"),
+  stop(strwrap("Pcev is currently not implemented for
+               estimation with blocks and an exact inference method"),
        call. = FALSE)
 }
 
@@ -226,10 +228,10 @@ print.Pcev <- function(pcevRes, ...) {
   N <- nrow(pcevRes$pcevObj$Y)
   p <- ncol(pcevRes$pcevObj$Y)
   q <- ncol(pcevRes$pcevObj$X)
-  if(q > 2) {
-    exact <- "Roy's largest root test)"
-  } else {
+  if(pcevRes$Wilks) {
     exact <- "Wilks' lambda test)"
+  } else {
+    exact <- "Roy's largest root test)"
   }
   
   cat("\nPrincipal component of explained variance\n")

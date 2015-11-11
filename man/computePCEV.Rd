@@ -5,7 +5,8 @@
 \title{Principal Components of Explained Variance}
 \usage{
 computePCEV(response, covariate, confounder = NULL, estimation = "all",
-  inference = "exact", index = NULL, shrink = FALSE, nperm = 1000)
+  inference = "exact", index = NULL, shrink = FALSE, nperm = 1000,
+  Wilks = FALSE)
 }
 \arguments{
 \item{response}{A matrix of response variables.}
@@ -20,18 +21,21 @@ computePCEV(response, covariate, confounder = NULL, estimation = "all",
 \item{inference}{Character string specifying which inference method to use:
 \code{"exact"} or \code{"permutation"}. Default value is \code{"exact"}.}
 
-\item{index}{If \code{estimation = "block"}, index is a vector describing the block
-to which individual response variables correspond.}
+\item{index}{If \code{estimation = "block"}, index is a vector describing the
+block to which individual response variables correspond.}
 
 \item{shrink}{Should we use a shrinkage estimate of the residual variance?
 Default value is \code{FALSE}..}
 
 \item{nperm}{The number of permutations to perform if \code{inference =
 "permutation"}}
+
+\item{Wilks}{Should we use a Wilks test instead of Roy's largest test? This
+is only implemented for a single covariates.}
 }
 \value{
-A list containing the first PCEV, the p-value, the estimate of the
-  shrinkage factor, etc.
+An object of class \code{Pcev} containing the first PCEV, the
+  p-value, the estimate of the shrinkage factor, etc.
 }
 \description{
 \code{computePCEV} computes the first PCEV and tests its significance.
@@ -39,8 +43,7 @@ A list containing the first PCEV, the p-value, the estimate of the
 \details{
 This is the main function. It computes the PCEV using either the classical
 method or the block approach. A p-value is also computed, testing the
-significance of the PCEV. Note that the classical method is currently only
-implemented for use with a single covariate.
+significance of the PCEV.
 }
 \seealso{
 \code{\link{estimatePcev}}

@@ -23,11 +23,13 @@ roysPval(pcevObj, ...)
 
 \item{shrink}{Should we use a shrinkage estimate of the residual variance?}
 
-\item{index}{If \code{pcevObj} is of class \code{PcevBlock}, index is a vector
-describing the block to which individual response variables correspond.}
+\item{index}{If \code{pcevObj} is of class \code{PcevBlock}, index is a
+vector describing the block to which individual response variables
+correspond.}
 }
 \description{
-sdf
+This function uses Johnstone's approximation using the Tracy-Wildom
+distribution
 }
 \section{Methods (by class)}{
 \itemize{

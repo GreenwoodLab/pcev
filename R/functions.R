@@ -4,8 +4,7 @@
 #' 
 #' This is the main function. It computes the PCEV using either the classical 
 #' method or the block approach. A p-value is also computed, testing the 
-#' significance of the PCEV. Note that the classical method is currently only 
-#' implemented for use with a single covariate.
+#' significance of the PCEV.
 #' 
 #' @seealso \code{\link{estimatePcev}}
 #' @param response A matrix of response variables.
@@ -15,18 +14,21 @@
 #'   \code{"all"} or \code{"block"}. Default value is \code{"all"}.
 #' @param inference Character string specifying which inference method to use: 
 #'   \code{"exact"} or \code{"permutation"}. Default value is \code{"exact"}.
-#' @param index If \code{estimation = "block"}, index is a vector describing the block 
-#'   to which individual response variables correspond.
+#' @param index If \code{estimation = "block"}, index is a vector describing the
+#'   block to which individual response variables correspond.
 #' @param shrink Should we use a shrinkage estimate of the residual variance? 
 #'   Default value is \code{FALSE}..
 #' @param nperm The number of permutations to perform if \code{inference = 
 #'   "permutation"}
-#' @return A list containing the first PCEV, the p-value, the estimate of the 
-#'   shrinkage factor, etc.
+#' @param Wilks Should we use a Wilks test instead of Roy's largest test? This
+#'   is only implemented for a single covariates.
+#' @return An object of class \code{Pcev} containing the first PCEV, the
+#'   p-value, the estimate of the shrinkage factor, etc.
 #' @export
 computePCEV <- function(response, covariate, confounder = NULL, 
                         estimation = "all", inference = "exact", 
-                        index = NULL, shrink = FALSE, nperm = 1000) {
+                        index = NULL, shrink = FALSE, nperm = 1000, 
+                        Wilks = FALSE) {
   # Check input
   if (!estimation %in% c("all", "block")){
     stop("Estimation method should be \"all\" or \"block\"")
@@ -36,6 +38,7 @@ computePCEV <- function(response, covariate, confounder = NULL,
   }
   if (!is.numeric(index)) index <- NULL
   if (!is.logical(shrink)) shrink <- FALSE
+  if (!is.logical(Wilks)) Wilks <- FALSE
   
   # Create pcev objects
   if (estimation == "all") {
@@ -49,12 +52,16 @@ computePCEV <- function(response, covariate, confounder = NULL,
                          confounder)
   }
   
+  if (Wilks && ncol(pcevObj$X) != 2) {
+    warning("Wilks can only be applied with a single covariate")
+    Wilks <- FALSE
+  }
+  
   # Perform estimation and inference
   if (inference == "permutation") {
     pcevRes <- permutePval(pcevObj, shrink, index, nperm)
   } else {
-    # 2 columns mean intercept + one other regression coefficient
-    if (ncol(pcevObj$X) == 2) {
+    if (Wilks) {
       pcevRes <- wilksPval(pcevObj, shrink, index)
     } else {
       pcevRes <- roysPval(pcevObj, shrink, index)
@@ -71,6 +78,7 @@ computePCEV <- function(response, covariate, confounder = NULL,
   pcevRes$methods <- c(estimation, inference)
   names(pcevRes$methods) <- c("Estimation", "Inference")
   pcevRes$nperm <- nperm 
+  pcevRes$Wilks <- Wilks
   class(pcevRes) <- "Pcev"
 
   # return results
