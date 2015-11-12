@@ -4,3 +4,6 @@
 ^tests/*$
 ^BLK3.pdf$
 ^analysisScript.R$
+
+## Ignore travis config file
+^\.travis\.yml$

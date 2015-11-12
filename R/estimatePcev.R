@@ -37,16 +37,24 @@ estimatePcev.PcevClassical <- function(pcevObj, shrink, ...) {
   fit_confounder <- lm.fit(cbind(rep_len(1, N), pcevObj$Z), Y)
   Yfit_confounder <- fit_confounder$fitted.values
   
-  Vr <- crossprod(res, Y)
+  Vr <- crossprod(res)
   Vm <- crossprod(Yfit - Yfit_confounder, Y)
   
   # Shrinkage estimate of Vr
-  if (shrink) Vr <- shrink(Vr, res)
+  if (shrink) {
+    Vrs <- shrink(Vr, res)
+    
+    # Computing PCEV
+    temp <- eigen(Vr, symmetric=TRUE)
+    Ur <- temp$vectors
+    diagD <- eigen(Vrs, symmetric=TRUE, only.values=TRUE)$values
+    } else {
+      # Computing PCEV
+      temp <- eigen(Vr, symmetric=TRUE)
+      Ur <- temp$vectors
+      diagD <- temp$values
+    }
   
-  # Computing PCEV
-  temp <- eigen(Vr, symmetric=TRUE)
-  Ur <- temp$vectors
-  diagD <- temp$values
   value <- 1/sqrt(diagD)
   root.Vr <- Ur %*% diag(value, nrow = length(value)) %*% t(Ur)
   mainMatrix <- root.Vr %*% Vm %*% root.Vr
