@@ -45,6 +45,13 @@ This is the main function. It computes the PCEV using either the classical
 method or the block approach. A p-value is also computed, testing the
 significance of the PCEV.
 }
+\examples{
+set.seed(12345)
+Y <- matrix(rnorm(100*20), nrow=100)
+X <- rnorm(100)
+pcev_out <- computePCEV(Y, X)
+pcev_out2 <- computePCEV(Y, X, shrink = TRUE)
+}
 \seealso{
 \code{\link{estimatePcev}}
 }

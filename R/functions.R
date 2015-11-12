@@ -24,6 +24,12 @@
 #'   is only implemented for a single covariates.
 #' @return An object of class \code{Pcev} containing the first PCEV, the
 #'   p-value, the estimate of the shrinkage factor, etc.
+#' @examples 
+#' set.seed(12345)
+#' Y <- matrix(rnorm(100*20), nrow=100)
+#' X <- rnorm(100)
+#' pcev_out <- computePCEV(Y, X)
+#' pcev_out2 <- computePCEV(Y, X, shrink = TRUE)
 #' @export
 computePCEV <- function(response, covariate, confounder = NULL, 
                         estimation = "all", inference = "exact", 
