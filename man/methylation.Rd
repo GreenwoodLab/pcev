@@ -2,15 +2,17 @@
 % Please edit documentation in R/functions.R
 \docType{data}
 \name{methylation}
+\alias{index}
 \alias{methylation}
 \alias{pheno}
-\alias{position2}
+\alias{position}
 \title{Methylation values around BLK gene}
-\format{The data comes in three objects:
+\format{The data comes in four objects:
 \describe{
-\item{methylation}{Matrix of methylation values at 6,000 sites measured on 40 samples}
+\item{methylation}{Matrix of methylation values at 5,986 sites measured on 40 samples}
 \item{pheno}{Vector of phenotype, indicating whether the sample comes from a B cell}
-\item{position2}{Data frame recording the position of each CpG site along the BLK region}
+\item{position}{Data frame recording the position of each CpG site along the BLK region}
+\item{index}{Index vector used in the computation of PCEV-block}
 }}
 \source{
 Tomi Pastinen, McGill University
@@ -20,13 +22,15 @@ methylation
 
 pheno
 
-position2
+position
+
+index
 }
 \description{
 A dataset containing methylation values for cell-separated samples. The
 methylation was measured using bisulfite sequencing. The data also contains
 the genomic position of these CpG sites, as well as a binary phenotype
-(whether the sample comes from a B cell).
+(i.e. whether the sample comes from a B cell).
 }
 \details{
 Methylation was first measured at 24,068 sites, on 40 samples. Filtering was

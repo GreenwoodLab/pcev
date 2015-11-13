@@ -130,25 +130,28 @@ wilksPval.PcevClassical <- function(pcevObj, shrink, index, ...) {
 
 #' @describeIn wilksPval
 wilksPval.PcevBlock <- function(pcevObj, shrink, index, ...) {
-  N <- nrow(pcevObj$Y)
-  p <- ncol(pcevObj$Y)
-  if (N - p <= 1) stop("To perform an exact test, we need N - p > 1", 
-                       call. = FALSE)
-  results <- estimatePcev(pcevObj, shrink, index)
-  PCEV <- pcevObj$Y %*% results$weights
-  
-  fit <- lm.fit(pcevObj$X, PCEV)
-  beta <- fit$coefficients[2]
-  h2Hat <- beta^2/(1 + beta^2)
-  lambda <- h2Hat/(1 - h2Hat)
-  
-  df1 <- p
-  df2 <- N-p-1
-  pvalue <- pf((N-p-1) * lambda/p, df1, df2, lower.tail = FALSE)
-  
-  results$pvalue <- pvalue
-  
-  return(results)
+  stop(strwrap("Pcev is currently not implemented for
+               estimation with blocks and an exact inference method"),
+       call. = FALSE)
+#   N <- nrow(pcevObj$Y)
+#   p <- ncol(pcevObj$Y)
+#   if (N - p <= 1) stop("To perform an exact test, we need N - p > 1", 
+#                        call. = FALSE)
+#   results <- estimatePcev(pcevObj, shrink, index)
+#   PCEV <- pcevObj$Y %*% results$weights
+#   
+#   fit <- lm.fit(pcevObj$X, PCEV)
+#   beta <- fit$coefficients[2]
+#   h2Hat <- beta^2/(1 + beta^2)
+#   lambda <- h2Hat/(1 - h2Hat)
+#   
+#   df1 <- p
+#   df2 <- N-p-1
+#   pvalue <- pf((N-p-1) * lambda/p, df1, df2, lower.tail = FALSE)
+#   
+#   results$pvalue <- pvalue
+#   
+#   return(results)
 }
 
 # Roy's largest root methods----
@@ -188,7 +191,7 @@ roysPval.PcevClassical <- function(pcevObj, shrink, index, ...) {
   p <- ncol(pcevObj$Y)
   q <- ncol(pcevObj$X) - 1
   d <- results$largestRoot
-  theta <- d / (1 + d)
+  # theta <- d / (1 + d)
   
   nuH <- q
   nuE <- N - q - 1
@@ -197,16 +200,42 @@ roysPval.PcevClassical <- function(pcevObj, shrink, index, ...) {
   n <- 0.5 * (nuE - p - 1)
   one_third <- 1/3
   
-  N <- 2 * (s + m + n) + 1 
+  N1 <- 2 * (s + m + n) + 1 
   gamma <- 2 * asin( sqrt( (s - 0.5)/N ) )
   phi <- 2*asin( sqrt( (s + 2*m + 0.5)/N ) )
   
   mu <- 2 * log(tan( 0.5*(phi + gamma)))
   sigma <- (16/N^2)^one_third * ( sin(phi+gamma)^2*sin(phi)*sin(gamma)) ^(-1*one_third)
   
-  TW <- (log(theta/(1-theta)) - mu)/sigma
+  if(shrink) {
+    # Estimate the null distribution using 
+    # permutations and MLE
+    null_dist <- replicate(25, expr = {
+      tmp <- pcevObj
+      tmp$Y <- tmp$Y[sample(N), ]
+      
+      tmpRes <- try(estimatePcev(tmp, shrink, index), silent=TRUE)
+      if(inherits(tmpRes, "try-error")) {
+        return(NA)
+      } else {
+        return(tmpRes$largestRoot)
+      }
+    })
+    # Fit a location-scale version of TW distribution
+    res <- optim(c(mu, sigma), function(param) logLik(param, log(null_dist)), 
+                 control = list(fnscale=-1))
+    mu1 <- res$par[1]
+    sigma1 <- res$par[2]
+    TW <- (log(d) - mu1)/sigma1
+    
+    pvalue <- RMTstat::ptw(TW, beta=1, lower.tail = FALSE, log.p = FALSE)
+  } else {
+    # TW <- (log(theta/(1-theta)) - mu)/sigma
+    TW <- (log(d) - mu)/sigma
+    
+    pvalue <- RMTstat::ptw(TW, beta=1, lower.tail = FALSE, log.p = FALSE)
+  }
   
-  pvalue <- RMTstat::ptw(TW, beta=1, lower.tail = FALSE, log.p = FALSE)
   results$pvalue <- pvalue
   
   return(results)
@@ -223,12 +252,12 @@ roysPval.PcevBlock <- function(pcevObj, shrink, index, ...) {
 # Print method----
 
 #' @export
-print.Pcev <- function(pcevRes, ...) {
+print.Pcev <- function(x, ...) {
   # Provide a summary of the results
-  N <- nrow(pcevRes$pcevObj$Y)
-  p <- ncol(pcevRes$pcevObj$Y)
-  q <- ncol(pcevRes$pcevObj$X)
-  if(pcevRes$Wilks) {
+  N <- nrow(x$pcevObj$Y)
+  p <- ncol(x$pcevObj$Y)
+  q <- ncol(x$pcevObj$X)
+  if(x$Wilks) {
     exact <- "Wilks' lambda test)"
   } else {
     exact <- "Roy's largest root test)"
@@ -236,17 +265,17 @@ print.Pcev <- function(pcevRes, ...) {
   
   cat("\nPrincipal component of explained variance\n")
   cat("\n", N, "observations,", p, "response variables\n")
-  cat("\nEstimation method:", pcevRes$methods[1])
-  cat("\nInference method:", pcevRes$methods[2])
-  if(pcevRes$methods[2] == "exact") {
+  cat("\nEstimation method:", x$methods[1])
+  cat("\nInference method:", x$methods[2])
+  if(x$methods[2] == "exact") {
     cat("\n(performed using", exact)
   }
-  pvalue <- pcevRes$pvalue
+  pvalue <- x$pvalue
   if(pvalue == 0) {
-    if(pcevRes$methods[2] == "permutation") {
-    pvalue <- paste0("< ", 1/pcevRes$nperm)
+    if(x$methods[2] == "permutation") {
+    pvalue <- paste0("< ", 1/x$nperm)
     }
-    if(pcevRes$methods[1] == "exact") {
+    if(x$methods[1] == "exact") {
       pvalue <- "~ 0"
     }
   }
@@ -254,7 +283,22 @@ print.Pcev <- function(pcevRes, ...) {
   
   cat("\nVariable importance factors")
   if(p > 10) cat(" (truncated)\n") else cat("\n")
-  cat(format(head(pcevRes$VIMP, n = 10), digits = 3), 
+  cat(format(head(x$VIMP, n = 10), digits = 3), 
       "\n\n")
   
+}
+
+# Utility functions for null distribution estimation----
+dtw_ls <- function(x, mu, sigma, beta=1, log=FALSE) {
+  x1 <- (x - mu)/sigma
+  return(RMTstat::dtw(x1, beta, log)/sigma)
+}
+
+logLik <- function(param, data) {
+  mu <- param[1]
+  sigma <- param[2]
+  
+  lL <- sum(log(dtw_ls(data, mu, sigma, log=FALSE)))
+  
+  return(lL)
 }

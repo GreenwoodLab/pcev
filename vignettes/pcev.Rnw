@@ -3,7 +3,10 @@
 %\VignetteEngine{knitr::latex}
 \usepackage[utf8]{inputenc}
 
+\title{Principal Component of Explained Variance}
+
 \begin{document}
+\maketitle
 
 <<data>>=
 library(pcev)
@@ -28,7 +31,7 @@ plot(position$Pos/1e6, -log10(pval), xlab="Position (Mb)",
 abline(h=-log10(8.3*10^-6), lty=2)
 @
 
-<<cluster>>=
+<<cluster, eval=FALSE>>=
 # Break the region into sub-regions
 cl <- bumphunter::clusterMaker(chr=position$Chr, 
                                pos=position$Pos, 
@@ -61,15 +64,17 @@ for(j in sort(unique(cl))) {
   counter <- counter + 1
   index[index == j] <- counter
 }
-
-table(table(index))
 @
 
 <<output>>=
+data(index)
+table(table(index))
+
 pcev_out <- computePCEV(methylation, covariate = pheno,
                         estimation = "block", 
                         inference = "permutation",
                         index = index, nperm=10)
+pcev_out
 @
 
 <<manPlotVIP>>=

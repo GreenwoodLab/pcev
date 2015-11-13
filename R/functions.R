@@ -146,8 +146,8 @@ shrink <- function(Vr, res){
   # Compute the estimator
   sigma <- shrinkage * prior + (1 - shrinkage) * sample
   sigma <- n * sigma
-  # out <- list(cov=sigma, prior=prior, shrinkage=shrinkage)
-  return(sigma)
+  out <- list(cov=sigma, rho=shrinkage)
+  return(out)
 }
 
 # Constructor functions----
@@ -209,16 +209,17 @@ PcevBlock <- function(response, covariate, confounder) {
 #' A dataset containing methylation values for cell-separated samples. The 
 #' methylation was measured using bisulfite sequencing. The data also contains 
 #' the genomic position of these CpG sites, as well as a binary phenotype 
-#' (whether the sample comes from a B cell).
+#' (i.e. whether the sample comes from a B cell).
 #' 
 #' Methylation was first measured at 24,068 sites, on 40 samples. Filtering was
 #' performed to keep the 25\% most variable sites. See the vignette for more detail.
 #' 
-#' @format The data comes in three objects:
+#' @format The data comes in four objects:
 #' \describe{
-#' \item{methylation}{Matrix of methylation values at 6,000 sites measured on 40 samples}
+#' \item{methylation}{Matrix of methylation values at 5,986 sites measured on 40 samples}
 #' \item{pheno}{Vector of phenotype, indicating whether the sample comes from a B cell}
-#' \item{position2}{Data frame recording the position of each CpG site along the BLK region}
+#' \item{position}{Data frame recording the position of each CpG site along the BLK region}
+#' \item{index}{Index vector used in the computation of PCEV-block}
 #' }
 #' @source Tomi Pastinen, McGill University
 "methylation"
@@ -227,4 +228,7 @@ PcevBlock <- function(response, covariate, confounder) {
 "pheno"
 
 #' @rdname methylation
-"position2"
+"position"
+
+#' @rdname methylation
+"index"

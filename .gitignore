@@ -3,6 +3,9 @@
 .RData
 inst/doc
 
+Rprof.out
 pcev.Rproj
 BLK3.pdf
 analysisScript.R
+vignettes/
+!vignettes/pcev.Rnw

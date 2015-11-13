@@ -42,7 +42,9 @@ estimatePcev.PcevClassical <- function(pcevObj, shrink, ...) {
   
   # Shrinkage estimate of Vr
   if (shrink) {
-    Vrs <- shrink(Vr, res)
+    out <- shrink(Vr, res)
+    Vrs <- out$cov
+    rho <- out$rho
     
     # Computing PCEV
     temp <- eigen(Vr, symmetric=TRUE)

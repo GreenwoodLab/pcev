@@ -4,6 +4,11 @@
 ^tests/*$
 ^BLK3.pdf$
 ^analysisScript.R$
+^Rprof\.out$
+^vignettes/*tex$
+^vignettes/figure/*$
+^vignettes/pcev\.log*$
+^vignettes/*pdf*$
 
 ## Ignore travis config file
 ^\.travis\.yml$
