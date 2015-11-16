@@ -6,6 +6,12 @@
 #' method or the block approach. A p-value is also computed, testing the 
 #' significance of the PCEV.
 #' 
+#' When a permutation procedure is used to either estimate a p-value or estimate
+#' the parameters of the null distribution under shrinkage, computations can be
+#' considerably sped up by re-using previous estimates of the residual variance
+#' matrix. This is the default behaviour, and it can be changed by setting the
+#' parameter \code{reduce} to \code{FALSE}.
+#' 
 #' @seealso \code{\link{estimatePcev}}
 #' @param response A matrix of response variables.
 #' @param covariate A matrix or a data frame of covariates.
@@ -20,9 +26,11 @@
 #'   Default value is \code{FALSE}..
 #' @param nperm The number of permutations to perform if \code{inference = 
 #'   "permutation"}
-#' @param Wilks Should we use a Wilks test instead of Roy's largest test? This
+#' @param Wilks Should we use a Wilks test instead of Roy's largest test? This 
 #'   is only implemented for a single covariates.
-#' @return An object of class \code{Pcev} containing the first PCEV, the
+#' @param reduce Should we use the previous estimates of the residual variance matrix? 
+#'   See details. The default value is \code{TRUE}.
+#' @return An object of class \code{Pcev} containing the first PCEV, the 
 #'   p-value, the estimate of the shrinkage factor, etc.
 #' @examples 
 #' set.seed(12345)
@@ -34,7 +42,7 @@
 computePCEV <- function(response, covariate, confounder = NULL, 
                         estimation = "all", inference = "exact", 
                         index = NULL, shrink = FALSE, nperm = 1000, 
-                        Wilks = FALSE) {
+                        Wilks = FALSE, reduce = TRUE) {
   # Check input
   if (!estimation %in% c("all", "block")){
     stop("Estimation method should be \"all\" or \"block\"")
@@ -65,12 +73,12 @@ computePCEV <- function(response, covariate, confounder = NULL,
   
   # Perform estimation and inference
   if (inference == "permutation") {
-    pcevRes <- permutePval(pcevObj, shrink, index, nperm)
+    pcevRes <- permutePval(pcevObj, shrink, index, nperm, reduce)
   } else {
     if (Wilks) {
       pcevRes <- wilksPval(pcevObj, shrink, index)
     } else {
-      pcevRes <- roysPval(pcevObj, shrink, index)
+      pcevRes <- roysPval(pcevObj, shrink, index, reduce)
     }
   }
   
@@ -85,6 +93,8 @@ computePCEV <- function(response, covariate, confounder = NULL,
   names(pcevRes$methods) <- c("Estimation", "Inference")
   pcevRes$nperm <- nperm 
   pcevRes$Wilks <- Wilks
+  pcevRes$shrink <- shrink
+  pcevRes$reduce <- reduce
   class(pcevRes) <- "Pcev"
 
   # return results
@@ -102,7 +112,7 @@ computeVIMP <- function(pcevObj, list, signed=FALSE) {
 }
 
 
-shrink <- function(Vr, res){
+shrink_est <- function(Vr, res){
   # port of matlab code from http://www.econ.uzh.ch/faculty/wolf/publications.html#9
   # Ledoit, O. and Wolf, M. (2004).
   # Honey, I shrunk the sample covariance matrix.

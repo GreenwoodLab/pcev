@@ -11,9 +11,9 @@ roysPval(pcevObj, ...)
 
 \method{roysPval}{default}(pcevObj, ...)
 
-\method{roysPval}{PcevClassical}(pcevObj, shrink, index, ...)
+\method{roysPval}{PcevClassical}(pcevObj, shrink, index, reduce, ...)
 
-\method{roysPval}{PcevBlock}(pcevObj, shrink, index, ...)
+\method{roysPval}{PcevBlock}(pcevObj, shrink, index, reduce, ...)
 }
 \arguments{
 \item{pcevObj}{A pcev object of class \code{PcevClassical} or

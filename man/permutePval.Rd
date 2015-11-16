@@ -11,9 +11,9 @@ permutePval(pcevObj, ...)
 
 \method{permutePval}{default}(pcevObj, ...)
 
-\method{permutePval}{PcevClassical}(pcevObj, shrink, index, nperm, ...)
+\method{permutePval}{PcevClassical}(pcevObj, shrink, index, nperm, reduce, ...)
 
-\method{permutePval}{PcevBlock}(pcevObj, shrink, index, nperm, ...)
+\method{permutePval}{PcevBlock}(pcevObj, shrink, index, nperm, reduce, ...)
 }
 \arguments{
 \item{pcevObj}{A pcev object of class \code{PcevClassical} or

@@ -1,34 +1,39 @@
-#' Estimation of PCEV
+#' Estimation of PCEV (reduced computation)
 #' 
-#' \code{estimatePcev} estimates the PCEV.
+#' \code{estimatePcev_red} estimates the PCEV by reusing previous estimate of 
+#' the residual variance. This is used to speed up computations of the 
+#' permutation procedures.
 #' 
 #' @seealso \code{\link{computePCEV}}
 #' @param pcevObj A pcev object of class \code{PcevClassical} or 
 #'   \code{PcevBlock}
-#' @param shrink Should we use a shrinkage estimate of the residual variance? 
-#' @param index If \code{pcevObj} is of class \code{PcevBlock}, index is a vector
-#'   describing the block to which individual response variables correspond.
+#' @param root_Vr Previous estimate of the square root of the inverse of the 
+#'   residual variance
+#' @param root_Vr_list List of previous estimates of the square root of the 
+#'   inverse of the residual variances. Requires one for each block and one for 
+#'   the second stage of the estimation.
+#' @param index If \code{pcevObj} is of class \code{PcevBlock}, index is a 
+#'   vector describing the block to which individual response variables 
+#'   correspond.
 #' @param ... Extra parameters.
-#' @return A list containing the variance components, the first PCEV, the 
-#'   eigenvalues of \eqn{V_R^{-1}V_G} and the estimate of the shrinkage 
-#'   parameter \eqn{\rho}
-#' @export 
-estimatePcev <- function(pcevObj, ...) UseMethod("estimatePcev")
+#' @return A list containing the first PCEV and the largest eigenvalue of
+#'   \eqn{V_R^{-1}V_G}.
+#' @export
+estimatePcev_red <- function(pcevObj, ...) UseMethod("estimatePcev_red")
 
-#' @describeIn  estimatePcev
-estimatePcev.default <- function(pcevObj, ...) {
+#' @describeIn  estimatePcev_red
+estimatePcev_red.default <- function(pcevObj, ...) {
   stop(strwrap("This function should be used with a Pcev object of class 
                PcevClassical or PcevBlock"))
 }
 
-#' @describeIn estimatePcev
-estimatePcev.PcevClassical <- function(pcevObj, shrink, index, ...) {
+#' @describeIn estimatePcev_red
+estimatePcev_red.PcevClassical <- function(pcevObj, index, root_Vr, ...) {
   #initializing parameters
-  rho <- NULL
   Y <- pcevObj$Y
   N <- nrow(Y)
   p <- ncol(Y)
-
+  
   # Variance decomposition
   fit <- lm.fit(cbind(pcevObj$X, pcevObj$Z), Y)
   Yfit <- fit$fitted.values
@@ -36,43 +41,21 @@ estimatePcev.PcevClassical <- function(pcevObj, shrink, index, ...) {
   fit_confounder <- lm.fit(cbind(rep_len(1, N), pcevObj$Z), Y)
   Yfit_confounder <- fit_confounder$fitted.values
   
-  Vr <- crossprod(res)
   Vm <- crossprod(Yfit - Yfit_confounder, Y)
   
-  # Shrinkage estimate of Vr
-  if (shrink) {
-    out <- shrink_est(Vr, res)
-    Vrs <- out$cov
-    rho <- out$rho
-    
-    # Computing PCEV
-    temp <- eigen(Vr, symmetric=TRUE)
-    Ur <- temp$vectors
-    diagD <- eigen(Vrs, symmetric=TRUE, only.values=TRUE)$values
-    } else {
-      # Computing PCEV
-      temp <- eigen(Vr, symmetric=TRUE)
-      Ur <- temp$vectors
-      diagD <- temp$values
-    }
-  
-  value <- 1/sqrt(diagD)
-  root_Vr <- Ur %*% diag(value, nrow = length(value)) %*% t(Ur)
+  # Reuse previous estimate of root_Vr
   mainMatrix <- root_Vr %*% Vm %*% root_Vr
   temp1 <- eigen(mainMatrix, symmetric=TRUE)
   weights <- root_Vr %*% temp1$vectors
   d <- temp1$values
   
-  return(list("residual" = Vr,
-              "model" = Vm,
-              "weights" = weights[,1, drop=FALSE],
-              "rootVr" = root_Vr,
-              "largestRoot" = d[1],
-              "rho" = rho))
+  return(list("weights" = weights[,1, drop=FALSE],
+              "largestRoot" = d[1]))
 }
 
-#' @describeIn estimatePcev
-estimatePcev.PcevBlock <- function(pcevObj, shrink, index, ...) {
+
+#' @describeIn estimatePcev_red
+estimatePcev_red.PcevBlock <- function(pcevObj, index, root_Vr_list, ...) {
   p <- ncol(pcevObj$Y)
   N <- nrow(pcevObj$Y)
   
@@ -86,8 +69,6 @@ estimatePcev.PcevBlock <- function(pcevObj, shrink, index, ...) {
   }
   Ypcev <- matrix(NA, nrow = N, ncol = d)
   weights <- rep_len(0, p)
-  rootVr <- list("first" = vector("list", d), 
-                 "second" = NA)
   
   counter <- 0
   for (i in unique(index)) {
@@ -95,10 +76,9 @@ estimatePcev.PcevBlock <- function(pcevObj, shrink, index, ...) {
     pcevObj_red <- pcevObj 
     pcevObj_red$Y <- pcevObj$Y[, index == i, drop = FALSE]
     class(pcevObj_red) <- "PcevClassical"
-    result <- estimatePcev(pcevObj_red, shrink)
+    result <- estimatePcev_red(pcevObj_red, root_Vr_list$first[[counter]])
     weights[index==i] <- result$weights
     Ypcev[,counter] <- pcevObj_red$Y %*% weights[index==i]
-    rootVr$first[[counter]] <- result$rootVr
   }
   
   pcevObj_total <- pcevObj
@@ -111,9 +91,8 @@ estimatePcev.PcevBlock <- function(pcevObj, shrink, index, ...) {
     weight_step2 <- beta_total/crossprod(beta_total)
     
   } else {
-    result <- estimatePcev(pcevObj_total, shrink)
+    result <- estimatePcev(pcevObj_total, root_Vr_list$second)
     weight_step2 <- result$weights
-    rootVr$second <- result$rootVr
   }
   
   counter <- 0
@@ -122,6 +101,5 @@ estimatePcev.PcevBlock <- function(pcevObj, shrink, index, ...) {
     weights[index==i] <- weights[index==i]*weight_step2[counter]
   }
   
-  return(list("weights" = weights,
-              "rootVr" = rootVr))
+  return(list("weights" = weights))
 }

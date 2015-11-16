@@ -11,7 +11,7 @@ estimatePcev(pcevObj, ...)
 
 \method{estimatePcev}{default}(pcevObj, ...)
 
-\method{estimatePcev}{PcevClassical}(pcevObj, shrink, ...)
+\method{estimatePcev}{PcevClassical}(pcevObj, shrink, index, ...)
 
 \method{estimatePcev}{PcevBlock}(pcevObj, shrink, index, ...)
 }

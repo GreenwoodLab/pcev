@@ -22,7 +22,7 @@ permutePval.default <- function(pcevObj, ...) {
 }
 
 #' @describeIn permutePval
-permutePval.PcevClassical <- function(pcevObj, shrink, index, nperm, ...) {
+permutePval.PcevClassical <- function(pcevObj, shrink, index, nperm, reduce, ...) {
   results <- estimatePcev(pcevObj, shrink)
   N <- nrow(pcevObj$Y)
   
@@ -33,21 +33,39 @@ permutePval.PcevClassical <- function(pcevObj, shrink, index, nperm, ...) {
   initFstat <- (sum((mean(PCEV) - initFit$fitted.values)^2)/df1)/(sum(initFit$residuals^2)/df2)
   initPval <- pf(initFstat, df1, df2, lower.tail = FALSE)
   
-  permutationPvalues <- replicate(nperm, expr = {
-    tmp <- pcevObj
-    tmp$Y <- tmp$Y[sample(N), ]
-    
-    tmpRes <- try(estimatePcev(tmp, shrink, index), silent=TRUE)
-    if(inherits(tmpRes, "try-error")) {
-      return(NA)
-    } else {
-      tmpPCEV <- tmp$Y %*% tmpRes$weights
+  if (reduce) {
+    permutationPvalues <- replicate(nperm, expr = {
+      tmp <- pcevObj
+      tmp$Y <- tmp$Y[sample(N), ]
       
-      tmpFit <- lm.fit(tmp$X, tmpPCEV)
-      tmpFstat <- (sum((mean(tmpPCEV) - tmpFit$fitted.values)^2)/df1)/(sum(tmpFit$residuals^2)/df2)
-      return(pf(tmpFstat, df1, df2, lower.tail = FALSE))
-    }
-  })
+      tmpRes <- try(estimatePcev_red(tmp, index, results$rootVr), silent=TRUE)
+      if(inherits(tmpRes, "try-error")) {
+        return(NA)
+      } else {
+        tmpPCEV <- tmp$Y %*% tmpRes$weights
+        
+        tmpFit <- lm.fit(tmp$X, tmpPCEV)
+        tmpFstat <- (sum((mean(tmpPCEV) - tmpFit$fitted.values)^2)/df1)/(sum(tmpFit$residuals^2)/df2)
+        return(pf(tmpFstat, df1, df2, lower.tail = FALSE))
+      }
+    })
+  } else {
+    permutationPvalues <- replicate(nperm, expr = {
+      tmp <- pcevObj
+      tmp$Y <- tmp$Y[sample(N), ]
+      
+      tmpRes <- try(estimatePcev(tmp, shrink, index), silent=TRUE)
+      if(inherits(tmpRes, "try-error")) {
+        return(NA)
+      } else {
+        tmpPCEV <- tmp$Y %*% tmpRes$weights
+        
+        tmpFit <- lm.fit(tmp$X, tmpPCEV)
+        tmpFstat <- (sum((mean(tmpPCEV) - tmpFit$fitted.values)^2)/df1)/(sum(tmpFit$residuals^2)/df2)
+        return(pf(tmpFstat, df1, df2, lower.tail = FALSE))
+      }
+    })
+  }
   
   pvalue <- mean(permutationPvalues < initPval)
   
@@ -57,7 +75,7 @@ permutePval.PcevClassical <- function(pcevObj, shrink, index, nperm, ...) {
 }
 
 #' @describeIn permutePval
-permutePval.PcevBlock <- function(pcevObj, shrink, index, nperm, ...) {
+permutePval.PcevBlock <- function(pcevObj, shrink, index, nperm, reduce, ...) {
   results <- estimatePcev(pcevObj, shrink, index)
   N <- nrow(pcevObj$Y)
   
@@ -68,21 +86,39 @@ permutePval.PcevBlock <- function(pcevObj, shrink, index, nperm, ...) {
   initFstat <- (sum((mean(PCEV) - initFit$fitted.values)^2)/df1)/(sum(initFit$residuals^2)/df2)
   initPval <- pf(initFstat, df1, df2, lower.tail = FALSE)
   
-  permutationPvalues <- replicate(nperm, expr = {
-    tmp <- pcevObj
-    tmp$Y <- tmp$Y[sample(N), ]
-    
-    tmpRes <- try(estimatePcev(tmp, shrink, index), silent=TRUE)
-    if(inherits(tmpRes, "try-error")) {
-      return(NA)
-    } else {
-      tmpPCEV <- tmp$Y %*% tmpRes$weights
+  if (reduce) {
+    permutationPvalues <- replicate(nperm, expr = {
+      tmp <- pcevObj
+      tmp$Y <- tmp$Y[sample(N), ]
       
-      tmpFit <- lm.fit(tmp$X, tmpPCEV)
-      tmpFstat <- (sum((mean(tmpPCEV) - tmpFit$fitted.values)^2)/df1)/(sum(tmpFit$residuals^2)/df2)
-      return(pf(tmpFstat, df1, df2, lower.tail = FALSE))
-    }
-  })
+      tmpRes <- try(estimatePcev_red(tmp, index, results$rootVr), silent=TRUE)
+      if(inherits(tmpRes, "try-error")) {
+        return(NA)
+      } else {
+        tmpPCEV <- tmp$Y %*% tmpRes$weights
+        
+        tmpFit <- lm.fit(tmp$X, tmpPCEV)
+        tmpFstat <- (sum((mean(tmpPCEV) - tmpFit$fitted.values)^2)/df1)/(sum(tmpFit$residuals^2)/df2)
+        return(pf(tmpFstat, df1, df2, lower.tail = FALSE))
+      }
+    })
+  } else {
+    permutationPvalues <- replicate(nperm, expr = {
+      tmp <- pcevObj
+      tmp$Y <- tmp$Y[sample(N), ]
+      
+      tmpRes <- try(estimatePcev(tmp, shrink, index), silent=TRUE)
+      if(inherits(tmpRes, "try-error")) {
+        return(NA)
+      } else {
+        tmpPCEV <- tmp$Y %*% tmpRes$weights
+        
+        tmpFit <- lm.fit(tmp$X, tmpPCEV)
+        tmpFstat <- (sum((mean(tmpPCEV) - tmpFit$fitted.values)^2)/df1)/(sum(tmpFit$residuals^2)/df2)
+        return(pf(tmpFstat, df1, df2, lower.tail = FALSE))
+      }
+    })
+  }
   
   pvalue <- mean(permutationPvalues < initPval, na.rm = TRUE)
   results$pvalue <- pvalue
@@ -179,7 +215,7 @@ roysPval.default <- function(pcevObj, ...) {
 }
 
 #' @describeIn roysPval
-roysPval.PcevClassical <- function(pcevObj, shrink, index, ...) {
+roysPval.PcevClassical <- function(pcevObj, shrink, index, reduce, ...) {
   
   if (!requireNamespace("RMTstat", quietly = TRUE)) {
     stop("RMTstat needs to be installed in order to use the exact method with multiple covariates.", 
@@ -210,20 +246,47 @@ roysPval.PcevClassical <- function(pcevObj, shrink, index, ...) {
   if(shrink) {
     # Estimate the null distribution using 
     # permutations and MLE
-    null_dist <- replicate(25, expr = {
+    if(reduce) {
+      # Do a first permutation
       tmp <- pcevObj
       tmp$Y <- tmp$Y[sample(N), ]
+      results_perm <- estimatePcev(tmp, shrink, index)
       
-      tmpRes <- try(estimatePcev(tmp, shrink, index), silent=TRUE)
-      if(inherits(tmpRes, "try-error")) {
-        return(NA)
-      } else {
-        return(tmpRes$largestRoot)
-      }
-    })
+      # Do the other permutations
+      null_dist <- replicate(25, expr = {
+        tmp <- pcevObj
+        tmp$Y <- tmp$Y[sample(N), ]
+        
+        tmpRes <- try(estimatePcev_red(tmp, index, results_perm$rootVr), silent=TRUE)
+        if(inherits(tmpRes, "try-error")) {
+          return(NA)
+        } else {
+          return(tmpRes$largestRoot)
+        }
+      })
+    } else {
+      null_dist <- replicate(50, expr = {
+        tmp <- pcevObj
+        tmp$Y <- tmp$Y[sample(N), ]
+        
+        tmpRes <- try(estimatePcev(tmp, shrink, index), silent=TRUE)
+        if(inherits(tmpRes, "try-error")) {
+          return(NA)
+        } else {
+          return(tmpRes$largestRoot)
+        }
+      })
+    }
+    
     # Fit a location-scale version of TW distribution
+    # Note: likelihood may throw warnings at some evaluations, 
+    # which is OK
+    oldw <- getOption("warn")
+    options(warn = -1)
     res <- optim(c(mu, sigma), function(param) logLik(param, log(null_dist)), 
                  control = list(fnscale=-1))
+    options(warn = oldw)
+    
     mu1 <- res$par[1]
     sigma1 <- res$par[2]
     TW <- (log(d) - mu1)/sigma1
@@ -243,7 +306,7 @@ roysPval.PcevClassical <- function(pcevObj, shrink, index, ...) {
 }
 
 #' @describeIn roysPval
-roysPval.PcevBlock <- function(pcevObj, shrink, index, ...) {
+roysPval.PcevBlock <- function(pcevObj, shrink, index, reduce, ...) {
   stop(strwrap("Pcev is currently not implemented for
                estimation with blocks and an exact inference method"),
        call. = FALSE)
@@ -280,10 +343,10 @@ print.Pcev <- function(x, ...) {
     }
   }
   cat("\nP-value obtained:", pvalue, "\n")
-  
+  if(x$shrink) cat("\nShrinkage parameter rho was estimated at", x$rho, "\n")
   cat("\nVariable importance factors")
   if(p > 10) cat(" (truncated)\n") else cat("\n")
-  cat(format(head(x$VIMP, n = 10), digits = 3), 
+  cat(format(head(sort(x$VIMP, decreasing = TRUE), n = 10), digits = 3), 
       "\n\n")
   
 }
@@ -301,6 +364,7 @@ dtw_ls <- function(x, mu, sigma, beta=1, log=FALSE) {
 logLik <- function(param, data) {
   mu <- param[1]
   sigma <- param[2]
+  data <- data[!is.na(data)]
   
   lL <- sum(log(dtw_ls(data, mu, sigma, log=FALSE)))
   
