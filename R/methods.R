@@ -229,11 +229,6 @@ roysPval.default <- function(pcevObj, ...) {
 #' @describeIn roysPval
 roysPval.PcevClassical <- function(pcevObj, shrink, index, reduce, ...) {
   
-  if (!requireNamespace("RMTstat", quietly = TRUE)) {
-    stop("RMTstat needs to be installed in order to use the exact method with multiple covariates.", 
-         call. = FALSE)
-  }
-  
   results <- estimatePcev(pcevObj, shrink)
   N <- nrow(pcevObj$Y)
   p <- ncol(pcevObj$Y)

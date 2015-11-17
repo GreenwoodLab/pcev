@@ -8,17 +8,17 @@ Authors@R: c(
   role = c("aut")),
   person("Karim", "Oualkacha", email = "",
   role = c("aut")))
-Description: PCEV is a statistical tool for the analysis of a mutivariate
+Description: PCEV is a statistical tool for the analysis of a multivariate
     response vector. It is a dimension-reduction technique, similar to Principal
     Components Analysis (PCA), which seeks the maximize the proportion of
     variance (in the response vector) being explained by a set of covariates.
-Depends: R (>= 3.1.0)
+Depends: R (>= 3.0.0)
+Imports: RMTstat
 License: GPL (>=2)
 LazyData: true
 URL: http://github.com/GreenwoodLab/pcev
 BugReports: http://github.com/GreenwoodLab/pcev/issues
 Suggests: 
     knitr,
-    RMTstat,
     testthat
 VignetteBuilder: knitr
