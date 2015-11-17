@@ -247,17 +247,17 @@ roysPval.PcevClassical <- function(pcevObj, shrink, index, reduce, ...) {
     # Estimate the null distribution using 
     # permutations and MLE
     if(reduce) {
-      # Do a first permutation
-      tmp <- pcevObj
-      tmp$Y <- tmp$Y[sample(N), ]
-      results_perm <- estimatePcev(tmp, shrink, index)
+#       # Do a first permutation
+#       tmp <- pcevObj
+#       tmp$Y <- tmp$Y[sample(N), ]
+#       results_perm <- estimatePcev(tmp, shrink, index)
       
       # Do the other permutations
       null_dist <- replicate(25, expr = {
         tmp <- pcevObj
         tmp$Y <- tmp$Y[sample(N), ]
         
-        tmpRes <- try(estimatePcev_red(tmp, index, results_perm$rootVr), silent=TRUE)
+        tmpRes <- try(estimatePcev_red(tmp, index, results$rootVr), silent=TRUE)
         if(inherits(tmpRes, "try-error")) {
           return(NA)
         } else {
