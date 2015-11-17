@@ -1,4 +1,4 @@
-#' Principal Components of Explained Variance
+#' Principal Component of Explained Variance
 #' 
 #' \code{computePCEV} computes the first PCEV and tests its significance.
 #' 

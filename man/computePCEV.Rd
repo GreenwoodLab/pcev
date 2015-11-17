@@ -2,7 +2,7 @@
 % Please edit documentation in R/functions.R
 \name{computePCEV}
 \alias{computePCEV}
-\title{Principal Components of Explained Variance}
+\title{Principal Component of Explained Variance}
 \usage{
 computePCEV(response, covariate, confounder = NULL, estimation = "all",
   inference = "exact", index = NULL, shrink = FALSE, nperm = 1000,

@@ -26,10 +26,18 @@ roysPval(pcevObj, ...)
 \item{index}{If \code{pcevObj} is of class \code{PcevBlock}, index is a
 vector describing the block to which individual response variables
 correspond.}
+
+\item{reduce}{Logical. Should we reduce the computation time by re-using the
+previous estimates of the inverse residual variance matrix?}
 }
 \description{
-This function uses Johnstone's approximation using the Tracy-Wildom
-distribution
+This function uses Johnstone's approximation to the null distribution of
+Roy's Largest Root statistic. It uses the a location-scale variant of the
+Tracy-Wildom distribution of order 1.
+}
+\details{
+Note that if \code{shrink} is set to \code{TRUE}, the location-scale
+parameters are estimated using a smaller number of permutations. distribution
 }
 \section{Methods (by class)}{
 \itemize{

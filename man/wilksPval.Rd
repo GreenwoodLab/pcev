@@ -23,11 +23,14 @@ wilksPval(pcevObj, ...)
 
 \item{shrink}{Should we use a shrinkage estimate of the residual variance?}
 
-\item{index}{If \code{pcevObj} is of class \code{PcevBlock}, index is a vector
-describing the block to which individual response variables correspond.}
+\item{index}{If \code{pcevObj} is of class \code{PcevBlock}, index is a
+vector describing the block to which individual response variables
+correspond.}
 }
 \description{
-sdf
+Computes a p-value using the Wilk's Lambda. The null distribution of this
+test statistic is only known in the case of a single covariate, and therefore
+this is the only case implemented.
 }
 \section{Methods (by class)}{
 \itemize{

@@ -2,14 +2,17 @@
 
 #' Permutation p-value
 #' 
-#' sdf
+#' Computes a p-value using a permutation procedure.
 #' 
 #' @param pcevObj A pcev object of class \code{PcevClassical} or 
 #'   \code{PcevBlock}
-#' @param shrink Should we use a shrinkage estimate of the residual variance? 
-#' @param index If \code{pcevObj} is of class \code{PcevBlock}, index is a vector
-#'   describing the block to which individual response variables correspond.
+#' @param shrink Should we use a shrinkage estimate of the residual variance?
+#' @param index If \code{pcevObj} is of class \code{PcevBlock}, index is a
+#'   vector describing the block to which individual response variables
+#'   correspond.
 #' @param nperm The number of permutations to perform.
+#' @param reduce Logical. Should we reduce the computation time by re-using the
+#'   previous estimates of the inverse residual variance matrix?
 #' @param ... Extra parameters.
 #' @export
 permutePval <- function(pcevObj, ...) UseMethod("permutePval")
@@ -130,13 +133,16 @@ permutePval.PcevBlock <- function(pcevObj, shrink, index, nperm, reduce, ...) {
 
 #' Wilks' lambda exact test
 #' 
-#' sdf
+#' Computes a p-value using the Wilk's Lambda. The null distribution of this
+#' test statistic is only known in the case of a single covariate, and therefore
+#' this is the only case implemented.
 #' 
 #' @param pcevObj A pcev object of class \code{PcevClassical} or 
 #'   \code{PcevBlock}
-#' @param shrink Should we use a shrinkage estimate of the residual variance? 
-#' @param index If \code{pcevObj} is of class \code{PcevBlock}, index is a vector
-#'   describing the block to which individual response variables correspond.
+#' @param shrink Should we use a shrinkage estimate of the residual variance?
+#' @param index If \code{pcevObj} is of class \code{PcevBlock}, index is a
+#'   vector describing the block to which individual response variables
+#'   correspond.
 #' @param ... Extra parameters.
 #' @export
 wilksPval <- function(pcevObj, ...) UseMethod("wilksPval")
@@ -194,15 +200,21 @@ wilksPval.PcevBlock <- function(pcevObj, shrink, index, ...) {
 
 #' Roy's largest root exact test
 #' 
-#' This function uses Johnstone's approximation using the Tracy-Wildom
-#' distribution
+#' This function uses Johnstone's approximation to the null distribution of 
+#' Roy's Largest Root statistic. It uses the a location-scale variant of the 
+#' Tracy-Wildom distribution of order 1.
+#' 
+#' Note that if \code{shrink} is set to \code{TRUE}, the location-scale
+#' parameters are estimated using a smaller number of permutations. distribution
 #' 
 #' @param pcevObj A pcev object of class \code{PcevClassical} or 
 #'   \code{PcevBlock}
 #' @param shrink Should we use a shrinkage estimate of the residual variance?
-#' @param index If \code{pcevObj} is of class \code{PcevBlock}, index is a
-#'   vector describing the block to which individual response variables
+#' @param index If \code{pcevObj} is of class \code{PcevBlock}, index is a 
+#'   vector describing the block to which individual response variables 
 #'   correspond.
+#' @param reduce Logical. Should we reduce the computation time by re-using the
+#'   previous estimates of the inverse residual variance matrix?
 #' @param ... Extra parameters.
 #' @export
 roysPval <- function(pcevObj, ...) UseMethod("roysPval")

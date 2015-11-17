@@ -23,13 +23,17 @@ permutePval(pcevObj, ...)
 
 \item{shrink}{Should we use a shrinkage estimate of the residual variance?}
 
-\item{index}{If \code{pcevObj} is of class \code{PcevBlock}, index is a vector
-describing the block to which individual response variables correspond.}
+\item{index}{If \code{pcevObj} is of class \code{PcevBlock}, index is a
+vector describing the block to which individual response variables
+correspond.}
 
 \item{nperm}{The number of permutations to perform.}
+
+\item{reduce}{Logical. Should we reduce the computation time by re-using the
+previous estimates of the inverse residual variance matrix?}
 }
 \description{
-sdf
+Computes a p-value using a permutation procedure.
 }
 \section{Methods (by class)}{
 \itemize{
