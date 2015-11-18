@@ -29,7 +29,7 @@
 #' @param Wilks Should we use a Wilks test instead of Roy's largest test? This 
 #'   is only implemented for a single covariates.
 #' @param reduce Should we use the previous estimates of the residual variance matrix? 
-#'   See details. The default value is \code{TRUE}.
+#'   See details. The default value is \code{FALSE}.
 #' @return An object of class \code{Pcev} containing the first PCEV, the 
 #'   p-value, the estimate of the shrinkage factor, etc.
 #' @examples 
@@ -42,7 +42,7 @@
 computePCEV <- function(response, covariate, confounder = NULL, 
                         estimation = "all", inference = "exact", 
                         index = NULL, shrink = FALSE, nperm = 1000, 
-                        Wilks = FALSE, reduce = TRUE) {
+                        Wilks = FALSE, reduce = FALSE) {
   # Check input
   if (!estimation %in% c("all", "block")){
     stop("Estimation method should be \"all\" or \"block\"")
