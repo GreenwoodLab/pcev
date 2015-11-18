@@ -314,15 +314,30 @@ roysPval.PcevClassical <- function(pcevObj, shrink, index, reduce, ...) {
 
 #' @describeIn roysPval
 roysPval.PcevBlock <- function(pcevObj, shrink, index, reduce, ...) {
-  stop(strwrap("Pcev is currently not implemented for
-               estimation with blocks and an exact inference method"),
-       call. = FALSE)
+#   stop(strwrap("Pcev is currently not implemented for
+#                estimation with blocks and an exact inference method"),
+#        call. = FALSE)
   
-  results <- estimatePcev(pcevObj, shrink)
+  results <- estimatePcev(pcevObj, shrink, index)
   N <- nrow(pcevObj$Y)
   p <- ncol(pcevObj$Y)
   q <- ncol(pcevObj$X) - 1
-  d <- results$largestRoot
+  
+  # Estimate largest root
+  root_Vr_bd <- blockMatrixDiagonal(results$rootVr$first)
+  
+  fit <- lm.fit(cbind(pcevObj$X, pcevObj$Z), Y)
+  Yfit <- fit$fitted.values
+  fit_confounder <- lm.fit(cbind(rep_len(1, N), pcevObj$Z), Y)
+  Yfit_confounder <- fit_confounder$fitted.values
+  
+  Vm <- crossprod(Yfit - Yfit_confounder, Y)
+  
+  mainMatrix <- root_Vr_bd %*% Vm %*% root_Vr_bd
+  
+  temp1 <- eigen(mainMatrix, symmetric=TRUE, only.values = TRUE)
+  d <- temp1$values[1]
+  
   # theta <- d / (1 + d)
   
   nuH <- q
@@ -348,7 +363,21 @@ roysPval.PcevBlock <- function(pcevObj, shrink, index, reduce, ...) {
     if(inherits(tmpRes, "try-error")) {
       return(NA)
     } else {
-      return(tmpRes$largestRoot)
+      root_Vr_tmp <- blockMatrixDiagonal(tmpRes$rootVr$first)
+      
+      fit <- lm.fit(cbind(tmp$X, tmp$Z), tmp$Y)
+      Yfit <- fit$fitted.values
+      fit_confounder <- lm.fit(cbind(rep_len(1, N), tmp$Z), tmp$Y)
+      Yfit_confounder <- fit_confounder$fitted.values
+      
+      Vm_tmp <- crossprod(Yfit - Yfit_confounder, tmp$Y)
+      
+      mainMatrix_tmp <- root_Vr_tmp %*% Vm_tmp %*% root_Vr_tmp
+      
+      tmpEi <- eigen(mainMatrix_tmp, symmetric=TRUE, only.values = TRUE)
+      d <- tmpEi$values[1]
+      
+      return(d)
     }
   })
     
@@ -430,4 +459,18 @@ logLik <- function(param, data) {
   lL <- sum(log(dtw_ls(data, mu, sigma, log=FALSE)))
   
   return(lL)
+}
+
+blockMatrixDiagonal <- function(matrix_list) {  
+  
+  dimensions <- sapply(matrix_list, nrow)
+  finalDimension <- sum(dimensions)
+  finalMatrix <- matrix(0, nrow = finalDimension, ncol = finalDimension)
+  index <- 1
+  for(k in 1:length(dimensions)){
+    finalMatrix[index:(index+dimensions[k]-1), index:(index+dimensions[k]-1)] <- matrix_list[[k]]
+    index <- index + dimensions[k]
+  }
+  
+  return(finalMatrix)
 }
