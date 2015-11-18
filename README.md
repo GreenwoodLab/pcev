@@ -15,4 +15,4 @@ library(devtools)
 devtools::install_github('GreenwoodLab/pcev', build_vignettes = TRUE)
 ```
 
-The main function is $\texttt{computePCEV}$, and indeed most users will only need this one function. See the documentation for more information about its parameters and for some examples.
+The main function is ```computePCEV```, and indeed most users will only need this one function. See the documentation for more information about its parameters and for some examples.
