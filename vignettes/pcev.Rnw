@@ -142,13 +142,24 @@ pcev_out <- computePCEV(methylation, covariate = pheno,
 pcev_out
 @
 
-<<manPlotVIP>>=
+We can construct something resembling a Manhattan plot, but where the univariate p-values are replaced by what we call a \emph{variable importance factor} (or VIMP): it is defined as the correlation between a given response variable $Y_j$ and the PCEV (in absolute value). Figure~\ref{fig:manPlotVIP} shows this type of plot for our particular data. We have also identified the BLK gene using a red line:
+
+<<manPlotVIP, fig.align='center', fig.cap="Manhattan-VIMP plot">>=
 # Manhattan plot VIMP
 BLK_boundaries <- c(11235000, 11385000)
-plot(position$Pos/1e6, pcev_out$VIMP, xlab="Position (Mb)",
-     ylab="Variable Importance", pch=19, cex=0.5, ylim=c(0,1))
-lines(x=BLK_boundaries/1e6, y=rep_len(0.9,2),lwd=3, col='red')
+plot(position$Pos/1e6, pcev_out$VIMP, xlab = "Position (Mb)",
+     ylab = "Variable Importance", pch = 19, cex = 0.5, 
+     ylim = c(0,1))
+lines(x = BLK_boundaries/1e6, y = rep_len(0.9,2),
+      lwd = 3, col = 'red')
 @
 
+As we can see, the VIMP can serve as surrogates for the univariate p-values when it comes to identifying the most important response variables. In our case, it is able to capture the gene of interest.
+
+\section{Session Info}
+
+<<>>=
+sessionInfo()
+@
 
 \end{document}

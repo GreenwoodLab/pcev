@@ -1,6 +1,6 @@
 Package: pcev
 Title: Principal components of explained variance (PCEV)
-Version: 0.0.0.9000
+Version: 1.1.1
 Authors@R: c(
   person("Maxime", "Turgeon", email = "maxime.turgeon@mail.mcgill.ca",
   role = c("aut", "cre")),

@@ -12,5 +12,7 @@ You can install from GitHub using the [devtools](http://cran.r-project.org/web/p
 
 ``` r
 library(devtools)
-devtools::install_github('GreenwoodLab/pcev')
+devtools::install_github('GreenwoodLab/pcev', build_vignettes = TRUE)
 ```
+
+The main function is $\texttt{computePCEV}$, and indeed most users will only need this one function. See the documentation for more information about its parameters and for some examples.
