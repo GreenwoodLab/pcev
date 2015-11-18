@@ -272,7 +272,7 @@ roysPval.PcevClassical <- function(pcevObj, shrink, index, reduce, ...) {
         }
       })
     } else {
-      null_dist <- replicate(50, expr = {
+      null_dist <- replicate(25, expr = {
         tmp <- pcevObj
         tmp$Y <- tmp$Y[sample(N), ]
         
@@ -317,6 +317,60 @@ roysPval.PcevBlock <- function(pcevObj, shrink, index, reduce, ...) {
   stop(strwrap("Pcev is currently not implemented for
                estimation with blocks and an exact inference method"),
        call. = FALSE)
+  
+  results <- estimatePcev(pcevObj, shrink)
+  N <- nrow(pcevObj$Y)
+  p <- ncol(pcevObj$Y)
+  q <- ncol(pcevObj$X) - 1
+  d <- results$largestRoot
+  # theta <- d / (1 + d)
+  
+  nuH <- q
+  nuE <- N - q - 1
+  s <- min(p, nuH)
+  m <- 0.5 * (abs(p - nuH) - 1)
+  n <- 0.5 * (nuE - p - 1)
+  one_third <- 1/3
+  
+  N1 <- 2 * (s + m + n) + 1 
+  gamma <- 2 * asin( sqrt( (s - 0.5)/N ) )
+  phi <- 2*asin( sqrt( (s + 2*m + 0.5)/N ) )
+  
+  mu <- 2 * log(tan( 0.5*(phi + gamma)))
+  sigma <- (16/N^2)^one_third * ( sin(phi+gamma)^2*sin(phi)*sin(gamma)) ^(-1*one_third)
+  
+  
+  null_dist <- replicate(25, expr = {
+    tmp <- pcevObj
+    tmp$Y <- tmp$Y[sample(N), ]
+    
+    tmpRes <- try(estimatePcev(tmp, shrink, index), silent=TRUE)
+    if(inherits(tmpRes, "try-error")) {
+      return(NA)
+    } else {
+      return(tmpRes$largestRoot)
+    }
+  })
+    
+    
+  # Fit a location-scale version of TW distribution
+  # Note: likelihood may throw warnings at some evaluations, 
+  # which is OK
+  oldw <- getOption("warn")
+  options(warn = -1)
+  res <- optim(c(mu, sigma), function(param) logLik(param, log(null_dist)), 
+               control = list(fnscale=-1))
+  options(warn = oldw)
+  
+  mu1 <- res$par[1]
+  sigma1 <- res$par[2]
+  TW <- (log(d) - mu1)/sigma1
+  
+  pvalue <- RMTstat::ptw(TW, beta=1, lower.tail = FALSE, log.p = FALSE)
+  
+  results$pvalue <- pvalue
+  
+  return(results)
 }
 
 # Print method----

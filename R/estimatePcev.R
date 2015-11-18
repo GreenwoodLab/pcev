@@ -49,12 +49,12 @@ estimatePcev.PcevClassical <- function(pcevObj, shrink, index, ...) {
     temp <- eigen(Vr, symmetric=TRUE)
     Ur <- temp$vectors
     diagD <- eigen(Vrs, symmetric=TRUE, only.values=TRUE)$values
-    } else {
-      # Computing PCEV
-      temp <- eigen(Vr, symmetric=TRUE)
-      Ur <- temp$vectors
-      diagD <- temp$values
-    }
+  } else {
+    # Computing PCEV
+    temp <- eigen(Vr, symmetric=TRUE)
+    Ur <- temp$vectors
+    diagD <- temp$values
+  }
   
   value <- 1/sqrt(diagD)
   root_Vr <- Ur %*% diag(value, nrow = length(value)) %*% t(Ur)
