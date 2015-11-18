@@ -1,12 +1,77 @@
 \documentclass{article}
 %\VignetteIndexEntry{Principal Component of Explained Variance}
 %\VignetteEngine{knitr::latex}
-\usepackage[utf8]{inputenc}
+\usepackage{amsmath,amsthm,amscd,amsfonts,amssymb}
+
+\newcommand{\Var}{\mathrm{Var}}
+\DeclareMathOperator*{\argmax}{\arg\!\max}
+
+\newtheorem{thm}{Theorem}[section]
 
 \title{Principal Component of Explained Variance}
+\author{Maxime Turgeon}
 
 \begin{document}
 \maketitle
+
+\section{General theoretical framework}
+
+We consider the following setting: let $Y$ be a multivariate phenotype of dimension $p$ (e.g. methylation values at $p$ CpG sites, or brain imaging measured at $p$ locations in the brain), let $X$ be a $q$-dimensional vector of covariates of interest (e.g.: smoking, cell type or SNPs) and let $C$ be a $r$-dimensional vector of confounders. We assume that the relationship
+between $Y$ and $X$ can be represented via a linear model
+$$Y = BX + \Gamma C + E,$$
+where $B$ and $\Gamma$ are $p \times q$ and $p \times r$ matrices of regression coefficients for the covariates of interest and confounders, respectively, and $E \sim N (0, \sigma)$ is a vector of residual errors. This model assumption allows us to decompose the total variance of $Y$ as follows:
+\begin{align*}
+\Var(Y) &= \Var(BX) + \Var(\Gamma C) + \Var(E)\\
+  &= B\Var(X)B^T + \Gamma\Var(C)\Gamma^T + \Sigma\\
+  &= V_M + V_C + V_R,
+\end{align*}
+where $V_M = B\Var(X)B^T$ is the model component and $V_R = \Sigma$ is the residual component.
+PCEV seeks a linear combination of outcomes, $w^T Y$ , which maximises the ratio $h^2 (w)$ of
+variance being explained by the covariates $X$, such that:
+\begin{align*}
+h^2 (w) &= \frac{\Var(w^T BX)}{\Var(w^T E)}\\
+  &= \frac{w^T V_M w}{w^T V_R w}.
+\end{align*}
+PCEV thus seeks the vector $w$ which maximises the criterion $h^2 (w)$. It follows from a Lagrange multiplier-type argument that $w$ is the solution to the generalised eigenvector problem 
+$$V_M w = \lambda V_R w,$$ 
+and therefore standard linear algebraic results can be used to get a closed form for $w_\mathrm{PCEV} := \argmax_w h^2 (w)$.
+
+Although there are some similarities between PCA and PCEV since both methods seek a
+linear combination of outcomes optimizing a given criterion, we recall that principal compo-
+nent analysis (PCA) reduces the dimension of $Y$ by looking for a linear combination of its
+components with maximal variance, regardless of the covariates $X$. Furthermore, an impor-
+tant difference between PCA and PCEV is in the number of components one can extract.
+While the number of components to select in PCA is usually left to the user, and the maximal
+number of extracted components is bounded above by $p$, the maximal number of components
+that can be extracted for PCEV is bounded above by $q$, the number of covariates. Therefore,
+if we are only interested in one covariate, only one PCEV can be extracted; this follows from
+considering the rank of the matrix $V_R^{−1} V_M$.
+
+\subsection{High-dimensional response vector}
+
+When $p$ is larger than the sample size, a na\"{i}ve implementation of PCEV will fail. To ensure the uniqueness of the solution to the maximisation process, the invertibility of the residual matrix $V_R$ is required; therefore, an accurate estimation of the matrix $V_R$ would require a large enough sample size, i.e. $p < n$. This limitation has led some authors to propose regularization techniques for the estimation of $w$, similar in spirit to ridge regression and Lasso. We want to stress once again that these methods require parameters that
+are computationally expensive to compute. For this reason, we propose a novel alternative,
+namely a block approach to the estimation of PCEV. Assume we can partition $Y$ into blocks
+(or clusters) in such a way that the number of components in a given block is small enough
+(i.e. smaller than $n$). We can then perform PCEV and get a linear combination $\tilde{Y}_j$ of
+the traits belonging to the $j$th block, for each block $j = 1, \ldots, b$. We then obtain a new multivariate pseudo-phenotype:
+$$\mathbf{\tilde{Y}} = ( \tilde{Y}_1 , \ldots , \tilde{Y}_b ),$$
+on which we can again perform PCEV.
+
+Since the result is a linear combination of linear combinations, it is itself a linear combination of the original traits $Y$. Although one might think that this stepwise approach is an ad-hoc extension of the original PCEV approach, it has nonetheless a very appealing and relevant mathematical property, described in the following result:
+
+\begin{thm}
+Assume one can partition the outcomes $Y$ into blocks in such a way that blocks are uncorrelated (i.e. outcomes lying in different blocks are uncorrelated). Then the linear combination (PCEV) obtained from the traditional approach and that obtained from
+the stepwise block approach described above are equal.
+\end{thm}
+
+Another approach to dealing with a high-dimensional response vector is to replace the classical linear regression estimator of $V_R$ by a shrinkage estimator, e.g. the Ledoit-Wolf linear shrinkage estimator. Both of these approaches are implemented in this packages.
+
+\subsection{Association tests}
+
+
+
+\section{Data analysis}
 
 <<data>>=
 library(pcev)
