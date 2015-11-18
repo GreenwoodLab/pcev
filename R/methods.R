@@ -326,12 +326,12 @@ roysPval.PcevBlock <- function(pcevObj, shrink, index, reduce, ...) {
   # Estimate largest root
   root_Vr_bd <- blockMatrixDiagonal(results$rootVr$first)
   
-  fit <- lm.fit(cbind(pcevObj$X, pcevObj$Z), Y)
+  fit <- lm.fit(cbind(pcevObj$X, pcevObj$Z), pcevObj$Y)
   Yfit <- fit$fitted.values
-  fit_confounder <- lm.fit(cbind(rep_len(1, N), pcevObj$Z), Y)
+  fit_confounder <- lm.fit(cbind(rep_len(1, N), pcevObj$Z), pcevObj$Y)
   Yfit_confounder <- fit_confounder$fitted.values
   
-  Vm <- crossprod(Yfit - Yfit_confounder, Y)
+  Vm <- crossprod(Yfit - Yfit_confounder, pcevObj$Y)
   
   mainMatrix <- root_Vr_bd %*% Vm %*% root_Vr_bd
   
