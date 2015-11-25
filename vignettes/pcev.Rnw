@@ -14,10 +14,11 @@
 \begin{document}
 \maketitle
 
+This package implements the dimension-reduction technique known as Principal Component of Explained Variance (PCEV), which is similar in spirit to Principal Component Analysis (PCA). The theoretical details are given in the next section. This is followed by a description of the user interface of the package \texttt{pcev}, and the last section presents a data analysis using this approach.
+
 \section{General theoretical framework}
 
-We consider the following setting: let $Y$ be a multivariate phenotype of dimension $p$ (e.g. methylation values at $p$ CpG sites, or brain imaging measured at $p$ locations in the brain), let $X$ be a $q$-dimensional vector of covariates of interest (e.g.: smoking, cell type or SNPs) and let $C$ be a $r$-dimensional vector of confounders. We assume that the relationship
-between $Y$ and $X$ can be represented via a linear model
+We consider the following setting: let $Y$ be a multivariate phenotype of dimension $p$ (e.g. methylation values at CpG sites, or brain imaging measured at $p$ locations in the brain), let $X$ be a $q$-dimensional vector of covariates of interest (e.g.: smoking, cell type or SNPs) and let $C$ be an $r$-dimensional vector of confounders. We assume that the relationship between $Y$ and $X$ can be represented via a linear model
 $$Y = BX + \Gamma C + E,$$
 where $B$ and $\Gamma$ are $p \times q$ and $p \times r$ matrices of regression coefficients for the covariates of interest and confounders, respectively, and $E \sim N (0, \sigma)$ is a vector of residual errors. This model assumption allows us to decompose the total variance of $Y$ as follows:
 \begin{align*}
@@ -25,9 +26,7 @@ where $B$ and $\Gamma$ are $p \times q$ and $p \times r$ matrices of regression 
   &= B\Var(X)B^T + \Gamma\Var(C)\Gamma^T + \Sigma\\
   &= V_M + V_C + V_R,
 \end{align*}
-where $V_M = B\Var(X)B^T$ is the model component and $V_R = \Sigma$ is the residual component.
-PCEV seeks a linear combination of outcomes, $w^T Y$ , which maximises the ratio $h^2 (w)$ of
-variance being explained by the covariates $X$, such that:
+where $V_M = B\Var(X)B^T$ is the model component and $V_R = \Sigma$ is the residual component. PCEV seeks a linear combination of outcomes, $w^T Y$ , which maximises the ratio $h^2 (w)$ of variance being explained by the covariates $X$, such that:
 \begin{align*}
 h^2 (w) &= \frac{\Var(w^T BX)}{\Var(w^T E)}\\
   &= \frac{w^T V_M w}{w^T V_R w}.
@@ -36,54 +35,80 @@ PCEV thus seeks the vector $w$ which maximises the criterion $h^2 (w)$. It follo
 $$V_M w = \lambda V_R w,$$ 
 and therefore standard linear algebraic results can be used to get a closed form for $w_\mathrm{PCEV} := \argmax_w h^2 (w)$.
 
-Although there are some similarities between PCA and PCEV since both methods seek a
-linear combination of outcomes optimizing a given criterion, we recall that principal compo-
-nent analysis (PCA) reduces the dimension of $Y$ by looking for a linear combination of its
-components with maximal variance, regardless of the covariates $X$. Furthermore, an impor-
-tant difference between PCA and PCEV is in the number of components one can extract.
-While the number of components to select in PCA is usually left to the user, and the maximal
-number of extracted components is bounded above by $p$, the maximal number of components
-that can be extracted for PCEV is bounded above by $q$, the number of covariates. Therefore,
-if we are only interested in one covariate, only one PCEV can be extracted; this follows from
-considering the rank of the matrix $V_R^{−1} V_M$.
-
 \subsection{High-dimensional response vector}
 
-When $p$ is larger than the sample size, a na\"{i}ve implementation of PCEV will fail. To ensure the uniqueness of the solution to the maximisation process, the invertibility of the residual matrix $V_R$ is required; therefore, an accurate estimation of the matrix $V_R$ would require a large enough sample size, i.e. $p < n$. This limitation has led some authors to propose regularization techniques for the estimation of $w$, similar in spirit to ridge regression and Lasso. We want to stress once again that these methods require parameters that
-are computationally expensive to compute. For this reason, we propose a novel alternative,
-namely a block approach to the estimation of PCEV. Assume we can partition $Y$ into blocks
-(or clusters) in such a way that the number of components in a given block is small enough
-(i.e. smaller than $n$). We can then perform PCEV and get a linear combination $\tilde{Y}_j$ of
-the traits belonging to the $j$th block, for each block $j = 1, \ldots, b$. We then obtain a new multivariate pseudo-phenotype:
+When $p$ is larger than the sample size, a na\"{i}ve implementation of PCEV will fail. For this reason, we proposed a novel alternative, namely a block approach to the estimation of PCEV. Assume we can partition $Y$ into blocks (or clusters) in such a way that the number of components in a given block is small enough (i.e. smaller than $n$). We can then perform PCEV and get a linear combination $\tilde{Y}_j$ of the traits belonging to the $j$th block, for each block $j = 1, \ldots, b$. We then obtain a new multivariate pseudo-phenotype:
 $$\mathbf{\tilde{Y}} = ( \tilde{Y}_1 , \ldots , \tilde{Y}_b ),$$
 on which we can again perform PCEV.
 
-Since the result is a linear combination of linear combinations, it is itself a linear combination of the original traits $Y$. Although one might think that this stepwise approach is an ad-hoc extension of the original PCEV approach, it has nonetheless a very appealing and relevant mathematical property, described in the following result:
+Although one might think that this stepwise approach is an ad-hoc extension of the original PCEV approach, it has nonetheless a very appealing and relevant mathematical property, described in the following result:
 
 \begin{thm}
-Assume one can partition the outcomes $Y$ into blocks in such a way that blocks are uncorrelated (i.e. outcomes lying in different blocks are uncorrelated). Then the linear combination (PCEV) obtained from the traditional approach and that obtained from
-the stepwise block approach described above are equal.
+Assume one can partition the outcomes $Y$ into blocks in such a way that blocks are uncorrelated (i.e. outcomes lying in different blocks are uncorrelated). Then the linear combination (PCEV) obtained from the traditional approach and that obtained from the stepwise block approach described above are equal.
 \end{thm}
 
-Another approach to dealing with a high-dimensional response vector is to replace the classical linear regression estimator of $V_R$ by a shrinkage estimator, e.g. the Ledoit-Wolf linear shrinkage estimator. Both of these approaches are implemented in this packages.
+Another approach to dealing with a high-dimensional response vector is to replace the classical linear regression estimator of $V_R$ by a shrinkage estimator, e.g. the Ledoit-Wolf linear shrinkage estimator. Both of these approaches, and a combination of the two, are implemented in this packages.
 
 \subsection{Association tests}
 
+Two testing procedures are implemented in this package:
+\begin{enumerate}
+  \item An asymptotic test, using either Wilks' Lambda or Roy's Largest Root statistic.
+  \item A permutation test.
+\end{enumerate}
+Johnstone~(2009) derived an approximation of the null distribution of Roy's Largest Root; this is what we use in the implementation.
 
+Specific details about which test can be used under a given estimation scheme are given below, with examples. 
+
+\section{Examples}
+
+The main function is \texttt{computePCEV}, and indeed most users will only need this one function. Its two main parameters are \texttt{response}, which needs to be a $n\times p$ matrix containing the values for the response variables, and \texttt{covariate}, which can be either an array or a data frame containing the values of the covariates. Let's look at a simple example:
+
+<<ex1>>=
+library(pcev)
+set.seed(12345)
+
+Y <- matrix(rnorm(100*20), nrow=100)
+X <- rnorm(100)
+
+pcev_out <- computePCEV(Y, X)
+pcev_out 
+@
+
+The default behaviour of the function is to use the classical approach to PCEV (i.e. no block) and use Roy's Largest Root test. This test works for an arbitrary number of covariates. On the other hand, when there is only one covariate, we can also use Wilks' Lambda test, whose null distribution is known exactly in this setting:
+
+<<ex2>>=
+pcev_out2 <- computePCEV(Y, X, Wilks=TRUE)
+pcev_out2
+@
+
+The output also gives the 10 highest variable importance factors (defined as the correlation between a response variable and the PCEV, in absolute value).
+
+There is also the possibility of using the Ledoit-Wolf linear shrinkage estimator for the residual variance component:
+
+<<ex3>>=
+pcev_out3 <- computePCEV(Y, X, shrink=TRUE)
+pcev_out3
+@
+
+The p-value is computed using a modification of Johnstone's approximation: a small number of permutations are performed\footnote{This is set at 25. Currently, there is no way for the user to change this number.}, and for each permutation Roy's Largest Root statistic is computed. Using these values, the parameters of a location-scale variant of the Tracy-Widom distribution of order 1 are then estimated using Maximum Likelihood, and this distribution is used to compute a p-value. There is currently no theoretical justification for doing this, but preliminary empirical results look promising.
 
 \section{Data analysis}
 
-<<data>>=
-library(pcev)
+Finally, we will show how to use the block approach to PCEV using a real data analysis. We have methylation levels of 5,986 CpG sites, measured on 40 samples using bisulfite sequencing\footnote{The data was knidly provided by Tomi Pastinen, McGill University}. Each sample corresponds to one of three cell types: B cells (8 samples), T cells (19 samples), and monocytes (13 samples). Note that the CpG sites are situated aroung the BLK gene, which is known to be differentially methylated across cell types. First, we load the data:
 
+<<data>>=
 data(methylation)
 data(pheno)
 data(position)
 @
 
+The phenotype of interest in binary: $X=1$ if the sample comes from a B cell, and $X=0$ otherwise. We also have information about the genomic position of each CpG site. 
 
-<<manPlot>>=
-# Compute nominal pvalues
+First, we will look at a Manhattan plot of the data (Figure~\ref{fig:manPlot}). Recall that the x-axis corresponds to the genomic position of a CpG, and the y-axis to the negative log of the p-value for the univariate association. As we can see, there is small region around 11.3 Mb with a strong univariate signal; this corresponds to the DMR. The code for producing the plot is given below:
+
+<<manPlot, fig.align='center', fig.cap="Manhattan plot">>=
+# Compute univariate p-values
 fit <- lm(methylation ~ pheno)
 pval <- vapply(summary(fit), function(sum) {
   pvalue <- sum$coef[2,4]
@@ -96,8 +121,10 @@ plot(position$Pos/1e6, -log10(pval), xlab="Position (Mb)",
 abline(h=-log10(8.3*10^-6), lty=2)
 @
 
+Since the number of CpG sites is much greater than the sample size, we cannot use the classical approach to PCEV. Instead we will use the block approach. A natural to define these blocks is to use genomic distance. This can be easily done using the function \texttt{clusterMaker} in the package \texttt{bumphunter}:
+
 <<cluster, eval=FALSE>>=
-# Break the region into sub-regions
+# Break the region into sub-regions of 500 kB
 cl <- bumphunter::clusterMaker(chr=position$Chr, 
                                pos=position$Pos, 
                                assumeSorted=TRUE, 
@@ -122,6 +149,7 @@ while(sum(blockLengths > 30) > 0) {
   blockLengths <- table(index)
 }
 
+# Re-index so that we have consecutive indices
 cl <- index
 index <- cl
 counter <- 0
@@ -131,10 +159,16 @@ for(j in sort(unique(cl))) {
 }
 @
 
-<<output>>=
+Another way to define the blocks would be hierarchical clustering. In any case, since we do not want this package to depend on \texttt{bumphunter}, we provide the vector of indices:
+
+<<index>>=
 data(index)
 table(table(index))
+@
 
+As we can see, there are no more than 30 CpG sites per block, and we have a total of 980 blocks. We are now ready to compute the PCEV:
+
+<<output, cache=TRUE, tidy=TRUE>>=
 pcev_out <- computePCEV(methylation, covariate = pheno,
                         estimation = "block", 
                         inference = "permutation",
@@ -142,7 +176,9 @@ pcev_out <- computePCEV(methylation, covariate = pheno,
 pcev_out
 @
 
-We can construct something resembling a Manhattan plot, but where the univariate p-values are replaced by what we call a \emph{variable importance factor} (or VIMP): it is defined as the correlation between a given response variable $Y_j$ and the PCEV (in absolute value). Figure~\ref{fig:manPlotVIP} shows this type of plot for our particular data. We have also identified the BLK gene using a red line:
+We used 10 permutations to compute the p-value, which is of course very low. Using 10,000 permutations, we got an approximate p-value of $4 \times 10^{-4}$. 
+
+We can construct something resembling a Manhattan plot, but where the univariate p-values are replaced by the \emph{variable importance factor}. Figure~\ref{fig:manPlotVIP} shows this type of plot for our particular data. We have also identified the BLK gene using a red line:
 
 <<manPlotVIP, fig.align='center', fig.cap="Manhattan-VIMP plot">>=
 # Manhattan plot VIMP
