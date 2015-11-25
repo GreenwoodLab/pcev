@@ -101,6 +101,8 @@ computePCEV <- function(response, covariate, confounder = NULL,
   return(pcevRes)
 }
 
+######################################
+# Utility functions for estimation----
 computeVIMP <- function(pcevObj, list, signed=FALSE) {
   
   VIMP <- cor(pcevObj$Y, list$PCEV)[,1]
@@ -160,6 +162,7 @@ shrink_est <- function(Vr, res){
   return(out)
 }
 
+###########################
 # Constructor functions----
 
 #' Constructor functions for the different pcev objects
@@ -212,6 +215,7 @@ PcevBlock <- function(response, covariate, confounder) {
   
 }
 
+####################################
 # Documentation for the datasets----
 
 #' Methylation values around BLK gene

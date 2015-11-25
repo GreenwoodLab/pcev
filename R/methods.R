@@ -1,4 +1,4 @@
-# permutation methods----
+# Permutation methods----
 
 #' Permutation p-value
 #' 
@@ -129,6 +129,7 @@ permutePval.PcevBlock <- function(pcevObj, shrink, index, nperm, reduce, ...) {
   return(results)
 }
 
+###################
 # Wilks methods----
 
 #' Wilks' lambda exact test
@@ -196,6 +197,7 @@ wilksPval.PcevBlock <- function(pcevObj, shrink, index, ...) {
 #   return(results)
 }
 
+################################
 # Roy's largest root methods----
 
 #' Roy's largest root exact test
@@ -254,12 +256,6 @@ roysPval.PcevClassical <- function(pcevObj, shrink, index, reduce, ...) {
     # Estimate the null distribution using 
     # permutations and MLE
     if(reduce) {
-#       # Do a first permutation
-#       tmp <- pcevObj
-#       tmp$Y <- tmp$Y[sample(N), ]
-#       results_perm <- estimatePcev(tmp, shrink, index)
-      
-      # Do the other permutations
       null_dist <- replicate(25, expr = {
         tmp <- pcevObj
         tmp$Y <- tmp$Y[sample(N), ]
@@ -314,11 +310,7 @@ roysPval.PcevClassical <- function(pcevObj, shrink, index, reduce, ...) {
 
 #' @describeIn roysPval
 roysPval.PcevBlock <- function(pcevObj, shrink, index, reduce, ...) {
-#   stop(strwrap("Pcev is currently not implemented for
-#                estimation with blocks and an exact inference method"),
-#        call. = FALSE)
-  
-  results <- estimatePcev(pcevObj, shrink, index)
+ results <- estimatePcev(pcevObj, shrink, index)
   N <- nrow(pcevObj$Y)
   p <- ncol(pcevObj$Y)
   q <- ncol(pcevObj$X) - 1
@@ -441,6 +433,7 @@ print.Pcev <- function(x, ...) {
   
 }
 
+########################################################
 # Utility functions for null distribution estimation----
 dtw_ls <- function(x, mu, sigma, beta=1, log=FALSE) {
   x1 <- (x - mu)/sigma
