@@ -6,16 +6,18 @@
 #' method or the block approach. A p-value is also computed, testing the 
 #' significance of the PCEV.
 #' 
-#' When a permutation procedure is used to either estimate a p-value or estimate
-#' the parameters of the null distribution under shrinkage, computations can be
-#' considerably sped up by re-using previous estimates of the residual variance
-#' matrix. This is the default behaviour, and it can be changed by setting the
-#' parameter \code{reduce} to \code{FALSE}.
+#' The p-value is computed using either a permutation approach or an exact test.
+#' The implemented exact tests use Wilks' Lambda (only for a single covariate)
+#' or Roy's Largest Root. The latter uses Johnstone's approximation to the null
+#' distribution. Note that this test is also available for the block approach,
+#' but there is no theoretical guarantee that it works, and the resulting
+#' p-value should therefore be compared to that obtained using a permutation
+#' procedure.
 #' 
 #' @seealso \code{\link{estimatePcev}}
 #' @param response A matrix of response variables.
-#' @param covariate A matrix or a data frame of covariates.
-#' @param confounder A matrix or data frame of confounders
+#' @param covariate An array or a data frame of covariates.
+#' @param confounder An array or data frame of confounders.
 #' @param estimation Character string specifying which estimation method to use:
 #'   \code{"all"} or \code{"block"}. Default value is \code{"all"}.
 #' @param inference Character string specifying which inference method to use: 
@@ -28,8 +30,6 @@
 #'   "permutation"}
 #' @param Wilks Should we use a Wilks test instead of Roy's largest test? This 
 #'   is only implemented for a single covariates.
-#' @param reduce Should we use the previous estimates of the residual variance matrix? 
-#'   See details. The default value is \code{FALSE}.
 #' @return An object of class \code{Pcev} containing the first PCEV, the 
 #'   p-value, the estimate of the shrinkage factor, etc.
 #' @examples 
@@ -42,13 +42,16 @@
 computePCEV <- function(response, covariate, confounder = NULL, 
                         estimation = "all", inference = "exact", 
                         index = NULL, shrink = FALSE, nperm = 1000, 
-                        Wilks = FALSE, reduce = FALSE) {
+                        Wilks = FALSE) {
   # Check input
-  if (!estimation %in% c("all", "block")){
+  if (!estimation %in% c("all", "block")) {
     stop("Estimation method should be \"all\" or \"block\"")
   }
-  if (!inference %in% c("exact", "permutation")){
+  if (!inference %in% c("exact", "permutation")) {
     stop("Inference method should be \"exact\" or \"permutation\"")
+  }
+  if (!is.matrix(response)) {
+    stop("The response variables should be passed as a matrix.")
   }
   if (!is.numeric(index)) index <- NULL
   if (!is.logical(shrink)) shrink <- FALSE
@@ -73,12 +76,12 @@ computePCEV <- function(response, covariate, confounder = NULL,
   
   # Perform estimation and inference
   if (inference == "permutation") {
-    pcevRes <- permutePval(pcevObj, shrink, index, nperm, reduce)
+    pcevRes <- permutePval(pcevObj, shrink, index, nperm)
   } else {
     if (Wilks) {
       pcevRes <- wilksPval(pcevObj, shrink, index)
     } else {
-      pcevRes <- roysPval(pcevObj, shrink, index, reduce)
+      pcevRes <- roysPval(pcevObj, shrink, index)
     }
   }
   
@@ -94,7 +97,6 @@ computePCEV <- function(response, covariate, confounder = NULL,
   pcevRes$nperm <- nperm 
   pcevRes$Wilks <- Wilks
   pcevRes$shrink <- shrink
-  pcevRes$reduce <- reduce
   class(pcevRes) <- "Pcev"
 
   # return results
