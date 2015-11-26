@@ -1,12 +1,12 @@
 Package: pcev
-Title: Principal components of explained variance (PCEV)
+Title: Principal component of explained variance (PCEV)
 Version: 1.1.1
 Authors@R: c(
   person("Maxime", "Turgeon", email = "maxime.turgeon@mail.mcgill.ca",
   role = c("aut", "cre")),
   person("Aurelie", "Labbe", email = "",
   role = c("aut")),
-  person("Karim", "Oualkacha", email = "",
+  person("Karim", "Oualkacha",
   role = c("aut")))
 Description: PCEV is a statistical tool for the analysis of a multivariate
     response vector. It is a dimension-reduction technique, similar to Principal
@@ -19,6 +19,5 @@ LazyData: true
 URL: http://github.com/GreenwoodLab/pcev
 BugReports: http://github.com/GreenwoodLab/pcev/issues
 Suggests: 
-    knitr,
-    testthat
+    knitr
 VignetteBuilder: knitr
