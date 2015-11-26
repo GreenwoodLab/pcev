@@ -1,0 +1,25 @@
+citHeader("To cite pcev in publications use:")
+
+citEntry(entry = "Article",
+  title        = "Principal component of explained variance: An efficient
+  and optimal data dimension reduction framework for association studies.",
+  author       = personList(as.person("Maxime Turgeon"),
+                   as.person("Karim Oualkacha"),
+                   as.person("Antonio Ciampi")
+                   as.person("Golsa Dehghan")
+                   as.person("Brent W. Zanke")
+                   as.person("Celia M.T. Greenwood")
+                   as.person("Aurelie Labbe")),
+  journal      = "",
+  year         = "",
+  volume       = "",
+  number       = "",
+  pages        = "",
+  url          = "",
+
+  textVersion  =
+  paste("Turgeon M. et al.",
+        "Principal component of explained variance: An efficient
+  and optimal data dimension reduction framework for association studies.",
+        "In preparation.")
+)

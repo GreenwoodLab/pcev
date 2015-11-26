@@ -1,7 +1,6 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
 ^inst/*$
-^tests/*$
 ^BLK3.pdf$
 ^analysisScript\.R$
 ^estimatePcev_red.R$
