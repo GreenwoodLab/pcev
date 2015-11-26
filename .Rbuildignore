@@ -3,10 +3,12 @@
 ^inst/*$
 ^tests/*$
 ^BLK3.pdf$
-^analysisScript.R$
+^analysisScript\.R$
+^estimatePcev_red.R$
 ^Rprof\.out$
 ^vignettes/*tex$
 ^vignettes/figure/*$
+^vignettes/cache/*$
 ^vignettes/pcev\.log*$
 ^vignettes/*pdf*$
 

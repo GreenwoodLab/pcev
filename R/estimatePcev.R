@@ -57,6 +57,9 @@ estimatePcev.PcevClassical <- function(pcevObj, shrink, index, ...) {
   }
   
   value <- 1/sqrt(diagD)
+  if (any(is.nan(value))) {
+    stop("The residual variance matrix is numerically singular.", call. = FALSE)
+  } 
   root_Vr <- Ur %*% diag(value, nrow = length(value)) %*% t(Ur)
   mainMatrix <- root_Vr %*% Vm %*% root_Vr
   temp1 <- eigen(mainMatrix, symmetric=TRUE)
