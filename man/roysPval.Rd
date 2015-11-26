@@ -11,9 +11,9 @@ roysPval(pcevObj, ...)
 
 \method{roysPval}{default}(pcevObj, ...)
 
-\method{roysPval}{PcevClassical}(pcevObj, shrink, index, reduce, ...)
+\method{roysPval}{PcevClassical}(pcevObj, shrink, index, ...)
 
-\method{roysPval}{PcevBlock}(pcevObj, shrink, index, reduce, ...)
+\method{roysPval}{PcevBlock}(pcevObj, shrink, index, ...)
 }
 \arguments{
 \item{pcevObj}{A pcev object of class \code{PcevClassical} or
@@ -26,9 +26,6 @@ roysPval(pcevObj, ...)
 \item{index}{If \code{pcevObj} is of class \code{PcevBlock}, index is a
 vector describing the block to which individual response variables
 correspond.}
-
-\item{reduce}{Logical. Should we reduce the computation time by re-using the
-previous estimates of the inverse residual variance matrix?}
 }
 \description{
 This function uses Johnstone's approximation to the null distribution of

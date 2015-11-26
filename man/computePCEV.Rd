@@ -6,14 +6,14 @@
 \usage{
 computePCEV(response, covariate, confounder = NULL, estimation = "all",
   inference = "exact", index = NULL, shrink = FALSE, nperm = 1000,
-  Wilks = FALSE, reduce = TRUE)
+  Wilks = FALSE)
 }
 \arguments{
 \item{response}{A matrix of response variables.}
 
-\item{covariate}{A matrix or a data frame of covariates.}
+\item{covariate}{An array or a data frame of covariates.}
 
-\item{confounder}{A matrix or data frame of confounders}
+\item{confounder}{An array or data frame of confounders.}
 
 \item{estimation}{Character string specifying which estimation method to use:
 \code{"all"} or \code{"block"}. Default value is \code{"all"}.}
@@ -32,9 +32,6 @@ Default value is \code{FALSE}..}
 
 \item{Wilks}{Should we use a Wilks test instead of Roy's largest test? This
 is only implemented for a single covariates.}
-
-\item{reduce}{Should we use the previous estimates of the residual variance matrix?
-See details. The default value is \code{TRUE}.}
 }
 \value{
 An object of class \code{Pcev} containing the first PCEV, the
@@ -48,11 +45,13 @@ This is the main function. It computes the PCEV using either the classical
 method or the block approach. A p-value is also computed, testing the
 significance of the PCEV.
 
-When a permutation procedure is used to either estimate a p-value or estimate
-the parameters of the null distribution under shrinkage, computations can be
-considerably sped up by re-using previous estimates of the residual variance
-matrix. This is the default behaviour, and it can be changed by setting the
-parameter \code{reduce} to \code{FALSE}.
+The p-value is computed using either a permutation approach or an exact test.
+The implemented exact tests use Wilks' Lambda (only for a single covariate)
+or Roy's Largest Root. The latter uses Johnstone's approximation to the null
+distribution. Note that this test is also available for the block approach,
+but there is no theoretical guarantee that it works, and the resulting
+p-value should therefore be compared to that obtained using a permutation
+procedure.
 }
 \examples{
 set.seed(12345)

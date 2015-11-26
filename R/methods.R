@@ -11,8 +11,6 @@
 #'   vector describing the block to which individual response variables
 #'   correspond.
 #' @param nperm The number of permutations to perform.
-#' @param reduce Logical. Should we reduce the computation time by re-using the
-#'   previous estimates of the inverse residual variance matrix?
 #' @param ... Extra parameters.
 #' @export
 permutePval <- function(pcevObj, ...) UseMethod("permutePval")
@@ -25,7 +23,7 @@ permutePval.default <- function(pcevObj, ...) {
 }
 
 #' @describeIn permutePval
-permutePval.PcevClassical <- function(pcevObj, shrink, index, nperm, reduce, ...) {
+permutePval.PcevClassical <- function(pcevObj, shrink, index, nperm, ...) {
   results <- estimatePcev(pcevObj, shrink)
   N <- nrow(pcevObj$Y)
   
@@ -36,39 +34,21 @@ permutePval.PcevClassical <- function(pcevObj, shrink, index, nperm, reduce, ...
   initFstat <- (sum((mean(PCEV) - initFit$fitted.values)^2)/df1)/(sum(initFit$residuals^2)/df2)
   initPval <- pf(initFstat, df1, df2, lower.tail = FALSE)
   
-  if (reduce) {
-    permutationPvalues <- replicate(nperm, expr = {
-      tmp <- pcevObj
-      tmp$Y <- tmp$Y[sample(N), ]
+  permutationPvalues <- replicate(nperm, expr = {
+    tmp <- pcevObj
+    tmp$Y <- tmp$Y[sample(N), ]
+    
+    tmpRes <- try(estimatePcev(tmp, shrink, index), silent=TRUE)
+    if(inherits(tmpRes, "try-error")) {
+      return(NA)
+    } else {
+      tmpPCEV <- tmp$Y %*% tmpRes$weights
       
-      tmpRes <- try(estimatePcev_red(tmp, index, results$rootVr), silent=TRUE)
-      if(inherits(tmpRes, "try-error")) {
-        return(NA)
-      } else {
-        tmpPCEV <- tmp$Y %*% tmpRes$weights
-        
-        tmpFit <- lm.fit(tmp$X, tmpPCEV)
-        tmpFstat <- (sum((mean(tmpPCEV) - tmpFit$fitted.values)^2)/df1)/(sum(tmpFit$residuals^2)/df2)
-        return(pf(tmpFstat, df1, df2, lower.tail = FALSE))
-      }
-    })
-  } else {
-    permutationPvalues <- replicate(nperm, expr = {
-      tmp <- pcevObj
-      tmp$Y <- tmp$Y[sample(N), ]
-      
-      tmpRes <- try(estimatePcev(tmp, shrink, index), silent=TRUE)
-      if(inherits(tmpRes, "try-error")) {
-        return(NA)
-      } else {
-        tmpPCEV <- tmp$Y %*% tmpRes$weights
-        
-        tmpFit <- lm.fit(tmp$X, tmpPCEV)
-        tmpFstat <- (sum((mean(tmpPCEV) - tmpFit$fitted.values)^2)/df1)/(sum(tmpFit$residuals^2)/df2)
-        return(pf(tmpFstat, df1, df2, lower.tail = FALSE))
-      }
-    })
-  }
+      tmpFit <- lm.fit(tmp$X, tmpPCEV)
+      tmpFstat <- (sum((mean(tmpPCEV) - tmpFit$fitted.values)^2)/df1)/(sum(tmpFit$residuals^2)/df2)
+      return(pf(tmpFstat, df1, df2, lower.tail = FALSE))
+    }
+  })
   
   pvalue <- mean(permutationPvalues < initPval)
   
@@ -78,7 +58,7 @@ permutePval.PcevClassical <- function(pcevObj, shrink, index, nperm, reduce, ...
 }
 
 #' @describeIn permutePval
-permutePval.PcevBlock <- function(pcevObj, shrink, index, nperm, reduce, ...) {
+permutePval.PcevBlock <- function(pcevObj, shrink, index, nperm, ...) {
   results <- estimatePcev(pcevObj, shrink, index)
   N <- nrow(pcevObj$Y)
   
@@ -89,39 +69,22 @@ permutePval.PcevBlock <- function(pcevObj, shrink, index, nperm, reduce, ...) {
   initFstat <- (sum((mean(PCEV) - initFit$fitted.values)^2)/df1)/(sum(initFit$residuals^2)/df2)
   initPval <- pf(initFstat, df1, df2, lower.tail = FALSE)
   
-  if (reduce) {
-    permutationPvalues <- replicate(nperm, expr = {
-      tmp <- pcevObj
-      tmp$Y <- tmp$Y[sample(N), ]
+  permutationPvalues <- replicate(nperm, expr = {
+    tmp <- pcevObj
+    tmp$Y <- tmp$Y[sample(N), ]
+    
+    tmpRes <- try(estimatePcev(tmp, shrink, index), silent=TRUE)
+    if(inherits(tmpRes, "try-error")) {
+      return(NA)
+    } else {
+      tmpPCEV <- tmp$Y %*% tmpRes$weights
       
-      tmpRes <- try(estimatePcev_red(tmp, index, results$rootVr), silent=TRUE)
-      if(inherits(tmpRes, "try-error")) {
-        return(NA)
-      } else {
-        tmpPCEV <- tmp$Y %*% tmpRes$weights
-        
-        tmpFit <- lm.fit(tmp$X, tmpPCEV)
-        tmpFstat <- (sum((mean(tmpPCEV) - tmpFit$fitted.values)^2)/df1)/(sum(tmpFit$residuals^2)/df2)
-        return(pf(tmpFstat, df1, df2, lower.tail = FALSE))
-      }
-    })
-  } else {
-    permutationPvalues <- replicate(nperm, expr = {
-      tmp <- pcevObj
-      tmp$Y <- tmp$Y[sample(N), ]
-      
-      tmpRes <- try(estimatePcev(tmp, shrink, index), silent=TRUE)
-      if(inherits(tmpRes, "try-error")) {
-        return(NA)
-      } else {
-        tmpPCEV <- tmp$Y %*% tmpRes$weights
-        
-        tmpFit <- lm.fit(tmp$X, tmpPCEV)
-        tmpFstat <- (sum((mean(tmpPCEV) - tmpFit$fitted.values)^2)/df1)/(sum(tmpFit$residuals^2)/df2)
-        return(pf(tmpFstat, df1, df2, lower.tail = FALSE))
-      }
-    })
-  }
+      tmpFit <- lm.fit(tmp$X, tmpPCEV)
+      tmpFstat <- (sum((mean(tmpPCEV) - tmpFit$fitted.values)^2)/df1)/(sum(tmpFit$residuals^2)/df2)
+      return(pf(tmpFstat, df1, df2, lower.tail = FALSE))
+    }
+  })
+  
   
   pvalue <- mean(permutationPvalues < initPval, na.rm = TRUE)
   results$pvalue <- pvalue
@@ -176,25 +139,6 @@ wilksPval.PcevBlock <- function(pcevObj, shrink, index, ...) {
   stop(strwrap("Pcev is currently not implemented for
                estimation with blocks and an exact inference method"),
        call. = FALSE)
-#   N <- nrow(pcevObj$Y)
-#   p <- ncol(pcevObj$Y)
-#   if (N - p <= 1) stop("To perform an exact test, we need N - p > 1", 
-#                        call. = FALSE)
-#   results <- estimatePcev(pcevObj, shrink, index)
-#   PCEV <- pcevObj$Y %*% results$weights
-#   
-#   fit <- lm.fit(pcevObj$X, PCEV)
-#   beta <- fit$coefficients[2]
-#   h2Hat <- beta^2/(1 + beta^2)
-#   lambda <- h2Hat/(1 - h2Hat)
-#   
-#   df1 <- p
-#   df2 <- N-p-1
-#   pvalue <- pf((N-p-1) * lambda/p, df1, df2, lower.tail = FALSE)
-#   
-#   results$pvalue <- pvalue
-#   
-#   return(results)
 }
 
 ################################
@@ -215,8 +159,6 @@ wilksPval.PcevBlock <- function(pcevObj, shrink, index, ...) {
 #' @param index If \code{pcevObj} is of class \code{PcevBlock}, index is a 
 #'   vector describing the block to which individual response variables 
 #'   correspond.
-#' @param reduce Logical. Should we reduce the computation time by re-using the
-#'   previous estimates of the inverse residual variance matrix?
 #' @param ... Extra parameters.
 #' @export
 roysPval <- function(pcevObj, ...) UseMethod("roysPval")
@@ -229,7 +171,7 @@ roysPval.default <- function(pcevObj, ...) {
 }
 
 #' @describeIn roysPval
-roysPval.PcevClassical <- function(pcevObj, shrink, index, reduce, ...) {
+roysPval.PcevClassical <- function(pcevObj, shrink, index, ...) {
   
   results <- estimatePcev(pcevObj, shrink)
   N <- nrow(pcevObj$Y)
@@ -255,31 +197,17 @@ roysPval.PcevClassical <- function(pcevObj, shrink, index, reduce, ...) {
   if(shrink) {
     # Estimate the null distribution using 
     # permutations and MLE
-    if(reduce) {
-      null_dist <- replicate(25, expr = {
-        tmp <- pcevObj
-        tmp$Y <- tmp$Y[sample(N), ]
-        
-        tmpRes <- try(estimatePcev_red(tmp, index, results$rootVr), silent=TRUE)
-        if(inherits(tmpRes, "try-error")) {
-          return(NA)
-        } else {
-          return(tmpRes$largestRoot)
-        }
-      })
-    } else {
-      null_dist <- replicate(25, expr = {
-        tmp <- pcevObj
-        tmp$Y <- tmp$Y[sample(N), ]
-        
-        tmpRes <- try(estimatePcev(tmp, shrink, index), silent=TRUE)
-        if(inherits(tmpRes, "try-error")) {
-          return(NA)
-        } else {
-          return(tmpRes$largestRoot)
-        }
-      })
-    }
+    null_dist <- replicate(25, expr = {
+      tmp <- pcevObj
+      tmp$Y <- tmp$Y[sample(N), ]
+      
+      tmpRes <- try(estimatePcev(tmp, shrink, index), silent=TRUE)
+      if(inherits(tmpRes, "try-error")) {
+        return(NA)
+      } else {
+        return(tmpRes$largestRoot)
+      }
+    })
     
     # Fit a location-scale version of TW distribution
     # Note: likelihood may throw warnings at some evaluations, 
@@ -309,8 +237,11 @@ roysPval.PcevClassical <- function(pcevObj, shrink, index, reduce, ...) {
 }
 
 #' @describeIn roysPval
-roysPval.PcevBlock <- function(pcevObj, shrink, index, reduce, ...) {
- results <- estimatePcev(pcevObj, shrink, index)
+roysPval.PcevBlock <- function(pcevObj, shrink, index, ...) {
+  
+  warning("There is no theoretical guarantee that this approach works.\nWe recommend comparing the resulting p-value with that obtained from a permutation procedure.")
+  
+  results <- estimatePcev(pcevObj, shrink, index)
   N <- nrow(pcevObj$Y)
   p <- ncol(pcevObj$Y)
   q <- ncol(pcevObj$X) - 1
@@ -394,6 +325,7 @@ roysPval.PcevBlock <- function(pcevObj, shrink, index, reduce, ...) {
   return(results)
 }
 
+##################
 # Print method----
 
 #' @export

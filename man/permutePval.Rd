@@ -11,9 +11,9 @@ permutePval(pcevObj, ...)
 
 \method{permutePval}{default}(pcevObj, ...)
 
-\method{permutePval}{PcevClassical}(pcevObj, shrink, index, nperm, reduce, ...)
+\method{permutePval}{PcevClassical}(pcevObj, shrink, index, nperm, ...)
 
-\method{permutePval}{PcevBlock}(pcevObj, shrink, index, nperm, reduce, ...)
+\method{permutePval}{PcevBlock}(pcevObj, shrink, index, nperm, ...)
 }
 \arguments{
 \item{pcevObj}{A pcev object of class \code{PcevClassical} or
@@ -28,9 +28,6 @@ vector describing the block to which individual response variables
 correspond.}
 
 \item{nperm}{The number of permutations to perform.}
-
-\item{reduce}{Logical. Should we reduce the computation time by re-using the
-previous estimates of the inverse residual variance matrix?}
 }
 \description{
 Computes a p-value using a permutation procedure.
