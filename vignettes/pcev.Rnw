@@ -1,6 +1,8 @@
-\documentclass{article}
+%\VignetteEngine{knitr::knitr}
 %\VignetteIndexEntry{Principal Component of Explained Variance}
-%\VignetteEngine{knitr::latex}
+%\VignetteDepends{pcev,RMTstat}
+
+\documentclass{article}
 \usepackage{amsmath,amsthm,amscd,amsfonts,amssymb}
 
 \newcommand{\Var}{\mathrm{Var}}

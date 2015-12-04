@@ -174,22 +174,22 @@ roysPval.default <- function(pcevObj, ...) {
 roysPval.PcevClassical <- function(pcevObj, shrink, index, ...) {
   
   results <- estimatePcev(pcevObj, shrink)
-  N <- nrow(pcevObj$Y)
+  n <- nrow(pcevObj$Y)
   p <- ncol(pcevObj$Y)
   q <- ncol(pcevObj$X) - 1
   d <- results$largestRoot
   # theta <- d / (1 + d)
   
   nuH <- q
-  nuE <- N - q - 1
+  nuE <- n - q - 1
   s <- min(p, nuH)
   m <- 0.5 * (abs(p - nuH) - 1)
-  n <- 0.5 * (nuE - p - 1)
+  N <- 0.5 * (nuE - p - 1)
   one_third <- 1/3
   
-  N1 <- 2 * (s + m + n) + 1 
-  gamma <- 2 * asin( sqrt( (s - 0.5)/N ) )
-  phi <- 2*asin( sqrt( (s + 2*m + 0.5)/N ) )
+  N1 <- 2 * (s + m + N) + 1 
+  gamma <- 2 * asin( sqrt( (s - 0.5)/N1 ) )
+  phi <- 2*asin( sqrt( (s + 2*m + 0.5)/N1 ) )
   
   mu <- 2 * log(tan( 0.5*(phi + gamma)))
   sigma <- (16/N^2)^one_third * ( sin(phi+gamma)^2*sin(phi)*sin(gamma)) ^(-1*one_third)

@@ -4,7 +4,7 @@ Version: 1.1.1
 Authors@R: c(
   person("Maxime", "Turgeon", email = "maxime.turgeon@mail.mcgill.ca",
   role = c("aut", "cre")),
-  person("Aurelie", "Labbe", email = "",
+  person("Aurelie", "Labbe",
   role = c("aut")),
   person("Karim", "Oualkacha",
   role = c("aut")))
@@ -18,6 +18,5 @@ License: GPL (>=2)
 LazyData: true
 URL: http://github.com/GreenwoodLab/pcev
 BugReports: http://github.com/GreenwoodLab/pcev/issues
-Suggests: 
-    knitr
+Suggests: knitr
 VignetteBuilder: knitr
