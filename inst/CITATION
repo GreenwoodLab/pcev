@@ -5,10 +5,10 @@ citEntry(entry = "Article",
   and optimal data dimension reduction framework for association studies.",
   author       = personList(as.person("Maxime Turgeon"),
                    as.person("Karim Oualkacha"),
-                   as.person("Antonio Ciampi")
-                   as.person("Golsa Dehghan")
-                   as.person("Brent W. Zanke")
-                   as.person("Celia M.T. Greenwood")
+                   as.person("Antonio Ciampi"),
+                   as.person("Golsa Dehghan"),
+                   as.person("Brent W. Zanke"),
+                   as.person("Celia M.T. Greenwood"),
                    as.person("Aurelie Labbe")),
   journal      = "",
   year         = "",

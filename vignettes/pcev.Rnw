@@ -1,6 +1,5 @@
 %\VignetteEngine{knitr::knitr}
 %\VignetteIndexEntry{Principal Component of Explained Variance}
-%\VignetteDepends{pcev,RMTstat}
 
 \documentclass{article}
 \usepackage{amsmath,amsthm,amscd,amsfonts,amssymb}
