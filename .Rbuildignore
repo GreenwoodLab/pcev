@@ -5,6 +5,7 @@
 ^analysisScript\.R$
 ^estimatePcev_red.R$
 ^Rprof\.out$
+^cran-comments\.md$
 ^vignettes/*tex$
 ^vignettes/figure/*$
 ^vignettes/cache/*$
