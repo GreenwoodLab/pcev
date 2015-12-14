@@ -125,6 +125,9 @@ estimatePcev.PcevBlock <- function(pcevObj, shrink, index, ...) {
     weights[index==i] <- weights[index==i]*weight_step2[counter]
   }
   
+  vipBlock <- VIMP <- abs(cor(Ypcev, Ypcev %*% weight_step2)[,1])
+  
   return(list("weights" = weights,
-              "rootVr" = rootVr))
+              "rootVr" = rootVr,
+              "VIMPblock" = vipBlock))
 }
