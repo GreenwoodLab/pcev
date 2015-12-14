@@ -360,7 +360,7 @@ print.Pcev <- function(x, ...) {
   if(x$shrink) cat("\nShrinkage parameter rho was estimated at", x$rho, "\n")
   cat("\nVariable importance factors")
   if(p > 10) cat(" (truncated)\n") else cat("\n")
-  cat(format(head(sort(x$VIMP, decreasing = TRUE), n = 10), digits = 3), 
+  cat(format(sort(x$VIMP, decreasing = TRUE)[1:10], digits = 3), 
       "\n\n")
   
 }
