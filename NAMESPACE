@@ -8,3 +8,5 @@ export(estimatePcev)
 export(permutePval)
 export(roysPval)
 export(wilksPval)
+importFrom("stats", "coefficients", "cor", "lm.fit", "model.matrix",
+             "optim", "pf")
