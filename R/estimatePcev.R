@@ -6,11 +6,11 @@
 #' @param pcevObj A pcev object of class \code{PcevClassical} or 
 #'   \code{PcevBlock}
 #' @param shrink Should we use a shrinkage estimate of the residual variance? 
-#' @param index If \code{pcevObj} is of class \code{PcevBlock}, index is a vector
+#' @param index If \code{pcevObj} is of class \code{PcevBlock}, \code{index} is a vector
 #'   describing the block to which individual response variables correspond.
 #' @param ... Extra parameters.
 #' @return A list containing the variance components, the first PCEV, the 
-#'   eigenvalues of \eqn{V_R^{-1}V_G} and the estimate of the shrinkage 
+#'   eigenvalues of \eqn{V_R^{-1}V_M} and the estimate of the shrinkage 
 #'   parameter \eqn{\rho}
 #' @export 
 estimatePcev <- function(pcevObj, ...) UseMethod("estimatePcev")

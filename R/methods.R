@@ -7,7 +7,7 @@
 #' @param pcevObj A pcev object of class \code{PcevClassical} or 
 #'   \code{PcevBlock}
 #' @param shrink Should we use a shrinkage estimate of the residual variance?
-#' @param index If \code{pcevObj} is of class \code{PcevBlock}, index is a
+#' @param index If \code{pcevObj} is of class \code{PcevBlock}, \code{index} is a
 #'   vector describing the block to which individual response variables
 #'   correspond.
 #' @param nperm The number of permutations to perform.
@@ -97,15 +97,16 @@ permutePval.PcevBlock <- function(pcevObj, shrink, index, nperm, ...) {
 
 #' Wilks' lambda exact test
 #' 
-#' Computes a p-value using the Wilk's Lambda. The null distribution of this
-#' test statistic is only known in the case of a single covariate, and therefore
-#' this is the only case implemented.
+#' Computes a p-value using Wilks' Lambda.
+#' 
+#' The null distribution of this test statistic is only known in the case of a
+#' single covariate, and therefore this is the only case implemented.
 #' 
 #' @param pcevObj A pcev object of class \code{PcevClassical} or 
 #'   \code{PcevBlock}
 #' @param shrink Should we use a shrinkage estimate of the residual variance?
-#' @param index If \code{pcevObj} is of class \code{PcevBlock}, index is a
-#'   vector describing the block to which individual response variables
+#' @param index If \code{pcevObj} is of class \code{PcevBlock}, \code{index} is
+#'   a vector describing the block to which individual response variables 
 #'   correspond.
 #' @param ... Extra parameters.
 #' @export
@@ -147,16 +148,16 @@ wilksPval.PcevBlock <- function(pcevObj, shrink, index, ...) {
 #' Roy's largest root exact test
 #' 
 #' This function uses Johnstone's approximation to the null distribution of 
-#' Roy's Largest Root statistic. It uses the a location-scale variant of the 
+#' Roy's Largest Root statistic. It uses a location-scale variant of the 
 #' Tracy-Wildom distribution of order 1.
 #' 
 #' Note that if \code{shrink} is set to \code{TRUE}, the location-scale
-#' parameters are estimated using a smaller number of permutations. distribution
+#' parameters are estimated using a small number of permutations.
 #' 
 #' @param pcevObj A pcev object of class \code{PcevClassical} or 
 #'   \code{PcevBlock}
 #' @param shrink Should we use a shrinkage estimate of the residual variance?
-#' @param index If \code{pcevObj} is of class \code{PcevBlock}, index is a 
+#' @param index If \code{pcevObj} is of class \code{PcevBlock}, \code{index} is a 
 #'   vector describing the block to which individual response variables 
 #'   correspond.
 #' @param ... Extra parameters.

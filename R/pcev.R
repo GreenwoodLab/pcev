@@ -14,5 +14,5 @@
 #' \code{\link{roysPval}}
 #'
 #' @docType package
-#' @name pcev
+#' @name pcev-package
 NULL

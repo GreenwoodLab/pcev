@@ -22,14 +22,14 @@
 #'   \code{"all"} or \code{"block"}. Default value is \code{"all"}.
 #' @param inference Character string specifying which inference method to use: 
 #'   \code{"exact"} or \code{"permutation"}. Default value is \code{"exact"}.
-#' @param index If \code{estimation = "block"}, index is a vector describing the
+#' @param index If \code{estimation = "block"}, \code{index} is a vector describing the
 #'   block to which individual response variables correspond.
 #' @param shrink Should we use a shrinkage estimate of the residual variance? 
 #'   Default value is \code{FALSE}..
 #' @param nperm The number of permutations to perform if \code{inference = 
 #'   "permutation"}
 #' @param Wilks Should we use a Wilks test instead of Roy's largest test? This 
-#'   is only implemented for a single covariates.
+#'   is only implemented for a single covariate.
 #' @return An object of class \code{Pcev} containing the first PCEV, the 
 #'   p-value, the estimate of the shrinkage factor, etc.
 #' @examples 
@@ -169,8 +169,8 @@ shrink_est <- function(Vr, res){
 
 #' Constructor functions for the different pcev objects
 #' 
-#' \code{PcevClassical} and \code{PcevBlock} create the pcev objects from the
-#' provided data that are necessary to compute the PCEV according to the user's
+#' \code{PcevClassical} and \code{PcevBlock} create the pcev objects from the 
+#' provided data that are necessary to compute the PCEV according to the user's 
 #' parameters.
 #' 
 #' @seealso \code{\link{estimatePcev}}, \code{\link{computePCEV}}
@@ -178,8 +178,8 @@ shrink_est <- function(Vr, res){
 #' @param covariate A matrix or a data frame of covariates.
 #' @param confounder A matrix or data frame of confounders
 #' @return A pcev object, of the class that corresponds to the estimation 
-#'   method. These objects are lists that essentially contain the data necessary
-#'   for computation.
+#'   method. These objects are lists that contain the data necessary for
+#'   computation.
 #' @name PcevObj
 NULL
 
@@ -237,7 +237,7 @@ PcevBlock <- function(response, covariate, confounder) {
 #' \item{position}{Data frame recording the position of each CpG site along the BLK region}
 #' \item{index}{Index vector used in the computation of PCEV-block}
 #' }
-#' @source Tomi Pastinen, McGill University
+#' @source Tomi Pastinen, McGill University, GEnome Quebec.
 "methylation"
 
 #' @rdname methylation
