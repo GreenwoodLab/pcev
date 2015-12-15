@@ -8,7 +8,7 @@ PCEV is a statistical tool for the analysis of a mutivariate response vector. It
 
 ## Installation
 
-You can install from GitHub using the [devtools](http://cran.r-project.org/web/packages/devtools/index.html) package:
+This package is available on [CRAN](https://cran.r-project.org/web/packages/pcev/). Alternatively, you can install from GitHub using the [devtools](http://cran.r-project.org/web/packages/devtools/index.html) package:
 
 ``` r
 library(devtools)
