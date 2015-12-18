@@ -1,5 +1,5 @@
 # PCEV
-[![Build Status](https://travis-ci.org/GreenwoodLab/pcev.svg?branch=master)](https://travis-ci.org/GreenwoodLab/pcev) [![CRAN](http://www.r-pkg.org/badges/version/pcev)](http://cran.rstudio.com/package=pcev) [![Downloads](http://cranlogs.r-pkg.org/badges/pcev?color=brightgreen)](http://www.r-pkg.org/pkg/pcev)
+[![Build Status](https://travis-ci.org/GreenwoodLab/pcev.svg?branch=master)](https://travis-ci.org/GreenwoodLab/pcev) [![CRAN](http://www.r-pkg.org/badges/version/pcev)](http://cran.rstudio.com/package=pcev) [![Downloads](http://cranlogs.r-pkg.org/badges/grand-total/pcev?color=green)](http://www.r-pkg.org/pkg/pcev)
 
 
 R package which implements Principal components of explained variance (PCEV).
