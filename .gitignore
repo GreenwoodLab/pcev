@@ -10,3 +10,4 @@ analysisScript.R
 vignettes/
 !vignettes/pcev.Rnw
 .commit
+cran-comments.md
