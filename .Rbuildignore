@@ -11,6 +11,7 @@
 ^vignettes/cache/*$
 ^vignettes/pcev\.log*$
 ^vignettes/*pdf*$
+^pcev_stats\.pdf$
 
 ## Ignore travis config file
 ^\.travis\.yml$
