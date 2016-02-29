@@ -66,12 +66,15 @@ estimatePcev.PcevClassical <- function(pcevObj, shrink, index, ...) {
   weights <- root_Vr %*% temp1$vectors
   d <- temp1$values
   
-  return(list("residual" = Vr,
+  out <- list("residual" = Vr,
               "model" = Vm,
               "weights" = weights[,1, drop=FALSE],
               "rootVr" = root_Vr,
               "largestRoot" = d[1],
-              "rho" = rho))
+              "rho" = rho)
+  if (ncol(pcevObj$X) > 2) out$otherWeights <- weights[,2:(ncol(pcevObj$X)-1), drop=FALSE]
+  
+  return(out)
 }
 
 #' @describeIn estimatePcev
@@ -125,9 +128,8 @@ estimatePcev.PcevBlock <- function(pcevObj, shrink, index, ...) {
     weights[index==i] <- weights[index==i]*weight_step2[counter]
   }
   
-  vipBlock <- VIMP <- abs(cor(Ypcev, Ypcev %*% weight_step2)[,1])
+  # vipBlock <- VIMP <- abs(cor(Ypcev, Ypcev %*% weight_step2)[,1])
   
   return(list("weights" = weights,
-              "rootVr" = rootVr,
-              "VIMPblock" = vipBlock))
+              "rootVr" = rootVr))
 }
