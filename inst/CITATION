@@ -7,9 +7,13 @@ citEntry(entry = "Article",
                    as.person("Karim Oualkacha"),
                    as.person("Antonio Ciampi"),
                    as.person("Golsa Dehghan"),
+                   as.person("Andrea L. Benedet"),
+                   as.person("Pedro Rosa-Neto"),
                    as.person("Brent W. Zanke"),
                    as.person("Celia M.T. Greenwood"),
-                   as.person("Aurelie Labbe")),
+                   as.person("Aurelie Labbe"),
+                   person("for the Alzheimer's Disease Neuroimaging Initiative", 
+                   role = "aut")),
   journal      = "",
   year         = "",
   volume       = "",
@@ -21,5 +25,5 @@ citEntry(entry = "Article",
   paste("Turgeon M. et al.",
         "Principal component of explained variance: An efficient
   and optimal data dimension reduction framework for association studies.",
-        "In preparation.")
+        "Submitted")
 )

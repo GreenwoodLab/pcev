@@ -15,14 +15,14 @@
 #' @export
 permutePval <- function(pcevObj, ...) UseMethod("permutePval")
 
-#' @describeIn permutePval
+#' @rdname permutePval
 permutePval.default <- function(pcevObj, ...) {
   stop(strwrap("This function should be used with a Pcev object of class 
                PcevClassical or PcevBlock"),
        call. = FALSE)
 }
 
-#' @describeIn permutePval
+#' @rdname permutePval
 permutePval.PcevClassical <- function(pcevObj, shrink, index, nperm, ...) {
   results <- estimatePcev(pcevObj, shrink)
   N <- nrow(pcevObj$Y)
@@ -57,7 +57,7 @@ permutePval.PcevClassical <- function(pcevObj, shrink, index, nperm, ...) {
   return(results)
 }
 
-#' @describeIn permutePval
+#' @rdname permutePval
 permutePval.PcevBlock <- function(pcevObj, shrink, index, nperm, ...) {
   results <- estimatePcev(pcevObj, shrink, index)
   N <- nrow(pcevObj$Y)
@@ -112,14 +112,14 @@ permutePval.PcevBlock <- function(pcevObj, shrink, index, nperm, ...) {
 #' @export
 wilksPval <- function(pcevObj, ...) UseMethod("wilksPval")
 
-#' @describeIn wilksPval
+#' @rdname wilksPval
 wilksPval.default <- function(pcevObj, ...) {
   stop(strwrap("This function should be used with a Pcev object of class 
                PcevClassical or PcevBlock"),
        call. = FALSE)
 }
 
-#' @describeIn wilksPval
+#' @rdname wilksPval
 wilksPval.PcevClassical <- function(pcevObj, shrink, index, ...) {
   results <- estimatePcev(pcevObj, shrink)
   N <- nrow(pcevObj$Y)
@@ -135,7 +135,7 @@ wilksPval.PcevClassical <- function(pcevObj, shrink, index, ...) {
   return(results)
 }
 
-#' @describeIn wilksPval
+#' @rdname wilksPval
 wilksPval.PcevBlock <- function(pcevObj, shrink, index, ...) {
   stop(strwrap("Pcev is currently not implemented for
                estimation with blocks and an exact inference method"),
@@ -164,14 +164,14 @@ wilksPval.PcevBlock <- function(pcevObj, shrink, index, ...) {
 #' @export
 roysPval <- function(pcevObj, ...) UseMethod("roysPval")
 
-#' @describeIn roysPval
+#' @rdname roysPval
 roysPval.default <- function(pcevObj, ...) {
   stop(strwrap("This function should be used with a Pcev object of class 
                PcevClassical"),
        call. = FALSE)
 }
 
-#' @describeIn roysPval
+#' @rdname roysPval
 roysPval.PcevClassical <- function(pcevObj, shrink, index, ...) {
   
   results <- estimatePcev(pcevObj, shrink)
@@ -237,7 +237,7 @@ roysPval.PcevClassical <- function(pcevObj, shrink, index, ...) {
   
 }
 
-#' @describeIn roysPval
+#' @rdname roysPval
 roysPval.PcevBlock <- function(pcevObj, shrink, index, ...) {
   
   warning("There is no theoretical guarantee that this approach works.\nWe recommend comparing the resulting p-value with that obtained from a permutation procedure.")

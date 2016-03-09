@@ -39,23 +39,40 @@
 #' pcev_out <- computePCEV(Y, X)
 #' pcev_out2 <- computePCEV(Y, X, shrink = TRUE)
 #' @export
-computePCEV <- function(response, covariate, confounder = NULL, 
-                        estimation = "all", inference = "exact", 
+#' @importFrom stats coefficients cor lm.fit model.matrix optim pf
+computePCEV <- function(response, covariate, confounder, 
+                        estimation = c("all", "block"), 
+                        inference = c("exact", "permutation"), 
                         index = NULL, shrink = FALSE, nperm = 1000, 
                         Wilks = FALSE) {
   # Check input
-  if (!estimation %in% c("all", "block")) {
-    stop("Estimation method should be \"all\" or \"block\"")
-  }
-  if (!inference %in% c("exact", "permutation")) {
-    stop("Inference method should be \"exact\" or \"permutation\"")
-  }
+  estimation <- tryCatch(match.arg(estimation),
+                         error = function(c) {
+                           stop("Estimation method should be \"all\" or \"block\"", 
+                                call. = FALSE)
+                         })
+  
+  inference <- tryCatch(match.arg(inference),
+                        error = function(c) {
+                          stop("Inference method should be \"exact\" or \"permutation\"", 
+                               call. = FALSE)
+                        })
   if (!is.matrix(response)) {
-    stop("The response variables should be passed as a matrix.")
+    stop("The response variables should be passed as a matrix.", call. = FALSE)
   }
+  if(missing(confounder)) confounder <- NULL
+  
+  # We don't allow for missing values
+  if(anyNA(response) || anyNA(covariate) || anyNA(confounder)) {
+    stop("Missing values are not allowed", call. = FALSE)
+  }
+  
   if (!is.numeric(index)) index <- NULL
   if (!is.logical(shrink)) shrink <- FALSE
   if (!is.logical(Wilks)) Wilks <- FALSE
+  
+  # If user gives index, we should do block estimation
+  if(!is.null(index)) estimation <- "block"
   
   # Create pcev objects
   if (estimation == "all") {

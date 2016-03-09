@@ -1,8 +1,12 @@
 # pcev 1.1.9000
 
-* Removed VIMPblock.
+* Removed VIMPblock, as it is meaningless.
 
-* Added the possibility of computing multiple components (only for ```estimation = "all"```.
+* Added the possibility of computing multiple components (only for ```estimation = "all"```).
+
+* Changed how default values for ```computePCEV``` are handled internally.
+
+* Throw a meaningful error when there is missing data.
 
 # pcev 1.1.1
 

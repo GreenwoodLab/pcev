@@ -15,13 +15,13 @@
 #' @export 
 estimatePcev <- function(pcevObj, ...) UseMethod("estimatePcev")
 
-#' @describeIn  estimatePcev
+#' @rdname  estimatePcev
 estimatePcev.default <- function(pcevObj, ...) {
   stop(strwrap("This function should be used with a Pcev object of class 
                PcevClassical or PcevBlock"))
 }
 
-#' @describeIn estimatePcev
+#' @rdname estimatePcev
 estimatePcev.PcevClassical <- function(pcevObj, shrink, index, ...) {
   #initializing parameters
   rho <- NULL
@@ -77,7 +77,7 @@ estimatePcev.PcevClassical <- function(pcevObj, shrink, index, ...) {
   return(out)
 }
 
-#' @describeIn estimatePcev
+#' @rdname estimatePcev
 estimatePcev.PcevBlock <- function(pcevObj, shrink, index, ...) {
   p <- ncol(pcevObj$Y)
   N <- nrow(pcevObj$Y)
