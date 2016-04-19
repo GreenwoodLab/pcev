@@ -3,8 +3,8 @@
 #' \code{estimatePcev} estimates the PCEV.
 #' 
 #' @seealso \code{\link{computePCEV}}
-#' @param pcevObj A pcev object of class \code{PcevClassical} or 
-#'   \code{PcevBlock}
+#' @param pcevObj A pcev object of class \code{PcevClassical}, \code{PcevBlock} or
+#'   \code{PcevSingular}
 #' @param shrink Should we use a shrinkage estimate of the residual variance? 
 #' @param index If \code{pcevObj} is of class \code{PcevBlock}, \code{index} is a vector
 #'   describing the block to which individual response variables correspond.
