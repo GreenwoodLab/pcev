@@ -3,6 +3,7 @@
 S3method(print,Pcev)
 export(PcevBlock)
 export(PcevClassical)
+export(PcevSingular)
 export(computePCEV)
 export(estimatePcev)
 export(permutePval)
