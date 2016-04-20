@@ -169,7 +169,7 @@ estimatePcev.PcevSingular <- function(pcevObj, shrink, index, ...) {
   svdC<-fast.svd(C)
   Xpp <- svdC$u
   singWeights <- Xp %*% Xpp
-  
+  largestRoot<- max(t(singWeights) %*% Vm %*% singWeights)
   #singPCEV <- (Y) %*% singWeights[, 1] 
   
   #singVIMP <- unlist(lapply(1:ncol(Y), function(x) cor(singPCEV, (Y)[,x]))) 
@@ -180,7 +180,7 @@ estimatePcev.PcevSingular <- function(pcevObj, shrink, index, ...) {
               "model" = Vm,
               "weights" = singWeights[,1, drop=FALSE],
               "rootVr" = NULL,
-              "largestRoot" = NULL,
+              "largestRoot" = largestRoot,
               "rho" = rho)
   if (ncol(pcevObj$X) > 2) out$otherWeights <- weights[,2:(ncol(pcevObj$X)-1), drop=FALSE]
   
