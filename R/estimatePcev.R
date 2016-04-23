@@ -182,7 +182,7 @@ estimatePcev.PcevSingular <- function(pcevObj, shrink, index, ...) {
               "rootVr" = NULL,
               "largestRoot" = largestRoot,
               "rho" = rho)
-  if (ncol(pcevObj$X) > 2) out$otherWeights <- weights[,2:(ncol(pcevObj$X)-1), drop=FALSE]
+  if (ncol(pcevObj$X) > 2) out$otherWeights <- singWeights[,2:(ncol(pcevObj$X)-1), drop=FALSE]
   
   return(out)
 }
