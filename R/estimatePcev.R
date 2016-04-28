@@ -160,16 +160,16 @@ estimatePcev.PcevSingular <- function(pcevObj, shrink, index, ...) {
   #    Vrs <- out$cov
   #    rho <- out$rho
  
-  svdRes<-fast.svd(res)
-  rankVr<-rank.condition(res)$rank
+  svdRes<-corpcor::fast.svd(res)
+  rankVr<-corpcor::rank.condition(res)$rank
   eigVecVr<-svdRes$v[, 1:rankVr]
   eigValVrInv<-1/svdRes$d[1:rankVr]
   Xp <- eigVecVr %*% diag(sqrt(eigValVrInv))
-  C <- t(Xp) %*% Vm %*% Xp
-  svdC<-fast.svd(C)
+  C <- crossprod(Xp, Vm %*% Xp)
+  svdC<-corpcor::fast.svd(C)
   Xpp <- svdC$u
   singWeights <- Xp %*% Xpp
-  largestRoot<- max(t(singWeights) %*% Vm %*% singWeights)
+  largestRoot<- max(crossprod(singWeights,  Vm %*% singWeights))
   #singPCEV <- (Y) %*% singWeights[, 1] 
   
   #singVIMP <- unlist(lapply(1:ncol(Y), function(x) cor(singPCEV, (Y)[,x]))) 

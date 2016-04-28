@@ -206,7 +206,7 @@ linregfn<- function(y, covars){
 }
 
 #function to find the most deviant subpopulation of samples
-#' @export
+# @export
 fimp<-function(data, covars){
   pvals<-list()
   l <- unique(covars)
