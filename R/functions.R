@@ -186,6 +186,40 @@ shrink_est <- function(Vr, res){
   return(out)
 }
 
+#Function to find the level in the factor variable X
+#having the strongest effect on Y.
+
+#Anova helper-function
+linregfn<- function(y, covars){
+  Dis <- covars
+  y<-unlist(y)
+  modelstring <- "y ~ covars"  
+  fit <- lm(as.formula(modelstring))
+  resid<-fitted.values(fit)
+  sfit <- summary(fit)
+  anovF <- anova(fit)
+  nc1 <- nrow(sfit$coefficients)
+  nc2 <- nrow(anovF) - 1
+  pvals <- c(sfit$coefficients[2:nc1, 1], sfit$coefficients[2:nc1,4], anovF[1:nc2,5])
+  names(pvals) <- c(paste0('c_', rownames(sfit$coefficients)[2:nc1]), rownames(sfit$coefficients)[2:nc1], rownames(anovF)[1:nc2])
+  return(list(pvals=pvals, resid=resid))
+}
+
+#function to find the most deviant subpopulation of samples
+#' @export
+fimp<-function(data, covars){
+  pvals<-list()
+  l <- unique(covars)
+  for (i in l){
+    cnew <- ifelse(covars==i,1,0)
+    resFn <- linregfn(data, as.factor(cnew))
+    pvals <- c(pvals, resFn$pvals['covars'])
+  }
+  allp<-linregfn(data, as.factor(covars))$pvals['covars']
+  minp<-which(unlist(pvals)==min(unlist(pvals))); 
+  return(list(minp=minp, pval=pvals[minp], lev = l[minp], allp=allp))
+}
+
 ###########################
 # Constructor functions----
 
