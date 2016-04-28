@@ -4,7 +4,7 @@
 #' 
 #' Computes a p-value using a permutation procedure.
 #' 
-#' @param pcevObj A pcev object of class \code{PcevClassical} or 
+#' @param pcevObj A pcev object of class \code{PcevClassical} or \code{PcevSingular} 
 #'   \code{PcevBlock}
 #' @param shrink Should we use a shrinkage estimate of the residual variance?
 #' @param index If \code{pcevObj} is of class \code{PcevBlock}, \code{index} is a
@@ -18,7 +18,7 @@ permutePval <- function(pcevObj, ...) UseMethod("permutePval")
 #' @rdname permutePval
 permutePval.default <- function(pcevObj, ...) {
   stop(strwrap("This function should be used with a Pcev object of class 
-               PcevClassical or PcevBlock"),
+               PcevClassical, PcevSingular or PcevBlock"),
        call. = FALSE)
 }
 
@@ -87,6 +87,41 @@ permutePval.PcevBlock <- function(pcevObj, shrink, index, nperm, ...) {
   
   
   pvalue <- mean(permutationPvalues < initPval, na.rm = TRUE)
+  results$pvalue <- pvalue
+  
+  return(results)
+}
+
+#' @rdname permutePval
+permutePval.PcevSingular <- function(pcevObj, shrink, index, nperm, ...) {
+  results <- estimatePcev(pcevObj, shrink)
+  N <- nrow(pcevObj$Y)
+  
+  PCEV <- pcevObj$Y %*% results$weights
+  initFit <- lm.fit(pcevObj$X, PCEV)
+  df1 <- ncol(pcevObj$X) - 1
+  df2 <- N - ncol(pcevObj$X)
+  initFstat <- (sum((mean(PCEV) - initFit$fitted.values)^2)/df1)/(sum(initFit$residuals^2)/df2)
+  initPval <- pf(initFstat, df1, df2, lower.tail = FALSE)
+  
+  permutationPvalues <- replicate(nperm, expr = {
+    tmp <- pcevObj
+    tmp$Y <- tmp$Y[sample(N), ]
+    
+    tmpRes <- try(estimatePcev(tmp, shrink, index), silent=TRUE)
+    if(inherits(tmpRes, "try-error")) {
+      return(NA)
+    } else {
+      tmpPCEV <- tmp$Y %*% tmpRes$weights
+      
+      tmpFit <- lm.fit(tmp$X, tmpPCEV)
+      tmpFstat <- (sum((mean(tmpPCEV) - tmpFit$fitted.values)^2)/df1)/(sum(tmpFit$residuals^2)/df2)
+      return(pf(tmpFstat, df1, df2, lower.tail = FALSE))
+    }
+  })
+  
+  pvalue <- mean(permutationPvalues < initPval)
+  
   results$pvalue <- pvalue
   
   return(results)
@@ -238,6 +273,73 @@ roysPval.PcevClassical <- function(pcevObj, shrink, index, ...) {
 }
 
 #' @rdname roysPval
+roysPval.PcevSingular <- function(pcevObj, shrink, index, ...) {
+  
+  results <- estimatePcev(pcevObj, shrink)
+  n <- nrow(pcevObj$Y)
+  p <- ncol(pcevObj$Y)
+  q <- ncol(pcevObj$X) - 1
+  d <- results$largestRoot
+  # theta <- d / (1 + d)
+  
+  nuH <- q
+  nuE <- n - q - 1
+  s <- min(p, nuH)
+  m <- 0.5 * (abs(p - nuH) - 1)
+  N <- 0.5 * (nuE - p - 1)
+  one_third <- 1/3
+  
+  N1 <- 2 * (s + m + N) + 1 
+  gamma <- 2 * asin( sqrt( (s - 0.5)/N1 ) )
+  phi <- 2*asin( sqrt( (s + 2*m + 0.5)/N1 ) )
+  
+  mu <- 2 * log(tan( 0.5*(phi + gamma)))
+  sigma <- (16/N^2)^one_third * ( sin(phi+gamma)^2*sin(phi)*sin(gamma)) ^(-1*one_third)
+  
+  if(shrink) {
+    # Estimate the null distribution using 
+    # permutations and MLE
+    null_dist <- replicate(25, expr = {
+      tmp <- pcevObj
+      tmp$Y <- tmp$Y[sample(N), ]
+      
+      tmpRes <- try(estimatePcev(tmp, shrink, index), silent=TRUE)
+      if(inherits(tmpRes, "try-error")) {
+        return(NA)
+      } else {
+        return(tmpRes$largestRoot)
+      }
+    })
+    
+    # Fit a location-scale version of TW distribution
+    # Note: likelihood may throw warnings at some evaluations, 
+    # which is OK
+    oldw <- getOption("warn")
+    options(warn = -1)
+    res <- optim(c(mu, sigma), function(param) logLik(param, log(null_dist)), 
+                 control = list(fnscale=-1))
+    options(warn = oldw)
+    
+    mu1 <- res$par[1]
+    sigma1 <- res$par[2]
+    TW <- (log(d) - mu1)/sigma1
+    
+    pvalue <- RMTstat::ptw(TW, beta=1, lower.tail = FALSE, log.p = FALSE)
+  } else {
+    # TW <- (log(theta/(1-theta)) - mu)/sigma
+    TW <- (log(d) - mu)/sigma
+    
+    pvalue <- RMTstat::ptw(TW, beta=1, lower.tail = FALSE, log.p = FALSE)
+  }
+  
+  results$pvalue <- pvalue
+  
+  return(results)
+  
+}
+
+
+#' @rdname roysPval
 roysPval.PcevBlock <- function(pcevObj, shrink, index, ...) {
   
   warning("There is no theoretical guarantee that this approach works.\nWe recommend comparing the resulting p-value with that obtained from a permutation procedure.")
@@ -304,8 +406,8 @@ roysPval.PcevBlock <- function(pcevObj, shrink, index, ...) {
       return(d)
     }
   })
-    
-    
+  
+  
   # Fit a location-scale version of TW distribution
   # Note: likelihood may throw warnings at some evaluations, 
   # which is OK
@@ -351,7 +453,7 @@ print.Pcev <- function(x, ...) {
   pvalue <- x$pvalue
   if(pvalue == 0) {
     if(x$methods[2] == "permutation") {
-    pvalue <- paste0("< ", 1/x$nperm)
+      pvalue <- paste0("< ", 1/x$nperm)
     }
     if(x$methods[1] == "exact") {
       pvalue <- "~ 0"

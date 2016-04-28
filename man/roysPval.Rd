@@ -4,6 +4,7 @@
 \alias{roysPval}
 \alias{roysPval.PcevBlock}
 \alias{roysPval.PcevClassical}
+\alias{roysPval.PcevSingular}
 \alias{roysPval.default}
 \title{Roy's largest root exact test}
 \usage{
@@ -12,6 +13,8 @@ roysPval(pcevObj, ...)
 \method{roysPval}{default}(pcevObj, ...)
 
 \method{roysPval}{PcevClassical}(pcevObj, shrink, index, ...)
+
+\method{roysPval}{PcevSingular}(pcevObj, shrink, index, ...)
 
 \method{roysPval}{PcevBlock}(pcevObj, shrink, index, ...)
 }

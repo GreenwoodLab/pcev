@@ -4,6 +4,7 @@
 \alias{permutePval}
 \alias{permutePval.PcevBlock}
 \alias{permutePval.PcevClassical}
+\alias{permutePval.PcevSingular}
 \alias{permutePval.default}
 \title{Permutation p-value}
 \usage{
@@ -14,9 +15,11 @@ permutePval(pcevObj, ...)
 \method{permutePval}{PcevClassical}(pcevObj, shrink, index, nperm, ...)
 
 \method{permutePval}{PcevBlock}(pcevObj, shrink, index, nperm, ...)
+
+\method{permutePval}{PcevSingular}(pcevObj, shrink, index, nperm, ...)
 }
 \arguments{
-\item{pcevObj}{A pcev object of class \code{PcevClassical} or 
+\item{pcevObj}{A pcev object of class \code{PcevClassical} or \code{PcevSingular} 
 \code{PcevBlock}}
 
 \item{...}{Extra parameters.}

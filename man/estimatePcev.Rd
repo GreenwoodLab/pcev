@@ -4,6 +4,7 @@
 \alias{estimatePcev}
 \alias{estimatePcev.PcevBlock}
 \alias{estimatePcev.PcevClassical}
+\alias{estimatePcev.PcevSingular}
 \alias{estimatePcev.default}
 \title{Estimation of PCEV}
 \usage{
@@ -14,10 +15,12 @@ estimatePcev(pcevObj, ...)
 \method{estimatePcev}{PcevClassical}(pcevObj, shrink, index, ...)
 
 \method{estimatePcev}{PcevBlock}(pcevObj, shrink, index, ...)
+
+\method{estimatePcev}{PcevSingular}(pcevObj, shrink, index, ...)
 }
 \arguments{
-\item{pcevObj}{A pcev object of class \code{PcevClassical} or 
-\code{PcevBlock}}
+\item{pcevObj}{A pcev object of class \code{PcevClassical}, \code{PcevBlock} or
+\code{PcevSingular}}
 
 \item{...}{Extra parameters.}
 

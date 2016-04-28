@@ -3,7 +3,7 @@
 #' \code{computePCEV} computes the first PCEV and tests its significance.
 #' 
 #' This is the main function. It computes the PCEV using either the classical 
-#' method or the block approach. A p-value is also computed, testing the 
+#' method, block approach or singular .. (TODO). A p-value is also computed, testing the 
 #' significance of the PCEV.
 #' 
 #' The p-value is computed using either a permutation approach or an exact test.
@@ -19,7 +19,7 @@
 #' @param covariate An array or a data frame of covariates.
 #' @param confounder An array or data frame of confounders.
 #' @param estimation Character string specifying which estimation method to use:
-#'   \code{"all"} or \code{"block"}. Default value is \code{"all"}.
+#'   \code{"all"}, \code{"block"} or \code{"singular"}. Default value is \code{"all"}.
 #' @param inference Character string specifying which inference method to use: 
 #'   \code{"exact"} or \code{"permutation"}. Default value is \code{"exact"}.
 #' @param index If \code{estimation = "block"}, \code{index} is a vector describing the
@@ -41,14 +41,14 @@
 #' @export
 #' @importFrom stats coefficients cor lm.fit model.matrix optim pf
 computePCEV <- function(response, covariate, confounder, 
-                        estimation = c("all", "block"), 
+                        estimation = c("all", "block", "singular"), 
                         inference = c("exact", "permutation"), 
                         index = NULL, shrink = FALSE, nperm = 1000, 
                         Wilks = FALSE) {
   # Check input
   estimation <- tryCatch(match.arg(estimation),
                          error = function(c) {
-                           stop("Estimation method should be \"all\" or \"block\"", 
+                           stop("Estimation method should be \"all\", \"block\" or \"singular\"", 
                                 call. = FALSE)
                          })
   
@@ -90,6 +90,11 @@ computePCEV <- function(response, covariate, confounder,
     warning("Wilks can only be applied with a single covariate")
     Wilks <- FALSE
   }
+  if (estimation == "singular") {
+    pcevObj <- PcevSingular(response,
+                            covariate,
+                            confounder)
+  }
   
   # Perform estimation and inference
   if (inference == "permutation") {
@@ -115,7 +120,7 @@ computePCEV <- function(response, covariate, confounder,
   pcevRes$Wilks <- Wilks
   pcevRes$shrink <- shrink
   class(pcevRes) <- "Pcev"
-
+  
   # return results
   return(pcevRes)
 }
@@ -181,12 +186,46 @@ shrink_est <- function(Vr, res){
   return(out)
 }
 
+#Function to find the level in the factor variable X
+#having the strongest effect on Y.
+
+#Anova helper-function
+linregfn<- function(y, covars){
+  Dis <- covars
+  y<-unlist(y)
+  modelstring <- "y ~ covars"  
+  fit <- lm(as.formula(modelstring))
+  resid<-fitted.values(fit)
+  sfit <- summary(fit)
+  anovF <- anova(fit)
+  nc1 <- nrow(sfit$coefficients)
+  nc2 <- nrow(anovF) - 1
+  pvals <- c(sfit$coefficients[2:nc1, 1], sfit$coefficients[2:nc1,4], anovF[1:nc2,5])
+  names(pvals) <- c(paste0('c_', rownames(sfit$coefficients)[2:nc1]), rownames(sfit$coefficients)[2:nc1], rownames(anovF)[1:nc2])
+  return(list(pvals=pvals, resid=resid))
+}
+
+#function to find the most deviant subpopulation of samples
+# @export
+fimp<-function(data, covars){
+  pvals<-list()
+  l <- unique(covars)
+  for (i in l){
+    cnew <- ifelse(covars==i,1,0)
+    resFn <- linregfn(data, as.factor(cnew))
+    pvals <- c(pvals, resFn$pvals['covars'])
+  }
+  allp<-linregfn(data, as.factor(covars))$pvals['covars']
+  minp<-which(unlist(pvals)==min(unlist(pvals))); 
+  return(list(minp=minp, pval=pvals[minp], lev = l[minp], allp=allp))
+}
+
 ###########################
 # Constructor functions----
 
 #' Constructor functions for the different pcev objects
 #' 
-#' \code{PcevClassical} and \code{PcevBlock} create the pcev objects from the 
+#' \code{PcevClassical}, \code{PcevBlock} and \code{PcevSingular} create the pcev objects from the 
 #' provided data that are necessary to compute the PCEV according to the user's 
 #' parameters.
 #' 
@@ -230,6 +269,23 @@ PcevBlock <- function(response, covariate, confounder) {
                    X = model.matrix(~., as.data.frame(covariate)), 
                    Z = model.matrix(~., as.data.frame(confounder))[,-1]), 
               class = "PcevBlock")
+  }
+  
+}
+
+#' @rdname PcevObj
+#' @export
+PcevSingular <- function(response, covariate, confounder) {
+  if(is.null(confounder)) {
+    structure(list(Y = response, 
+                   X = model.matrix(~., as.data.frame(covariate)),
+                   Z = c()), 
+              class = "PcevSingular")
+  } else {
+    structure(list(Y = response, 
+                   X = model.matrix(~., as.data.frame(covariate)), 
+                   Z = model.matrix(~., as.data.frame(confounder))[,-1]), 
+              class = "PcevSingular")
   }
   
 }

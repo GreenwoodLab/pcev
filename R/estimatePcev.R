@@ -3,8 +3,8 @@
 #' \code{estimatePcev} estimates the PCEV.
 #' 
 #' @seealso \code{\link{computePCEV}}
-#' @param pcevObj A pcev object of class \code{PcevClassical} or 
-#'   \code{PcevBlock}
+#' @param pcevObj A pcev object of class \code{PcevClassical}, \code{PcevBlock} or
+#'   \code{PcevSingular}
 #' @param shrink Should we use a shrinkage estimate of the residual variance? 
 #' @param index If \code{pcevObj} is of class \code{PcevBlock}, \code{index} is a vector
 #'   describing the block to which individual response variables correspond.
@@ -132,4 +132,57 @@ estimatePcev.PcevBlock <- function(pcevObj, shrink, index, ...) {
   
   return(list("weights" = weights,
               "rootVr" = rootVr))
+}
+
+#' @rdname estimatePcev
+estimatePcev.PcevSingular <- function(pcevObj, shrink, index, ...) {
+  #initializing parameters
+  rho <- NULL
+  Y <- pcevObj$Y
+  N <- nrow(Y)
+  p <- ncol(Y)
+  N <- nrow(Y)
+  
+  # Variance decomposition
+  fit <- lm.fit(cbind(pcevObj$X, pcevObj$Z), Y)
+  Yfit <- fit$fitted.values
+  Intercepts<-fit$coefficients[1,]
+  res <- Y - Yfit
+  fit_confounder <- lm.fit(cbind(rep_len(1, N), pcevObj$Z), Y)
+  Yfit_confounder <- fit_confounder$fitted.values
+  
+  Vr <- crossprod(res)
+  Vm <- crossprod(Yfit - Yfit_confounder, Y)
+  
+  # Shrinkage estimate of Vr
+  #  if (shrink) {
+  #    out <- shrink_est(Vr, res)
+  #    Vrs <- out$cov
+  #    rho <- out$rho
+ 
+  svdRes<-corpcor::fast.svd(res)
+  rankVr<-corpcor::rank.condition(res)$rank
+  eigVecVr<-svdRes$v[, 1:rankVr]
+  eigValVrInv<-1/svdRes$d[1:rankVr]
+  Xp <- eigVecVr %*% diag(sqrt(eigValVrInv))
+  C <- crossprod(Xp, Vm %*% Xp)
+  svdC<-corpcor::fast.svd(C)
+  Xpp <- svdC$u
+  singWeights <- Xp %*% Xpp
+  largestRoot<- max(crossprod(singWeights,  Vm %*% singWeights))
+  #singPCEV <- (Y) %*% singWeights[, 1] 
+  
+  #singVIMP <- unlist(lapply(1:ncol(Y), function(x) cor(singPCEV, (Y)[,x]))) 
+  
+  
+  
+  out <- list("residual" = Vr,
+              "model" = Vm,
+              "weights" = singWeights[,1, drop=FALSE],
+              "rootVr" = NULL,
+              "largestRoot" = largestRoot,
+              "rho" = rho)
+  if (ncol(pcevObj$X) > 2) out$otherWeights <- singWeights[, -1]
+  
+  return(out)
 }

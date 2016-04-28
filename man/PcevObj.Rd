@@ -4,11 +4,14 @@
 \alias{PcevBlock}
 \alias{PcevClassical}
 \alias{PcevObj}
+\alias{PcevSingular}
 \title{Constructor functions for the different pcev objects}
 \usage{
 PcevClassical(response, covariate, confounder)
 
 PcevBlock(response, covariate, confounder)
+
+PcevSingular(response, covariate, confounder)
 }
 \arguments{
 \item{response}{A matrix of response variables.}
@@ -23,7 +26,7 @@ A pcev object, of the class that corresponds to the estimation
   computation.
 }
 \description{
-\code{PcevClassical} and \code{PcevBlock} create the pcev objects from the 
+\code{PcevClassical}, \code{PcevBlock} and \code{PcevSingular} create the pcev objects from the 
 provided data that are necessary to compute the PCEV according to the user's 
 parameters.
 }

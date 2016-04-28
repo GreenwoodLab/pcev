@@ -4,9 +4,9 @@
 \alias{computePCEV}
 \title{Principal Component of Explained Variance}
 \usage{
-computePCEV(response, covariate, confounder, estimation = c("all", "block"),
-  inference = c("exact", "permutation"), index = NULL, shrink = FALSE,
-  nperm = 1000, Wilks = FALSE)
+computePCEV(response, covariate, confounder, estimation = c("all", "block",
+  "singular"), inference = c("exact", "permutation"), index = NULL,
+  shrink = FALSE, nperm = 1000, Wilks = FALSE)
 }
 \arguments{
 \item{response}{A matrix of response variables.}
@@ -16,7 +16,7 @@ computePCEV(response, covariate, confounder, estimation = c("all", "block"),
 \item{confounder}{An array or data frame of confounders.}
 
 \item{estimation}{Character string specifying which estimation method to use:
-\code{"all"} or \code{"block"}. Default value is \code{"all"}.}
+\code{"all"}, \code{"block"} or \code{"singular"}. Default value is \code{"all"}.}
 
 \item{inference}{Character string specifying which inference method to use: 
 \code{"exact"} or \code{"permutation"}. Default value is \code{"exact"}.}
@@ -42,7 +42,7 @@ An object of class \code{Pcev} containing the first PCEV, the
 }
 \details{
 This is the main function. It computes the PCEV using either the classical 
-method or the block approach. A p-value is also computed, testing the 
+method, block approach or singular .. (TODO). A p-value is also computed, testing the 
 significance of the PCEV.
 
 The p-value is computed using either a permutation approach or an exact test.
