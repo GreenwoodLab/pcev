@@ -18,7 +18,7 @@ estimatePcev <- function(pcevObj, ...) UseMethod("estimatePcev")
 #' @rdname  estimatePcev
 estimatePcev.default <- function(pcevObj, ...) {
   stop(strwrap("This function should be used with a Pcev object of class 
-               PcevClassical or PcevBlock"))
+               PcevClassical, PcevBlock or PcevSingular"))
 }
 
 #' @rdname estimatePcev
@@ -181,7 +181,8 @@ estimatePcev.PcevSingular <- function(pcevObj, shrink, index, ...) {
               "weights" = singWeights[,1, drop=FALSE],
               "rootVr" = NULL,
               "largestRoot" = largestRoot,
-              "rho" = rho)
+              "rho" = rho,
+              "rank" = rankVr)
   if (ncol(pcevObj$X) > 2) out$otherWeights <- singWeights[, -1]
   
   return(out)

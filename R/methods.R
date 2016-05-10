@@ -150,7 +150,7 @@ wilksPval <- function(pcevObj, ...) UseMethod("wilksPval")
 #' @rdname wilksPval
 wilksPval.default <- function(pcevObj, ...) {
   stop(strwrap("This function should be used with a Pcev object of class 
-               PcevClassical or PcevBlock"),
+               PcevClassical, PcevBlock or PcevSingular"),
        call. = FALSE)
 }
 
@@ -171,9 +171,14 @@ wilksPval.PcevClassical <- function(pcevObj, shrink, index, ...) {
 }
 
 #' @rdname wilksPval
+wilksPval.PcevSingular <- function(pcevObj, shrink, index, ...) {
+  stop(strwrap("Wilks test is only available for estimation = all."),
+       call. = FALSE)
+}
+
+#' @rdname wilksPval
 wilksPval.PcevBlock <- function(pcevObj, shrink, index, ...) {
-  stop(strwrap("Pcev is currently not implemented for
-               estimation with blocks and an exact inference method"),
+  stop(strwrap("Wilks test is only available for estimation = all."),
        call. = FALSE)
 }
 
@@ -235,7 +240,7 @@ roysPval.PcevClassical <- function(pcevObj, shrink, index, ...) {
     # permutations and MLE
     null_dist <- replicate(25, expr = {
       tmp <- pcevObj
-      tmp$Y <- tmp$Y[sample(N), ]
+      tmp$Y <- tmp$Y[sample(n), ]
       
       tmpRes <- try(estimatePcev(tmp, shrink, index), silent=TRUE)
       if(inherits(tmpRes, "try-error")) {
@@ -273,35 +278,38 @@ roysPval.PcevClassical <- function(pcevObj, shrink, index, ...) {
 }
 
 #' @rdname roysPval
-roysPval.PcevSingular <- function(pcevObj, shrink, index, ...) {
+roysPval.PcevSingular <- function(pcevObj, shrink, index, 
+                                  method = c("moments", "MLE"), ...) {
+  method <- match.arg(method)
   
   results <- estimatePcev(pcevObj, shrink)
   n <- nrow(pcevObj$Y)
   p <- ncol(pcevObj$Y)
-  q <- ncol(pcevObj$X) - 1
+  q <- ncol(pcevObj$X)
+  r <- results$rank
   d <- results$largestRoot
   # theta <- d / (1 + d)
   
-  nuH <- q
-  nuE <- n - q - 1
-  s <- min(p, nuH)
-  m <- 0.5 * (abs(p - nuH) - 1)
-  N <- 0.5 * (nuE - p - 1)
-  one_third <- 1/3
+  # nuH <- r
+  # nuE <- n - q
+  # s <- min(q, nuH)
+  # m <- 0.5 * (abs(q - nuH) - 1)
+  # N <- 0.5 * (nuE - nuH - 1)
+  # one_third <- 1/3
+  # 
+  # N1 <- 2 * (s + m + N) + 1 
+  # gamma <- 2 * asin( sqrt( (s - 0.5)/N1 ) )
+  # phi <- 2*asin( sqrt( (s + 2*m + 0.5)/N1 ) )
+  # 
+  # mu <- 2 * log(tan( 0.5*(phi + gamma)))
+  # sigma <- (16/N^2)^one_third * ( sin(phi+gamma)^2*sin(phi)*sin(gamma)) ^(-1*one_third)
   
-  N1 <- 2 * (s + m + N) + 1 
-  gamma <- 2 * asin( sqrt( (s - 0.5)/N1 ) )
-  phi <- 2*asin( sqrt( (s + 2*m + 0.5)/N1 ) )
-  
-  mu <- 2 * log(tan( 0.5*(phi + gamma)))
-  sigma <- (16/N^2)^one_third * ( sin(phi+gamma)^2*sin(phi)*sin(gamma)) ^(-1*one_third)
-  
-  if(shrink) {
+  # if(shrink) {
     # Estimate the null distribution using 
-    # permutations and MLE
+    # permutations and MLE/MoM
     null_dist <- replicate(25, expr = {
       tmp <- pcevObj
-      tmp$Y <- tmp$Y[sample(N), ]
+      tmp$Y <- tmp$Y[sample(n), ]
       
       tmpRes <- try(estimatePcev(tmp, shrink, index), silent=TRUE)
       if(inherits(tmpRes, "try-error")) {
@@ -311,26 +319,37 @@ roysPval.PcevSingular <- function(pcevObj, shrink, index, ...) {
       }
     })
     
-    # Fit a location-scale version of TW distribution
-    # Note: likelihood may throw warnings at some evaluations, 
-    # which is OK
-    oldw <- getOption("warn")
-    options(warn = -1)
-    res <- optim(c(mu, sigma), function(param) logLik(param, log(null_dist)), 
-                 control = list(fnscale=-1))
-    options(warn = oldw)
-    
-    mu1 <- res$par[1]
-    sigma1 <- res$par[2]
+    if (method == "MLE") {
+      # Fit a location-scale version of TW distribution
+      # Note: likelihood may throw warnings at some evaluations, 
+      # which is OK
+      oldw <- getOption("warn")
+      options(warn = -1)
+      res <- optim(c(2, 1), function(param) logLik(param, log(null_dist)), 
+                   control = list(fnscale=-1))
+      options(warn = oldw)
+      
+      mu1 <- res$par[1]
+      sigma1 <- res$par[2]
+    }
+    if (method == "moments") {
+      muTW <- -1.2065335745820
+      sigmaTW <- sqrt(1.607781034581)
+      
+      muS <- mean(log(null_dist))
+      sigmaS <- sd(log(null_dist))
+      
+      sigma1 <- sigmaS/sigmaTW
+      mu1 <- muS - sigma1 * muTW
+    }
     TW <- (log(d) - mu1)/sigma1
-    
     pvalue <- RMTstat::ptw(TW, beta=1, lower.tail = FALSE, log.p = FALSE)
-  } else {
-    # TW <- (log(theta/(1-theta)) - mu)/sigma
-    TW <- (log(d) - mu)/sigma
-    
-    pvalue <- RMTstat::ptw(TW, beta=1, lower.tail = FALSE, log.p = FALSE)
-  }
+  # } else {
+  #   # TW <- (log(theta/(1-theta)) - mu)/sigma
+  #   TW <- (log(d) - mu)/sigma
+  # 
+  #   pvalue <- RMTstat::ptw(TW, beta=1, lower.tail = FALSE, log.p = FALSE)
+  # }
   
   results$pvalue <- pvalue
   

@@ -85,15 +85,15 @@ computePCEV <- function(response, covariate, confounder,
                          covariate,
                          confounder)
   }
-  
-  if (Wilks && ncol(pcevObj$X) != 2) {
-    warning("Wilks can only be applied with a single covariate")
-    Wilks <- FALSE
-  }
   if (estimation == "singular") {
     pcevObj <- PcevSingular(response,
                             covariate,
                             confounder)
+  }
+  
+  if (Wilks && ncol(pcevObj$X) != 2) {
+    warning("Wilks can only be applied with a single covariate.")
+    Wilks <- FALSE
   }
   
   # Perform estimation and inference
