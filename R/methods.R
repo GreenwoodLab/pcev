@@ -34,23 +34,27 @@ permutePval.PcevClassical <- function(pcevObj, shrink, index, nperm, ...) {
   initFstat <- (sum((mean(PCEV) - initFit$fitted.values)^2)/df1)/(sum(initFit$residuals^2)/df2)
   initPval <- pf(initFstat, df1, df2, lower.tail = FALSE)
   
-  permutationPvalues <- replicate(nperm, expr = {
-    tmp <- pcevObj
-    tmp$Y <- tmp$Y[sample(N), ]
-    
-    tmpRes <- try(estimatePcev(tmp, shrink, index), silent=TRUE)
-    if(inherits(tmpRes, "try-error")) {
-      return(NA)
-    } else {
-      tmpPCEV <- tmp$Y %*% tmpRes$weights
+  if (nperm) {
+    permutationPvalues <- replicate(nperm, expr = {
+      tmp <- pcevObj
+      tmp$Y <- tmp$Y[sample(N), ]
       
-      tmpFit <- lm.fit(tmp$X, tmpPCEV)
-      tmpFstat <- (sum((mean(tmpPCEV) - tmpFit$fitted.values)^2)/df1)/(sum(tmpFit$residuals^2)/df2)
-      return(pf(tmpFstat, df1, df2, lower.tail = FALSE))
-    }
-  })
-  
-  pvalue <- mean(permutationPvalues < initPval)
+      tmpRes <- try(estimatePcev(tmp, shrink, index), silent=TRUE)
+      if(inherits(tmpRes, "try-error")) {
+        return(NA)
+      } else {
+        tmpPCEV <- tmp$Y %*% tmpRes$weights
+        
+        tmpFit <- lm.fit(tmp$X, tmpPCEV)
+        tmpFstat <- (sum((mean(tmpPCEV) - tmpFit$fitted.values)^2)/df1)/(sum(tmpFit$residuals^2)/df2)
+        return(pf(tmpFstat, df1, df2, lower.tail = FALSE))
+      }
+    })
+    
+    pvalue <- mean(permutationPvalues < initPval)
+  } else {
+    pvalue <- NA
+  }
   
   results$pvalue <- pvalue
   
@@ -69,26 +73,29 @@ permutePval.PcevBlock <- function(pcevObj, shrink, index, nperm, ...) {
   initFstat <- (sum((mean(PCEV) - initFit$fitted.values)^2)/df1)/(sum(initFit$residuals^2)/df2)
   initPval <- pf(initFstat, df1, df2, lower.tail = FALSE)
   
-  permutationPvalues <- replicate(nperm, expr = {
-    tmp <- pcevObj
-    tmp$Y <- tmp$Y[sample(N), ]
-    
-    tmpRes <- try(estimatePcev(tmp, shrink, index), silent=TRUE)
-    if(inherits(tmpRes, "try-error")) {
-      return(NA)
-    } else {
-      tmpPCEV <- tmp$Y %*% tmpRes$weights
+  if (nperm) {
+    permutationPvalues <- replicate(nperm, expr = {
+      tmp <- pcevObj
+      tmp$Y <- tmp$Y[sample(N), ]
       
-      tmpFit <- lm.fit(tmp$X, tmpPCEV)
-      tmpFstat <- (sum((mean(tmpPCEV) - tmpFit$fitted.values)^2)/df1)/(sum(tmpFit$residuals^2)/df2)
-      return(pf(tmpFstat, df1, df2, lower.tail = FALSE))
-    }
-  })
+      tmpRes <- try(estimatePcev(tmp, shrink, index), silent=TRUE)
+      if(inherits(tmpRes, "try-error")) {
+        return(NA)
+      } else {
+        tmpPCEV <- tmp$Y %*% tmpRes$weights
+        
+        tmpFit <- lm.fit(tmp$X, tmpPCEV)
+        tmpFstat <- (sum((mean(tmpPCEV) - tmpFit$fitted.values)^2)/df1)/(sum(tmpFit$residuals^2)/df2)
+        return(pf(tmpFstat, df1, df2, lower.tail = FALSE))
+      }
+    })
+    
+    pvalue <- mean(permutationPvalues < initPval)
+  } else {
+    pvalue <- NA
+  }
   
-  
-  pvalue <- mean(permutationPvalues < initPval, na.rm = TRUE)
   results$pvalue <- pvalue
-  
   return(results)
 }
 
@@ -104,23 +111,27 @@ permutePval.PcevSingular <- function(pcevObj, shrink, index, nperm, ...) {
   initFstat <- (sum((mean(PCEV) - initFit$fitted.values)^2)/df1)/(sum(initFit$residuals^2)/df2)
   initPval <- pf(initFstat, df1, df2, lower.tail = FALSE)
   
-  permutationPvalues <- replicate(nperm, expr = {
-    tmp <- pcevObj
-    tmp$Y <- tmp$Y[sample(N), ]
-    
-    tmpRes <- try(estimatePcev(tmp, shrink, index), silent=TRUE)
-    if(inherits(tmpRes, "try-error")) {
-      return(NA)
-    } else {
-      tmpPCEV <- tmp$Y %*% tmpRes$weights
+  if (nperm) {
+    permutationPvalues <- replicate(nperm, expr = {
+      tmp <- pcevObj
+      tmp$Y <- tmp$Y[sample(N), ]
       
-      tmpFit <- lm.fit(tmp$X, tmpPCEV)
-      tmpFstat <- (sum((mean(tmpPCEV) - tmpFit$fitted.values)^2)/df1)/(sum(tmpFit$residuals^2)/df2)
-      return(pf(tmpFstat, df1, df2, lower.tail = FALSE))
-    }
-  })
-  
-  pvalue <- mean(permutationPvalues < initPval)
+      tmpRes <- try(estimatePcev(tmp, shrink, index), silent=TRUE)
+      if(inherits(tmpRes, "try-error")) {
+        return(NA)
+      } else {
+        tmpPCEV <- tmp$Y %*% tmpRes$weights
+        
+        tmpFit <- lm.fit(tmp$X, tmpPCEV)
+        tmpFstat <- (sum((mean(tmpPCEV) - tmpFit$fitted.values)^2)/df1)/(sum(tmpFit$residuals^2)/df2)
+        return(pf(tmpFstat, df1, df2, lower.tail = FALSE))
+      }
+    })
+    
+    pvalue <- mean(permutationPvalues < initPval)
+  } else {
+    pvalue <- NA
+  }
   
   results$pvalue <- pvalue
   
@@ -191,15 +202,18 @@ wilksPval.PcevBlock <- function(pcevObj, shrink, index, ...) {
 #' Roy's Largest Root statistic. It uses a location-scale variant of the 
 #' Tracy-Wildom distribution of order 1.
 #' 
-#' Note that if \code{shrink} is set to \code{TRUE}, the location-scale
+#' Note that if \code{shrink} is set to \code{TRUE}, the location-scale 
 #' parameters are estimated using a small number of permutations.
 #' 
 #' @param pcevObj A pcev object of class \code{PcevClassical} or 
 #'   \code{PcevBlock}
 #' @param shrink Should we use a shrinkage estimate of the residual variance?
-#' @param index If \code{pcevObj} is of class \code{PcevBlock}, \code{index} is a 
-#'   vector describing the block to which individual response variables 
+#' @param index If \code{pcevObj} is of class \code{PcevBlock}, \code{index} is
+#'   a vector describing the block to which individual response variables 
 #'   correspond.
+#' @param method Method to use for the estimation of the location-scale
+#'   parameters. The available methods are the method of moments (default) and
+#'   Maximum Likelihood Estimation.
 #' @param ... Extra parameters.
 #' @export
 roysPval <- function(pcevObj, ...) UseMethod("roysPval")
@@ -278,6 +292,7 @@ roysPval.PcevClassical <- function(pcevObj, shrink, index, ...) {
 }
 
 #' @rdname roysPval
+#' @importFrom stats sd
 roysPval.PcevSingular <- function(pcevObj, shrink, index, 
                                   method = c("moments", "MLE"), ...) {
   method <- match.arg(method)
@@ -470,12 +485,14 @@ print.Pcev <- function(x, ...) {
     cat("\n(performed using", exact)
   }
   pvalue <- x$pvalue
-  if(pvalue == 0) {
-    if(x$methods[2] == "permutation") {
-      pvalue <- paste0("< ", 1/x$nperm)
-    }
-    if(x$methods[1] == "exact") {
-      pvalue <- "~ 0"
+  if (!is.na(pvalue)) {
+    if(pvalue == 0) {
+      if(x$methods[2] == "permutation") {
+        pvalue <- paste0("< ", 1/x$nperm)
+      }
+      if(x$methods[1] == "exact") {
+        pvalue <- "~ 0"
+      }
     }
   }
   cat("\nP-value obtained:", pvalue, "\n")

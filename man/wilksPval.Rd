@@ -4,6 +4,7 @@
 \alias{wilksPval}
 \alias{wilksPval.PcevBlock}
 \alias{wilksPval.PcevClassical}
+\alias{wilksPval.PcevSingular}
 \alias{wilksPval.default}
 \title{Wilks' lambda exact test}
 \usage{
@@ -12,6 +13,8 @@ wilksPval(pcevObj, ...)
 \method{wilksPval}{default}(pcevObj, ...)
 
 \method{wilksPval}{PcevClassical}(pcevObj, shrink, index, ...)
+
+\method{wilksPval}{PcevSingular}(pcevObj, shrink, index, ...)
 
 \method{wilksPval}{PcevBlock}(pcevObj, shrink, index, ...)
 }
