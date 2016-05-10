@@ -14,7 +14,8 @@ roysPval(pcevObj, ...)
 
 \method{roysPval}{PcevClassical}(pcevObj, shrink, index, ...)
 
-\method{roysPval}{PcevSingular}(pcevObj, shrink, index, ...)
+\method{roysPval}{PcevSingular}(pcevObj, shrink, index, method = c("moments",
+  "MLE"), ...)
 
 \method{roysPval}{PcevBlock}(pcevObj, shrink, index, ...)
 }
@@ -26,9 +27,13 @@ roysPval(pcevObj, ...)
 
 \item{shrink}{Should we use a shrinkage estimate of the residual variance?}
 
-\item{index}{If \code{pcevObj} is of class \code{PcevBlock}, \code{index} is a 
-vector describing the block to which individual response variables 
+\item{index}{If \code{pcevObj} is of class \code{PcevBlock}, \code{index} is
+a vector describing the block to which individual response variables 
 correspond.}
+
+\item{method}{Method to use for the estimation of the location-scale
+parameters. The available methods are the method of moments (default) and
+Maximum Likelihood Estimation.}
 }
 \description{
 This function uses Johnstone's approximation to the null distribution of 
@@ -36,7 +41,7 @@ Roy's Largest Root statistic. It uses a location-scale variant of the
 Tracy-Wildom distribution of order 1.
 }
 \details{
-Note that if \code{shrink} is set to \code{TRUE}, the location-scale
+Note that if \code{shrink} is set to \code{TRUE}, the location-scale 
 parameters are estimated using a small number of permutations.
 }
 

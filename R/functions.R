@@ -190,6 +190,7 @@ shrink_est <- function(Vr, res){
 #having the strongest effect on Y.
 
 #Anova helper-function
+#' @importFrom stats anova as.formula fitted.values lm
 linregfn<- function(y, covars){
   Dis <- covars
   y<-unlist(y)
