@@ -164,7 +164,7 @@ estimatePcev.PcevSingular <- function(pcevObj, shrink, index, ...) {
   rankVr<-corpcor::rank.condition(res)$rank
   eigVecVr<-svdRes$v[, 1:rankVr]
   eigValVrInv<-1/svdRes$d[1:rankVr]
-  Xp <- eigVecVr %*% diag(sqrt(eigValVrInv))
+  Xp <- eigVecVr %*% diag(eigValVrInv)
   C <- crossprod(Xp, Vm %*% Xp)
   svdC<-corpcor::fast.svd(C)
   Xpp <- svdC$u
