@@ -235,19 +235,21 @@ roysPval.PcevClassical <- function(pcevObj, shrink, index, ...) {
   d <- results$largestRoot
   # theta <- d / (1 + d)
   
-  nuH <- q
-  nuE <- n - q - 1
-  s <- min(p, nuH)
-  m <- 0.5 * (abs(p - nuH) - 1)
-  N <- 0.5 * (nuE - p - 1)
-  one_third <- 1/3
+  # nuH <- q
+  # nuE <- n - q - 1
+  # s <- min(p, nuH)
+  # m <- 0.5 * (abs(p - nuH) - 1)
+  # N <- 0.5 * (nuE - p - 1)
+  # one_third <- 1/3
+  # 
+  # N1 <- 2 * (s + m + N) + 1 
+  # gamma <- 2 * asin( sqrt( (s - 0.5)/N1 ) )
+  # phi <- 2*asin( sqrt( (s + 2*m + 0.5)/N1 ) )
+  # 
+  # mu <- 2 * log(tan( 0.5*(phi + gamma)))
+  # sigma <- (16/N^2)^one_third * ( sin(phi+gamma)^2*sin(phi)*sin(gamma)) ^(-1*one_third)
   
-  N1 <- 2 * (s + m + N) + 1 
-  gamma <- 2 * asin( sqrt( (s - 0.5)/N1 ) )
-  phi <- 2*asin( sqrt( (s + 2*m + 0.5)/N1 ) )
-  
-  mu <- 2 * log(tan( 0.5*(phi + gamma)))
-  sigma <- (16/N^2)^one_third * ( sin(phi+gamma)^2*sin(phi)*sin(gamma)) ^(-1*one_third)
+  params <- JohnstoneParam(p, n-q, q)
   
   if(shrink) {
     # Estimate the null distribution using 
@@ -280,7 +282,7 @@ roysPval.PcevClassical <- function(pcevObj, shrink, index, ...) {
     pvalue <- RMTstat::ptw(TW, beta=1, lower.tail = FALSE, log.p = FALSE)
   } else {
     # TW <- (log(theta/(1-theta)) - mu)/sigma
-    TW <- (log(d) - mu)/sigma
+    TW <- (log(d) - params[1])/params[2]
     
     pvalue <- RMTstat::ptw(TW, beta=1, lower.tail = FALSE, log.p = FALSE)
   }
@@ -537,4 +539,20 @@ blockMatrixDiagonal <- function(matrix_list) {
   }
   
   return(finalMatrix)
+}
+
+JohnstoneParam <- function(p, m, n) {
+  s_serif <- min(n, p)
+  m_serif <- 0.5*(abs(n - p) - 1)
+  n_serif <- 0.5*(abs(m - p) - 1)
+  N_serif <- 2*(s_serif + m_serif + n_serif) + 1
+  one_third <- 1/3
+  
+  gamma <- 2 * asin( sqrt( (s_serif - 0.5)/N_serif ) )
+  phi <- 2 * asin( sqrt( (s_serif + 2*m_serif + 0.5)/N_serif ) )
+  
+  mu <- 2 * log(tan( 0.5*(phi + gamma)))
+  sigma <- (16/N_serif^2)^one_third * (sin(phi+gamma)^2 * sin(phi) * sin(gamma))^(-1*one_third)
+  
+  return(c(mu, sigma))
 }

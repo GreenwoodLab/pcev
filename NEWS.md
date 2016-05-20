@@ -1,5 +1,7 @@
 # pcev 1.1.9000
 
+* Fixed the Johnstone approximation for Roy's largest root test.
+
 * Removed VIMPblock, as it is meaningless.
 
 * Added the possibility of computing multiple components (only for ```estimation = "all"```).
