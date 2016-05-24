@@ -271,7 +271,7 @@ roysPval.PcevClassical <- function(pcevObj, shrink, index, ...) {
     # which is OK
     oldw <- getOption("warn")
     options(warn = -1)
-    res <- optim(c(mu, sigma), function(param) logLik(param, log(null_dist)), 
+    res <- optim(c(params[1], params[2]), function(param) logLik(param, log(null_dist)), 
                  control = list(fnscale=-1))
     options(warn = oldw)
     

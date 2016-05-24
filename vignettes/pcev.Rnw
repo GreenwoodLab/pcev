@@ -210,6 +210,8 @@ As we can see, the VIMP can serve as surrogates for the univariate p-values when
 %'       lwd = 3, col = 'red')
 %' @
 
+\clearpage
+
 \section{Session Info}
 
 <<>>=
