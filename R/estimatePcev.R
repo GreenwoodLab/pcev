@@ -73,6 +73,9 @@ estimatePcev.PcevClassical <- function(pcevObj, shrink, index, ...) {
               "largestRoot" = d[1],
               "rho" = rho)
   if (ncol(pcevObj$X) > 2) out$otherWeights <- weights[,2:(ncol(pcevObj$X)-1), drop=FALSE]
+  genEigSol <- list("sampleComp" = pcevObj$Y %*% weights[,1:(ncol(pcevObj$X)-1), drop=FALSE],
+                    "sampleVal" = d[1:(ncol(pcevObj$X)-1)])
+  out$genEigSol <- genEigSol
   
   return(out)
 }
@@ -141,7 +144,6 @@ estimatePcev.PcevSingular <- function(pcevObj, shrink, index, ...) {
   Y <- pcevObj$Y
   N <- nrow(Y)
   p <- ncol(Y)
-  N <- nrow(Y)
   
   # Variance decomposition
   fit <- lm.fit(cbind(pcevObj$X, pcevObj$Z), Y)
@@ -169,7 +171,7 @@ estimatePcev.PcevSingular <- function(pcevObj, shrink, index, ...) {
   svdC<-corpcor::fast.svd(C)
   Xpp <- svdC$u
   singWeights <- Xp %*% Xpp
-  largestRoot<- max(crossprod(singWeights,  Vm %*% singWeights))
+  d <- diag(crossprod(singWeights,  Vm %*% singWeights))
   #singPCEV <- (Y) %*% singWeights[, 1] 
   
   #singVIMP <- unlist(lapply(1:ncol(Y), function(x) cor(singPCEV, (Y)[,x]))) 
@@ -180,10 +182,13 @@ estimatePcev.PcevSingular <- function(pcevObj, shrink, index, ...) {
               "model" = Vm,
               "weights" = singWeights[,1, drop=FALSE],
               "rootVr" = NULL,
-              "largestRoot" = largestRoot,
+              "largestRoot" = max(d),
               "rho" = rho,
               "rank" = rankVr)
   if (ncol(pcevObj$X) > 2) out$otherWeights <- singWeights[, -1]
+  genEigSol <- list("sampleComp" = pcevObj$Y %*% singWeights[,1:length(d)],
+                    "sampleVal" = d)
+  out$genEigSol <- genEigSol
   
   return(out)
 }

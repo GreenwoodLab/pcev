@@ -1,5 +1,7 @@
 # pcev 1.1.9000
 
+* Introduce an influence measure.
+
 * Fixed the Johnstone approximation for Roy's largest root test.
 
 * Removed VIMPblock, as it is meaningless.
