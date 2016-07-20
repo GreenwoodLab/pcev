@@ -273,13 +273,13 @@ roysPval.PcevClassical <- function(pcevObj, shrink, index, ...) {
 }
 
 #' @rdname roysPval
-roysPval.PcevSingular <- function(pcevObj, shrink, index, ...) {
-  
+roysPval.PcevSingular <- function(pcevObj, shrink, distrib , index, ...) {
   results <- estimatePcev(pcevObj, shrink)
   n <- nrow(pcevObj$Y)
   p <- ncol(pcevObj$Y)
   q <- ncol(pcevObj$X) - 1
   d <- results$largestRoot
+  
   # theta <- d / (1 + d)
   
   nuH <- q
@@ -326,10 +326,15 @@ roysPval.PcevSingular <- function(pcevObj, shrink, index, ...) {
     
     pvalue <- RMTstat::ptw(TW, beta=1, lower.tail = FALSE, log.p = FALSE)
   } else {
-    # TW <- (log(theta/(1-theta)) - mu)/sigma
-    TW <- (log(d) - mu)/sigma
-    
-    pvalue <- RMTstat::ptw(TW, beta=1, lower.tail = FALSE, log.p = FALSE)
+    if (distrib == 'Wishart'){
+      resid <- results$residual
+      trRessq <- sum(resid * resid); trRes <- sum(diag(resid))
+      b <- (trRes/nuE/p)^2 / ((trRessq-trRes^2/nuE)/(nuE-1)/(nuE+2)/p)
+      pvalue <- 1-singleWishart(d*p*b, nuE, q+1, mprec = TRUE) 
+    } else { 
+      TW <- (log(d) - mu)/sigma
+      pvalue <- RMTstat::ptw(TW, beta=1, lower.tail = FALSE, log.p = FALSE)
+    }
   }
   
   results$pvalue <- pvalue
@@ -337,6 +342,8 @@ roysPval.PcevSingular <- function(pcevObj, shrink, index, ...) {
   return(results)
   
 }
+
+
 
 
 #' @rdname roysPval

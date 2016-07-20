@@ -135,7 +135,7 @@ estimatePcev.PcevBlock <- function(pcevObj, shrink, index, ...) {
 }
 
 #' @rdname estimatePcev
-estimatePcev.PcevSingular <- function(pcevObj, shrink, index, ...) {
+estimatePcev.PcevSingular <- function(pcevObj, shrink, distrib, index, ...) {
   #initializing parameters
   rho <- NULL
   Y <- pcevObj$Y
@@ -154,11 +154,6 @@ estimatePcev.PcevSingular <- function(pcevObj, shrink, index, ...) {
   Vr <- crossprod(res)
   Vm <- crossprod(Yfit - Yfit_confounder, Y)
   
-  # Shrinkage estimate of Vr
-  #  if (shrink) {
-  #    out <- shrink_est(Vr, res)
-  #    Vrs <- out$cov
-  #    rho <- out$rho
  
   svdRes<-corpcor::fast.svd(res)
   rankVr<-corpcor::rank.condition(res)$rank

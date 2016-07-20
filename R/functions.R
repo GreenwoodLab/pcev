@@ -43,6 +43,7 @@
 computePCEV <- function(response, covariate, confounder, 
                         estimation = c("all", "block", "singular"), 
                         inference = c("exact", "permutation"), 
+                        distrib =  c('Wishart', 'TW'),
                         index = NULL, shrink = FALSE, nperm = 1000, 
                         Wilks = FALSE) {
   # Check input
@@ -57,6 +58,13 @@ computePCEV <- function(response, covariate, confounder,
                           stop("Inference method should be \"exact\" or \"permutation\"", 
                                call. = FALSE)
                         })
+  
+  distrib <- tryCatch(match.arg(distrib),
+                        error = function(c) {
+                          stop("Inference method should be \"Wishart\" or \"TW\"", 
+                               call. = FALSE)
+                        })
+  
   if (!is.matrix(response)) {
     stop("The response variables should be passed as a matrix.", call. = FALSE)
   }
@@ -103,7 +111,7 @@ computePCEV <- function(response, covariate, confounder,
     if (Wilks) {
       pcevRes <- wilksPval(pcevObj, shrink, index)
     } else {
-      pcevRes <- roysPval(pcevObj, shrink, index)
+      pcevRes <- roysPval(pcevObj, shrink, distrib, index)
     }
   }
   
