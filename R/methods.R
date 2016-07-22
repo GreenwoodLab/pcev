@@ -182,9 +182,18 @@ wilksPval.PcevBlock <- function(pcevObj, shrink, index, ...) {
 
 #' Roy's largest root exact test
 #' 
-#' This function uses Johnstone's approximation to the null distribution of 
-#' Roy's Largest Root statistic. It uses a location-scale variant of the 
-#' Tracy-Wildom distribution of order 1.
+#' In the classical domain of PCEV applicability this function uses Johnstone's
+#' approximation to the null distribution of ' Roy's Largest Root statistic.
+#' It uses a location-scale variant of the Tracy-Wildom distribution of order 1.
+#' 
+#'For singular PCEV, where number of variables is higher than the number of observations,
+#'one can choose between two aprroximations. First one, called 'Wishart', is based
+#'on the first term of expansion of the joint distribution of roots for singular beta
+#'ensemble. Second version of test, \code{estimation = "TW"}, assumes that largest root statistics follows
+#'Tracy-Wildom as in classical case. See vignette for the domains of the applicability
+#'of these tests.
+#'    
+#'   
 #' 
 #' Note that if \code{shrink} is set to \code{TRUE}, the location-scale
 #' parameters are estimated using a small number of permutations.
@@ -192,6 +201,8 @@ wilksPval.PcevBlock <- function(pcevObj, shrink, index, ...) {
 #' @param pcevObj A pcev object of class \code{PcevClassical} or 
 #'   \code{PcevBlock}
 #' @param shrink Should we use a shrinkage estimate of the residual variance?
+#' @param distrib If \code{estimation = "singular"}, choose one of two statistics,
+#'   \code{"Wishart"} or \code{"TW"}.
 #' @param index If \code{pcevObj} is of class \code{PcevBlock}, \code{index} is a 
 #'   vector describing the block to which individual response variables 
 #'   correspond.
@@ -330,7 +341,7 @@ roysPval.PcevSingular <- function(pcevObj, shrink, distrib , index, ...) {
       resid <- results$residual
       trRessq <- sum(resid * resid); trRes <- sum(diag(resid))
       b <- (trRes/nuE/p)^2 / ((trRessq-trRes^2/nuE)/(nuE-1)/(nuE+2)/p)
-      pvalue <- 1-singleWishart(d*p*b, nuE, q+1, mprec = TRUE) 
+      pvalue <- 1-rootWihart::singleWishart(d*p*b, nuE, q+1, mprec = TRUE) 
     } else { 
       TW <- (log(d) - mu)/sigma
       pvalue <- RMTstat::ptw(TW, beta=1, lower.tail = FALSE, log.p = FALSE)

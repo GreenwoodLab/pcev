@@ -7,6 +7,8 @@ Authors@R: c(
   person("Aurelie", "Labbe",
   role = c("aut")),
   person("Karim", "Oualkacha",
+  role = c("aut")),
+  person("Stepan", "Grinek",
   role = c("aut")))
 Description: Principal component of explained variance (PCEV) is a statistical
     tool for the analysis of a multivariate response vector. It is a dimension-

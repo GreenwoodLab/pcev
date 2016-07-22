@@ -24,6 +24,8 @@
 #'   \code{"exact"} or \code{"permutation"}. Default value is \code{"exact"}.
 #' @param index If \code{estimation = "block"}, \code{index} is a vector describing the
 #'   block to which individual response variables correspond.
+#' @param distrib If \code{estimation = "singular"}, choose one of the two statistics,
+#'   \code{"Wishart"} or \code{"TW"}.
 #' @param shrink Should we use a shrinkage estimate of the residual variance? 
 #'   Default value is \code{FALSE}..
 #' @param nperm The number of permutations to perform if \code{inference = 
