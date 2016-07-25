@@ -285,6 +285,7 @@ roysPval.PcevClassical <- function(pcevObj, shrink, index, ...) {
 
 #' @rdname roysPval
 roysPval.PcevSingular <- function(pcevObj, shrink, distrib , index, ...) {
+  #browser()
   results <- estimatePcev(pcevObj, shrink)
   n <- nrow(pcevObj$Y)
   p <- ncol(pcevObj$Y)
@@ -338,10 +339,10 @@ roysPval.PcevSingular <- function(pcevObj, shrink, distrib , index, ...) {
     pvalue <- RMTstat::ptw(TW, beta=1, lower.tail = FALSE, log.p = FALSE)
   } else {
     if (distrib == 'Wishart'){
-      resid <- results$residual
+      resid <- results$residual/(n-1)
       trRessq <- sum(resid * resid); trRes <- sum(diag(resid))
-      b <- (trRes/nuE/p)^2 / ((trRessq-trRes^2/nuE)/(nuE-1)/(nuE+2)/p)
-      pvalue <- 1-rootWihart::singleWishart(d*p*b, nuE, q+1, mprec = TRUE) 
+      b <- (trRes/p)^2 / ((n-1)^2*(trRessq-(trRes^2)/(n-1))/(n-2)/(n+1)/p)
+      pvalue <- 1-rootWishart::singleWishart(d*p*b/(n-q), n-q, q, mprec = TRUE) 
     } else { 
       TW <- (log(d) - mu)/sigma
       pvalue <- RMTstat::ptw(TW, beta=1, lower.tail = FALSE, log.p = FALSE)
