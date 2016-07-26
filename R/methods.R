@@ -307,29 +307,29 @@ roysPval.PcevSingular <- function(pcevObj, shrink, distrib , index, ...) {
     m <- 0.5 * (abs(p - nuH) - 1)
     N <- 0.5 * (nuE - p - 1)
     one_third <- 1/3
-      
+    
     N1 <- 2 * (s + m + N) + 1 
     gamma <- 2 * asin( sqrt( (s - 0.5)/N1 ) )
     phi <- 2*asin( sqrt( (s + 2*m + 0.5)/N1 ) )
-      
+    
     mu <- 2 * log(tan( 0.5*(phi + gamma)))
     sigma <- (16/N^2)^one_third * ( sin(phi+gamma)^2*sin(phi)*sin(gamma)) ^(-1*one_third)
-      
+    
     if(shrink) {
-        # Estimate the null distribution using 
-        # permutations and MLE
+      # Estimate the null distribution using 
+      # permutations and MLE
       null_dist <- replicate(25, expr = {
-      tmp <- pcevObj
-      tmp$Y <- tmp$Y[sample(N), ]
-          
-      tmpRes <- try(estimatePcev(tmp, shrink, index), silent=TRUE)
-      if(inherits(tmpRes, "try-error")) {
-        return(NA)
-      } else {
-        return(tmpRes$largestRoot)
+        tmp <- pcevObj
+        tmp$Y <- tmp$Y[sample(N), ]
+        
+        tmpRes <- try(estimatePcev(tmp, shrink, index), silent=TRUE)
+        if(inherits(tmpRes, "try-error")) {
+          return(NA)
+        } else {
+          return(tmpRes$largestRoot)
         }
       })
-        
+      
       # Fit a location-scale version of TW distribution
       # Note: likelihood may throw warnings at some evaluations, 
       # which is OK
@@ -338,16 +338,16 @@ roysPval.PcevSingular <- function(pcevObj, shrink, distrib , index, ...) {
       res <- optim(c(mu, sigma), function(param) logLik(param, log(null_dist)), 
                    control = list(fnscale=-1))
       options(warn = oldw)
-        
+      
       mu1 <- res$par[1]
       sigma1 <- res$par[2]
       TW <- (log(d) - mu1)/sigma1
       pvalue <- RMTstat::ptw(TW, beta=1, lower.tail = FALSE, log.p = FALSE)
-      } else {
-        TW <- (log(d) - mu)/sigma
-        pvalue <- RMTstat::ptw(TW, beta=1, lower.tail = FALSE, log.p = FALSE)
-        }
-      }
+    } else {
+      TW <- (log(d) - mu)/sigma
+      pvalue <- RMTstat::ptw(TW, beta=1, lower.tail = FALSE, log.p = FALSE)
+    }
+  }
   
   results$pvalue <- pvalue
   
