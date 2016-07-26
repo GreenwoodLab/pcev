@@ -141,7 +141,7 @@ estimatePcev.PcevSingular <- function(pcevObj, shrink, distrib, index, ...) {
   Y <- pcevObj$Y
   N <- nrow(Y)
   p <- ncol(Y)
-  N <- nrow(Y)
+  
   
   # Variance decomposition
   fit <- lm.fit(cbind(pcevObj$X, pcevObj$Z), Y)
@@ -154,12 +154,11 @@ estimatePcev.PcevSingular <- function(pcevObj, shrink, distrib, index, ...) {
   Vr <- crossprod(res)
   Vm <- crossprod(Yfit - Yfit_confounder, Y)
   
- 
   svdRes<-corpcor::fast.svd(res)
   rankVr<-corpcor::rank.condition(res)$rank
   eigVecVr<-svdRes$v[, 1:rankVr]
   eigValVrInv<-1/svdRes$d[1:rankVr]
-  Xp <- eigVecVr %*% diag(sqrt(eigValVrInv))
+  Xp <- eigVecVr %*% diag(eigValVrInv)
   C <- t(Xp) %*% Vm %*% Xp
   svdC<-corpcor::fast.svd(C)
   Xpp <- svdC$u
