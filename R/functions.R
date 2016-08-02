@@ -291,34 +291,3 @@ PcevSingular <- function(response, covariate, confounder) {
   
 }
 
-####################################
-# Documentation for the datasets----
-
-#' Methylation values around BLK gene
-#' 
-#' A dataset containing methylation values for cell-separated samples. The 
-#' methylation was measured using bisulfite sequencing. The data also contains 
-#' the genomic position of these CpG sites, as well as a binary phenotype 
-#' (i.e. whether the sample comes from a B cell).
-#' 
-#' Methylation was first measured at 24,068 sites, on 40 samples. Filtering was
-#' performed to keep the 25\% most variable sites. See the vignette for more detail.
-#' 
-#' @format The data comes in four objects:
-#' \describe{
-#' \item{methylation}{Matrix of methylation values at 5,986 sites measured on 40 samples}
-#' \item{pheno}{Vector of phenotype, indicating whether the sample comes from a B cell}
-#' \item{position}{Data frame recording the position of each CpG site along the BLK region}
-#' \item{index}{Index vector used in the computation of PCEV-block}
-#' }
-#' @source Tomi Pastinen, McGill University, GEnome Quebec.
-"methylation"
-
-#' @rdname methylation
-"pheno"
-
-#' @rdname methylation
-"position"
-
-#' @rdname methylation
-"index"
