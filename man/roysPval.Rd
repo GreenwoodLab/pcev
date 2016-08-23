@@ -14,8 +14,7 @@ roysPval(pcevObj, ...)
 
 \method{roysPval}{PcevClassical}(pcevObj, shrink, index, ...)
 
-\method{roysPval}{PcevSingular}(pcevObj, shrink, index, method = c("moments",
-  "MLE"), ...)
+\method{roysPval}{PcevSingular}(pcevObj, shrink, distrib, index, ...)
 
 \method{roysPval}{PcevBlock}(pcevObj, shrink, index, ...)
 }
@@ -29,18 +28,31 @@ roysPval(pcevObj, ...)
 
 \item{index}{If \code{pcevObj} is of class \code{PcevBlock}, \code{index} is
 a vector describing the block to which individual response variables 
-correspond.}
+correspond}
+
+\item{distrib}{If \code{estimation = "singular"}, choose one of two statistics,
+\code{"Wishart"} or \code{"TW"}.}
+
+\item{index}{If \code{pcevObj} is of class \code{PcevBlock}, \code{index} is a 
+vector describing the block to which individual response variables}
 
 \item{method}{Method to use for the estimation of the location-scale
 parameters. The available methods are the method of moments (default) and
 Maximum Likelihood Estimation.}
 }
 \description{
-This function uses Johnstone's approximation to the null distribution of 
-Roy's Largest Root statistic. It uses a location-scale variant of the 
-Tracy-Wildom distribution of order 1.
+In the classical domain of PCEV applicability this function uses Johnstone's
+approximation to the null distribution of ' Roy's Largest Root statistic.
+It uses a location-scale variant of the Tracy-Wildom distribution of order 1.
 }
 \details{
+For singular PCEV, where number of variables is higher than the number of observations,
+one can choose between two aprroximations. First one, called 'Wishart', is based
+on the first term of expansion of the joint distribution of roots for singular beta
+ensemble. Second version of test, \code{estimation = "TW"}, assumes that largest root statistics follows
+Tracy-Wildom as in classical case. See vignette for the domains of the applicability
+of these tests.
+
 Note that if \code{shrink} is set to \code{TRUE}, the location-scale 
 parameters are estimated using a small number of permutations.
 }

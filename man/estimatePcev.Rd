@@ -16,7 +16,7 @@ estimatePcev(pcevObj, ...)
 
 \method{estimatePcev}{PcevBlock}(pcevObj, shrink, index, ...)
 
-\method{estimatePcev}{PcevSingular}(pcevObj, shrink, index, ...)
+\method{estimatePcev}{PcevSingular}(pcevObj, shrink, distrib, index, ...)
 }
 \arguments{
 \item{pcevObj}{A pcev object of class \code{PcevClassical}, \code{PcevBlock} or

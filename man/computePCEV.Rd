@@ -5,8 +5,8 @@
 \title{Principal Component of Explained Variance}
 \usage{
 computePCEV(response, covariate, confounder, estimation = c("all", "block",
-  "singular"), inference = c("exact", "permutation"), index = NULL,
-  shrink = FALSE, nperm = 1000, Wilks = FALSE)
+  "singular"), inference = c("exact", "permutation"), distrib = c("Wishart",
+  "TW"), index = NULL, shrink = FALSE, nperm = 1000, Wilks = FALSE)
 }
 \arguments{
 \item{response}{A matrix of response variables.}
@@ -20,6 +20,9 @@ computePCEV(response, covariate, confounder, estimation = c("all", "block",
 
 \item{inference}{Character string specifying which inference method to use: 
 \code{"exact"} or \code{"permutation"}. Default value is \code{"exact"}.}
+
+\item{distrib}{If \code{estimation = "singular"}, choose one of the two statistics,
+\code{"Wishart"} or \code{"TW"}.}
 
 \item{index}{If \code{estimation = "block"}, \code{index} is a vector describing the
 block to which individual response variables correspond.}

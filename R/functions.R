@@ -24,6 +24,8 @@
 #'   \code{"exact"} or \code{"permutation"}. Default value is \code{"exact"}.
 #' @param index If \code{estimation = "block"}, \code{index} is a vector describing the
 #'   block to which individual response variables correspond.
+#' @param distrib If \code{estimation = "singular"}, choose one of the two statistics,
+#'   \code{"Wishart"} or \code{"TW"}.
 #' @param shrink Should we use a shrinkage estimate of the residual variance? 
 #'   Default value is \code{FALSE}..
 #' @param nperm The number of permutations to perform if \code{inference = 
@@ -43,6 +45,7 @@
 computePCEV <- function(response, covariate, confounder, 
                         estimation = c("all", "block", "singular"), 
                         inference = c("exact", "permutation"), 
+                        distrib =  c('Wishart', 'TW'),
                         index = NULL, shrink = FALSE, nperm = 1000, 
                         Wilks = FALSE) {
   # Check input
@@ -57,6 +60,13 @@ computePCEV <- function(response, covariate, confounder,
                           stop("Inference method should be \"exact\" or \"permutation\"", 
                                call. = FALSE)
                         })
+  
+  distrib <- tryCatch(match.arg(distrib),
+                        error = function(c) {
+                          stop("Inference method should be \"Wishart\" or \"TW\"", 
+                               call. = FALSE)
+                        })
+  
   if (!is.matrix(response)) {
     stop("The response variables should be passed as a matrix.", call. = FALSE)
   }
@@ -103,7 +113,7 @@ computePCEV <- function(response, covariate, confounder,
     if (Wilks) {
       pcevRes <- wilksPval(pcevObj, shrink, index)
     } else {
-      pcevRes <- roysPval(pcevObj, shrink, index)
+      pcevRes <- roysPval(pcevObj, shrink, distrib, index)
     }
   }
   
