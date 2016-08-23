@@ -182,9 +182,18 @@ wilksPval.PcevBlock <- function(pcevObj, shrink, index, ...) {
 
 #' Roy's largest root exact test
 #' 
-#' This function uses Johnstone's approximation to the null distribution of 
-#' Roy's Largest Root statistic. It uses a location-scale variant of the 
-#' Tracy-Wildom distribution of order 1.
+#' In the classical domain of PCEV applicability this function uses Johnstone's
+#' approximation to the null distribution of ' Roy's Largest Root statistic.
+#' It uses a location-scale variant of the Tracy-Wildom distribution of order 1.
+#' 
+#'For singular PCEV, where number of variables is higher than the number of observations,
+#'one can choose between two aprroximations. First one, called 'Wishart', is based
+#'on the first term of expansion of the joint distribution of roots for singular beta
+#'ensemble. Second version of test, \code{estimation = "TW"}, assumes that largest root statistics follows
+#'Tracy-Wildom as in classical case. See vignette for the domains of the applicability
+#'of these tests.
+#'    
+#'   
 #' 
 #' Note that if \code{shrink} is set to \code{TRUE}, the location-scale
 #' parameters are estimated using a small number of permutations.
@@ -192,6 +201,8 @@ wilksPval.PcevBlock <- function(pcevObj, shrink, index, ...) {
 #' @param pcevObj A pcev object of class \code{PcevClassical} or 
 #'   \code{PcevBlock}
 #' @param shrink Should we use a shrinkage estimate of the residual variance?
+#' @param distrib If \code{estimation = "singular"}, choose one of two statistics,
+#'   \code{"Wishart"} or \code{"TW"}.
 #' @param index If \code{pcevObj} is of class \code{PcevBlock}, \code{index} is a 
 #'   vector describing the block to which individual response variables 
 #'   correspond.
@@ -273,63 +284,69 @@ roysPval.PcevClassical <- function(pcevObj, shrink, index, ...) {
 }
 
 #' @rdname roysPval
-roysPval.PcevSingular <- function(pcevObj, shrink, index, ...) {
-  
+roysPval.PcevSingular <- function(pcevObj, shrink, distrib , index, ...) {
+  #browser()
   results <- estimatePcev(pcevObj, shrink)
   n <- nrow(pcevObj$Y)
   p <- ncol(pcevObj$Y)
-  q <- ncol(pcevObj$X) - 1
+  q <- ncol(pcevObj$X) 
   d <- results$largestRoot
-  # theta <- d / (1 + d)
   
-  nuH <- q
-  nuE <- n - q - 1
-  s <- min(p, nuH)
-  m <- 0.5 * (abs(p - nuH) - 1)
-  N <- 0.5 * (nuE - p - 1)
-  one_third <- 1/3
-  
-  N1 <- 2 * (s + m + N) + 1 
-  gamma <- 2 * asin( sqrt( (s - 0.5)/N1 ) )
-  phi <- 2*asin( sqrt( (s + 2*m + 0.5)/N1 ) )
-  
-  mu <- 2 * log(tan( 0.5*(phi + gamma)))
-  sigma <- (16/N^2)^one_third * ( sin(phi+gamma)^2*sin(phi)*sin(gamma)) ^(-1*one_third)
-  
-  if(shrink) {
-    # Estimate the null distribution using 
-    # permutations and MLE
-    null_dist <- replicate(25, expr = {
-      tmp <- pcevObj
-      tmp$Y <- tmp$Y[sample(N), ]
-      
-      tmpRes <- try(estimatePcev(tmp, shrink, index), silent=TRUE)
-      if(inherits(tmpRes, "try-error")) {
-        return(NA)
-      } else {
-        return(tmpRes$largestRoot)
-      }
-    })
-    
-    # Fit a location-scale version of TW distribution
-    # Note: likelihood may throw warnings at some evaluations, 
-    # which is OK
-    oldw <- getOption("warn")
-    options(warn = -1)
-    res <- optim(c(mu, sigma), function(param) logLik(param, log(null_dist)), 
-                 control = list(fnscale=-1))
-    options(warn = oldw)
-    
-    mu1 <- res$par[1]
-    sigma1 <- res$par[2]
-    TW <- (log(d) - mu1)/sigma1
-    
-    pvalue <- RMTstat::ptw(TW, beta=1, lower.tail = FALSE, log.p = FALSE)
+  if (distrib == 'Wishart'){
+    #browser()
+    resid <- results$residual
+    s <- q - 1
+    r <- n - s
+    trRessq <- sum(resid * resid); trRes <- sum(diag(resid))
+    b=(trRes/r/p)^2 / ((trRessq-trRes^2/r)/(r-1)/(r+2)/p);
+    pvalue <- 1-rootWishart::singleWishart(d*p*b, r, s, mprec = TRUE) 
   } else {
-    # TW <- (log(theta/(1-theta)) - mu)/sigma
-    TW <- (log(d) - mu)/sigma
+    nuH <- q
+    nuE <- n - q - 1
+    s <- min(p, nuH)
+    m <- 0.5 * (abs(p - nuH) - 1)
+    N <- 0.5 * (nuE - p - 1)
+    one_third <- 1/3
     
-    pvalue <- RMTstat::ptw(TW, beta=1, lower.tail = FALSE, log.p = FALSE)
+    N1 <- 2 * (s + m + N) + 1 
+    gamma <- 2 * asin( sqrt( (s - 0.5)/N1 ) )
+    phi <- 2*asin( sqrt( (s + 2*m + 0.5)/N1 ) )
+    
+    mu <- 2 * log(tan( 0.5*(phi + gamma)))
+    sigma <- (16/N^2)^one_third * ( sin(phi+gamma)^2*sin(phi)*sin(gamma)) ^(-1*one_third)
+    
+    if(shrink) {
+      # Estimate the null distribution using 
+      # permutations and MLE
+      null_dist <- replicate(25, expr = {
+        tmp <- pcevObj
+        tmp$Y <- tmp$Y[sample(N), ]
+        
+        tmpRes <- try(estimatePcev(tmp, shrink, index), silent=TRUE)
+        if(inherits(tmpRes, "try-error")) {
+          return(NA)
+        } else {
+          return(tmpRes$largestRoot)
+        }
+      })
+      
+      # Fit a location-scale version of TW distribution
+      # Note: likelihood may throw warnings at some evaluations, 
+      # which is OK
+      oldw <- getOption("warn")
+      options(warn = -1)
+      res <- optim(c(mu, sigma), function(param) logLik(param, log(null_dist)), 
+                   control = list(fnscale=-1))
+      options(warn = oldw)
+      
+      mu1 <- res$par[1]
+      sigma1 <- res$par[2]
+      TW <- (log(d) - mu1)/sigma1
+      pvalue <- RMTstat::ptw(TW, beta=1, lower.tail = FALSE, log.p = FALSE)
+    } else {
+      TW <- (log(d) - mu)/sigma
+      pvalue <- RMTstat::ptw(TW, beta=1, lower.tail = FALSE, log.p = FALSE)
+    }
   }
   
   results$pvalue <- pvalue
@@ -337,6 +354,8 @@ roysPval.PcevSingular <- function(pcevObj, shrink, index, ...) {
   return(results)
   
 }
+
+
 
 
 #' @rdname roysPval

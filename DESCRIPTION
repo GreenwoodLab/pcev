@@ -20,7 +20,8 @@ Depends:
 Imports:
     RMTstat,
     stats,
-    corpcor
+    corpcor,
+    rootWishart
 License: GPL (>=2)
 LazyData: true
 URL: http://github.com/GreenwoodLab/pcev
