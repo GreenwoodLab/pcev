@@ -8,6 +8,8 @@
 #' @param shrink Should we use a shrinkage estimate of the residual variance? 
 #' @param index If \code{pcevObj} is of class \code{PcevBlock}, \code{index} is a vector
 #'   describing the block to which individual response variables correspond.
+#' @param distrib If \code{estimation = "singular"}, choose one of two statistics,
+#'   \code{"Wishart"} or \code{"TW"}.
 #' @param ... Extra parameters.
 #' @return A list containing the variance components, the first PCEV, the 
 #'   eigenvalues of \eqn{V_R^{-1}V_M} and the estimate of the shrinkage 

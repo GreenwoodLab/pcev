@@ -33,9 +33,6 @@ correspond}
 \item{distrib}{If \code{estimation = "singular"}, choose one of two statistics,
 \code{"Wishart"} or \code{"TW"}.}
 
-\item{index}{If \code{pcevObj} is of class \code{PcevBlock}, \code{index} is a 
-vector describing the block to which individual response variables}
-
 \item{method}{Method to use for the estimation of the location-scale
 parameters. The available methods are the method of moments (default) and
 Maximum Likelihood Estimation.}

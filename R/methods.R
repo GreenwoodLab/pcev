@@ -222,8 +222,6 @@ wilksPval.PcevBlock <- function(pcevObj, shrink, index, ...) {
 #'   correspond
 #' @param distrib If \code{estimation = "singular"}, choose one of two statistics,
 #'   \code{"Wishart"} or \code{"TW"}.
-#' @param index If \code{pcevObj} is of class \code{PcevBlock}, \code{index} is a 
-#'   vector describing the block to which individual response variables 
 #' @param method Method to use for the estimation of the location-scale
 #'   parameters. The available methods are the method of moments (default) and
 #'   Maximum Likelihood Estimation.
@@ -318,16 +316,29 @@ roysPval.PcevSingular <- function(pcevObj, shrink, distrib, index, ...) {
     resid <- results$residual
     s <- q - 1
     r <- n - s
-    trRessq <- sum(resid * resid); trRes <- sum(diag(resid))
-    b=(trRes/r/p)^2 / ((trRessq-trRes^2/r)/(r-1)/(r+2)/p);
+    trRessq <- sum(resid ^ 2) 
+    trRes <- sum(diag(resid))
+    b <- (trRes/r/p)^2 / ((trRessq-trRes^2/r)/(r-1)/(r+2)/p)
     pvalue <- 1-rootWishart::singleWishart(d*p*b, r, s, mprec = TRUE) 
   } else {
+    null_dist <- replicate(25, expr = {
+      tmp <- pcevObj
+      tmp$Y <- tmp$Y[sample(n), ]
+      
+      tmpRes <- try(estimatePcev(tmp, shrink, index), silent=TRUE)
+      if(inherits(tmpRes, "try-error")) {
+        return(NA)
+      } else {
+        return(tmpRes$largestRoot)
+      }
+    })
+    
     # Use method of moments
     muTW <- -1.2065335745820
     sigmaTW <- sqrt(1.607781034581)
     
     muS <- mean(log(null_dist))
-    sigmaS <- sd(log(null_dist))
+    sigmaS <- stats::sd(log(null_dist))
     
     sigma1 <- sigmaS/sigmaTW
     mu1 <- muS - sigma1 * muTW

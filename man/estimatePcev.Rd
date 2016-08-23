@@ -28,6 +28,9 @@ estimatePcev(pcevObj, ...)
 
 \item{index}{If \code{pcevObj} is of class \code{PcevBlock}, \code{index} is a vector
 describing the block to which individual response variables correspond.}
+
+\item{distrib}{If \code{estimation = "singular"}, choose one of two statistics,
+\code{"Wishart"} or \code{"TW"}.}
 }
 \value{
 A list containing the variance components, the first PCEV, the 
