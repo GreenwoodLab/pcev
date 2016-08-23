@@ -305,14 +305,18 @@ roysPval.PcevClassical <- function(pcevObj, shrink, index, ...) {
 }
 
 #' @rdname roysPval
-roysPval.PcevSingular <- function(pcevObj, shrink, distrib, index, ...) {
+roysPval.PcevSingular <- function(pcevObj, shrink, distrib = c("Wishart", "TW"), index, ...) {
   results <- estimatePcev(pcevObj, shrink)
   n <- nrow(pcevObj$Y)
   p <- ncol(pcevObj$Y)
   q <- ncol(pcevObj$X) 
   d <- results$largestRoot
+  distrib <- match.arg(distrib)
   
   if (distrib == 'Wishart'){
+    if(!requireNamespace("rootWishart")) {
+      stop("This requires the rootWishart package. You should use distrib = TW instead.")
+    }
     resid <- results$residual
     s <- q - 1
     r <- n - s

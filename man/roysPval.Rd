@@ -14,7 +14,8 @@ roysPval(pcevObj, ...)
 
 \method{roysPval}{PcevClassical}(pcevObj, shrink, index, ...)
 
-\method{roysPval}{PcevSingular}(pcevObj, shrink, distrib, index, ...)
+\method{roysPval}{PcevSingular}(pcevObj, shrink, distrib = c("Wishart", "TW"),
+  index, ...)
 
 \method{roysPval}{PcevBlock}(pcevObj, shrink, index, ...)
 }
