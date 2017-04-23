@@ -45,9 +45,8 @@ or singular. A p-value is also computed, testing the significance of the PCEV.
 
 The p-value is computed using either a permutation approach or an exact test. The implemented 
 exact tests use Wilks' Lambda (only for a single covariate) or Roy's Largest Root. The latter 
-uses Johnstone's approximation to the null distribution. Note that this test is also available 
-for the block approach, but there is no theoretical guarantee that it works, and the resulting 
-p-value should therefore be compared to that obtained using a permutation procedure.
+uses Johnstone's approximation to the null distribution. Note that for the block approach, only
+p-values obtained from a permutation procedure are available.
 
 When \code{estimation = "singular"}, the p-value is computed using a heuristic: using the method 
 of moments and a small number of permutations (i.e. 25), a location-scale family of the 
@@ -59,7 +58,7 @@ When \code{estimation = "block"}, there are three different ways of specifying t
 is used to match each response to a block. 2) If \code{index} is a single positive integer, it is
 understood as the number of blocks, and each response is matched to a block randomly. 3) If 
 \code{index = "adaptive"} (the default), the number of blocks is chosen so that there are about 
-n/2 responses per block, and each response is match to a block randomly. All other values of
+n/2 responses per block, and each response is match to a block randomly. All other values of 
 \code{index} should result in an error.
 }
 \examples{

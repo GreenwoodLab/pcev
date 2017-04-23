@@ -39,8 +39,8 @@ permutePval.PcevClassical <- function(pcevObj, shrink, index, nperm, ...) {
       tmp <- pcevObj
       tmp$Y <- tmp$Y[sample(N), ]
       
-      tmpRes <- try(estimatePcev(tmp, shrink, index), silent=TRUE)
-      if(inherits(tmpRes, "try-error")) {
+      tmpRes <- try(estimatePcev(tmp, shrink, index), silent = TRUE)
+      if (inherits(tmpRes, "try-error")) {
         return(NA)
       } else {
         tmpPCEV <- tmp$Y %*% tmpRes$weights
@@ -78,8 +78,8 @@ permutePval.PcevBlock <- function(pcevObj, shrink, index, nperm, ...) {
       tmp <- pcevObj
       tmp$Y <- tmp$Y[sample(N), ]
       
-      tmpRes <- try(estimatePcev(tmp, shrink, index), silent=TRUE)
-      if(inherits(tmpRes, "try-error")) {
+      tmpRes <- try(estimatePcev(tmp, shrink, index), silent = TRUE)
+      if (inherits(tmpRes, "try-error")) {
         return(NA)
       } else {
         tmpPCEV <- tmp$Y %*% tmpRes$weights
@@ -116,8 +116,8 @@ permutePval.PcevSingular <- function(pcevObj, shrink, index, nperm, ...) {
       tmp <- pcevObj
       tmp$Y <- tmp$Y[sample(N), ]
       
-      tmpRes <- try(estimatePcev(tmp, shrink, index), silent=TRUE)
-      if(inherits(tmpRes, "try-error")) {
+      tmpRes <- try(estimatePcev(tmp, shrink, index), silent = TRUE)
+      if (inherits(tmpRes, "try-error")) {
         return(NA)
       } else {
         tmpPCEV <- tmp$Y %*% tmpRes$weights
@@ -171,10 +171,10 @@ wilksPval.PcevClassical <- function(pcevObj, shrink, index, ...) {
   N <- nrow(pcevObj$Y)
   p <- ncol(pcevObj$Y)
   d <- results$largestRoot
-  wilksLambda <- (N-p-1)/p * d
+  wilksLambda <- (N - p - 1)/p * d
   
   df1 <- p
-  df2 <- N-p-1
+  df2 <- N - p - 1
   pvalue <- pf(wilksLambda, df1, df2, lower.tail = FALSE)
   results$pvalue <- pvalue
   
@@ -189,7 +189,7 @@ wilksPval.PcevSingular <- function(pcevObj, shrink, index, ...) {
 
 #' @rdname wilksPval
 wilksPval.PcevBlock <- function(pcevObj, shrink, index, ...) {
-  stop(strwrap("Wilks test is only available for estimation = all."),
+  stop("Only inference = \"permutation\" is available for the block approach.",
        call. = FALSE)
 }
 
@@ -242,17 +242,17 @@ roysPval.PcevClassical <- function(pcevObj, shrink, index, ...) {
   p <- ncol(pcevObj$Y)
   q <- ncol(pcevObj$X) - 1
   d <- results$largestRoot
-  params <- JohnstoneParam(p, n-q, q)
+  params <- JohnstoneParam(p, n - q, q)
   
-  if(shrink) {
+  if (shrink) {
     # Estimate the null distribution using 
     # permutations and MLE
     null_dist <- replicate(25, expr = {
       tmp <- pcevObj
       tmp$Y <- tmp$Y[sample(n), ]
       
-      tmpRes <- try(estimatePcev(tmp, shrink, index), silent=TRUE)
-      if(inherits(tmpRes, "try-error")) {
+      tmpRes <- try(estimatePcev(tmp, shrink, index), silent = TRUE)
+      if (inherits(tmpRes, "try-error")) {
         return(NA)
       } else {
         return(tmpRes$largestRoot)
@@ -265,19 +265,19 @@ roysPval.PcevClassical <- function(pcevObj, shrink, index, ...) {
     oldw <- getOption("warn")
     options(warn = -1)
     res <- optim(c(params[1], params[2]), function(param) logLik(param, log(null_dist)), 
-                 control = list(fnscale=-1))
+                 control = list(fnscale = -1))
     options(warn = oldw)
     
     mu1 <- res$par[1]
     sigma1 <- res$par[2]
     TW <- (log(d) - mu1)/sigma1
     
-    pvalue <- RMTstat::ptw(TW, beta=1, lower.tail = FALSE, log.p = FALSE)
+    pvalue <- RMTstat::ptw(TW, beta = 1, lower.tail = FALSE, log.p = FALSE)
   } else {
     # TW <- (log(theta/(1-theta)) - mu)/sigma
     TW <- (log(d) - params[1])/params[2]
     
-    pvalue <- RMTstat::ptw(TW, beta=1, lower.tail = FALSE, log.p = FALSE)
+    pvalue <- RMTstat::ptw(TW, beta = 1, lower.tail = FALSE, log.p = FALSE)
   }
   
   results$pvalue <- pvalue
@@ -298,8 +298,8 @@ roysPval.PcevSingular <- function(pcevObj, shrink, index, ...) {
     tmp <- pcevObj
     tmp$Y <- tmp$Y[sample(n), ]
     
-    tmpRes <- try(estimatePcev(tmp, shrink, index), silent=TRUE)
-    if(inherits(tmpRes, "try-error")) {
+    tmpRes <- try(estimatePcev(tmp, shrink, index), silent = TRUE)
+    if (inherits(tmpRes, "try-error")) {
       return(NA)
     } else {
       return(tmpRes$largestRoot)
@@ -317,7 +317,7 @@ roysPval.PcevSingular <- function(pcevObj, shrink, index, ...) {
   mu1 <- muS - sigma1 * muTW
   
   TW <- (log(d) - mu1)/sigma1
-  pvalue <- RMTstat::ptw(TW, beta=1, lower.tail = FALSE, log.p = FALSE)
+  pvalue <- RMTstat::ptw(TW, beta = 1, lower.tail = FALSE, log.p = FALSE)
 
   
   results$pvalue <- pvalue
@@ -327,91 +327,8 @@ roysPval.PcevSingular <- function(pcevObj, shrink, index, ...) {
 
 #' @rdname roysPval
 roysPval.PcevBlock <- function(pcevObj, shrink, index, ...) {
-  
-  warning("There is no theoretical guarantee that this approach works.\nWe recommend comparing the resulting p-value with that obtained from a permutation procedure.")
-  
-  results <- estimatePcev(pcevObj, shrink, index)
-  N <- nrow(pcevObj$Y)
-  p <- ncol(pcevObj$Y)
-  q <- ncol(pcevObj$X) - 1
-  
-  # Estimate largest root
-  root_Vr_bd <- blockMatrixDiagonal(results$rootVr$first)
-  
-  fit <- lm.fit(cbind(pcevObj$X, pcevObj$Z), pcevObj$Y)
-  Yfit <- fit$fitted.values
-  fit_confounder <- lm.fit(cbind(rep_len(1, N), pcevObj$Z), pcevObj$Y)
-  Yfit_confounder <- fit_confounder$fitted.values
-  
-  Vm <- crossprod(Yfit - Yfit_confounder, pcevObj$Y)
-  
-  mainMatrix <- root_Vr_bd %*% Vm %*% root_Vr_bd
-  
-  temp1 <- eigen(mainMatrix, symmetric=TRUE, only.values = TRUE)
-  d <- temp1$values[1]
-  
-  # theta <- d / (1 + d)
-  
-  nuH <- q
-  nuE <- N - q - 1
-  s <- min(p, nuH)
-  m <- 0.5 * (abs(p - nuH) - 1)
-  n <- 0.5 * (nuE - p - 1)
-  one_third <- 1/3
-  
-  N1 <- 2 * (s + m + n) + 1 
-  gamma <- 2 * asin( sqrt( (s - 0.5)/N ) )
-  phi <- 2*asin( sqrt( (s + 2*m + 0.5)/N ) )
-  
-  mu <- 2 * log(tan( 0.5*(phi + gamma)))
-  sigma <- (16/N^2)^one_third * ( sin(phi+gamma)^2*sin(phi)*sin(gamma)) ^(-1*one_third)
-  
-  
-  null_dist <- replicate(25, expr = {
-    tmp <- pcevObj
-    tmp$Y <- tmp$Y[sample(N), ]
-    
-    tmpRes <- try(estimatePcev(tmp, shrink, index), silent=TRUE)
-    if(inherits(tmpRes, "try-error")) {
-      return(NA)
-    } else {
-      root_Vr_tmp <- blockMatrixDiagonal(tmpRes$rootVr$first)
-      
-      fit <- lm.fit(cbind(tmp$X, tmp$Z), tmp$Y)
-      Yfit <- fit$fitted.values
-      fit_confounder <- lm.fit(cbind(rep_len(1, N), tmp$Z), tmp$Y)
-      Yfit_confounder <- fit_confounder$fitted.values
-      
-      Vm_tmp <- crossprod(Yfit - Yfit_confounder, tmp$Y)
-      
-      mainMatrix_tmp <- root_Vr_tmp %*% Vm_tmp %*% root_Vr_tmp
-      
-      tmpEi <- eigen(mainMatrix_tmp, symmetric=TRUE, only.values = TRUE)
-      d <- tmpEi$values[1]
-      
-      return(d)
-    }
-  })
-  
-  
-  # Fit a location-scale version of TW distribution
-  # Note: likelihood may throw warnings at some evaluations, 
-  # which is OK
-  oldw <- getOption("warn")
-  options(warn = -1)
-  res <- optim(c(mu, sigma), function(param) logLik(param, log(null_dist)), 
-               control = list(fnscale=-1))
-  options(warn = oldw)
-  
-  mu1 <- res$par[1]
-  sigma1 <- res$par[2]
-  TW <- (log(d) - mu1)/sigma1
-  
-  pvalue <- RMTstat::ptw(TW, beta=1, lower.tail = FALSE, log.p = FALSE)
-  
-  results$pvalue <- pvalue
-  
-  return(results)
+  stop("Only inference = \"permutation\" is available for the block approach.",
+       call. = FALSE)
 }
 
 ##################
@@ -423,7 +340,7 @@ print.Pcev <- function(x, ...) {
   N <- nrow(x$pcevObj$Y)
   p <- ncol(x$pcevObj$Y)
   q <- ncol(x$pcevObj$X)
-  if(x$Wilks) {
+  if (x$Wilks) {
     exact <- "Wilks' lambda test)"
   } else {
     exact <- "Roy's largest root test)"
@@ -433,24 +350,24 @@ print.Pcev <- function(x, ...) {
   cat("\n", N, "observations,", p, "response variables\n")
   cat("\nEstimation method:", x$methods[1])
   cat("\nInference method:", x$methods[2])
-  if(x$methods[2] == "exact") {
+  if (x$methods[2] == "exact") {
     cat("\n(performed using", exact)
   }
   pvalue <- x$pvalue
   if (!is.na(pvalue)) {
-    if(pvalue == 0) {
-      if(x$methods[2] == "permutation") {
+    if (pvalue == 0) {
+      if (x$methods[2] == "permutation") {
         pvalue <- paste0("< ", 1/x$nperm)
       }
-      if(x$methods[1] == "exact") {
+      if (x$methods[1] == "exact") {
         pvalue <- "~ 0"
       }
     }
   }
   cat("\nP-value obtained:", pvalue, "\n")
-  if(x$shrink) cat("\nShrinkage parameter rho was estimated at", x$rho, "\n")
+  if (x$shrink) cat("\nShrinkage parameter rho was estimated at", x$rho, "\n")
   cat("\nVariable importance factors")
-  if(p > 10) cat(" (truncated)\n") else cat("\n")
+  if (p > 10) cat(" (truncated)\n") else cat("\n")
   cat(format(sort(x$VIMP, decreasing = TRUE)[1:10], digits = 3), 
       "\n\n")
   
@@ -472,7 +389,7 @@ logLik <- function(param, data) {
   sigma <- param[2]
   data <- data[!is.na(data)]
   
-  lL <- sum(log(dtw_ls(data, mu, sigma, log=FALSE)))
+  lL <- sum(log(dtw_ls(data, mu, sigma, log = FALSE)))
   
   return(lL)
 }
@@ -483,8 +400,9 @@ blockMatrixDiagonal <- function(matrix_list) {
   finalDimension <- sum(dimensions)
   finalMatrix <- matrix(0, nrow = finalDimension, ncol = finalDimension)
   index <- 1
-  for(k in 1:length(dimensions)){
-    finalMatrix[index:(index+dimensions[k]-1), index:(index+dimensions[k]-1)] <- matrix_list[[k]]
+  for (k in 1:length(dimensions)) {
+    finalMatrix[index:(index + dimensions[k] - 1), 
+                index:(index + dimensions[k] - 1)] <- matrix_list[[k]]
     index <- index + dimensions[k]
   }
   
@@ -502,7 +420,7 @@ JohnstoneParam <- function(p, m, n) {
   phi <- 2 * asin( sqrt( (s_serif + 2*m_serif + 0.5)/N_serif ) )
   
   mu <- 2 * log(tan( 0.5*(phi + gamma)))
-  sigma <- (16/N_serif^2)^one_third * (sin(phi+gamma)^2 * sin(phi) * sin(gamma))^(-1*one_third)
+  sigma <- (16/N_serif^2)^one_third * (sin(phi + gamma)^2 * sin(phi) * sin(gamma))^(-1*one_third)
   
   return(c(mu, sigma))
 }
