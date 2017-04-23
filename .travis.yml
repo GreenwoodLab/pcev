@@ -2,10 +2,12 @@ language: r
 r:
   - release
   - devel
-sudo: required
+sudo: false
+cache: packages
 
 r_packages:
   - knitr
+  - devtools
 
 notifications:
   email:
