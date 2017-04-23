@@ -1,6 +1,6 @@
 Package: pcev
 Title: Principal Component of Explained Variance
-Version: 1.1.9000
+Version: 2.2.9000
 Authors@R: c(
   person("Maxime", "Turgeon", email = "maxime.turgeon@mail.mcgill.ca",
   role = c("aut", "cre")),
@@ -26,7 +26,6 @@ LazyData: true
 URL: http://github.com/GreenwoodLab/pcev
 BugReports: http://github.com/GreenwoodLab/pcev/issues
 Suggests:
-    knitr,
-    rootWishart
+    knitr
 VignetteBuilder: knitr
-RoxygenNote: 5.0.1
+RoxygenNote: 6.0.1
