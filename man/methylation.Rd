@@ -2,13 +2,13 @@
 % Please edit documentation in R/pcev.R
 \docType{data}
 \name{methylation}
-\alias{index}
 \alias{methylation}
-\alias{methylation2}
 \alias{pheno}
-\alias{pheno2}
 \alias{position}
+\alias{index}
+\alias{pheno2}
 \alias{position2}
+\alias{methylation2}
 \title{Methylation values around BLK gene}
 \format{The data comes in four objects: 
 \describe{ 
@@ -55,4 +55,3 @@ A second sample of the methylation dataset was extracted. This second dataset co
 methylation values at 1000 CpG dinucleotides.
 }
 \keyword{datasets}
-

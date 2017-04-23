@@ -5,8 +5,8 @@
 \title{Principal Component of Explained Variance}
 \usage{
 computePCEV(response, covariate, confounder, estimation = c("all", "block",
-  "singular"), inference = c("exact", "permutation"), distrib = c("Wishart",
-  "TW"), index = NULL, shrink = FALSE, nperm = 1000, Wilks = FALSE)
+  "singular"), inference = c("exact", "permutation"), index = "adaptive",
+  shrink = FALSE, nperm = 1000, Wilks = FALSE)
 }
 \arguments{
 \item{response}{A matrix of response variables.}
@@ -15,46 +15,52 @@ computePCEV(response, covariate, confounder, estimation = c("all", "block",
 
 \item{confounder}{An array or data frame of confounders.}
 
-\item{estimation}{Character string specifying which estimation method to use:
-\code{"all"}, \code{"block"} or \code{"singular"}. Default value is \code{"all"}.}
+\item{estimation}{Character string specifying which estimation method to use: \code{"all"}, 
+\code{"block"} or \code{"singular"}. Default value is \code{"all"}.}
 
-\item{inference}{Character string specifying which inference method to use: 
-\code{"exact"} or \code{"permutation"}. Default value is \code{"exact"}.}
+\item{inference}{Character string specifying which inference method to use: \code{"exact"} or 
+\code{"permutation"}. Default value is \code{"exact"}.}
 
-\item{distrib}{If \code{estimation = "singular"}, choose one of the two statistics,
-\code{"Wishart"} or \code{"TW"}.}
+\item{index}{Only used if \code{estimation = "block"}. Default value is \code{"adapative"}. See 
+details.}
 
-\item{index}{If \code{estimation = "block"}, \code{index} is a vector describing the
-block to which individual response variables correspond.}
+\item{shrink}{Should we use a shrinkage estimate of the residual variance? Default value is 
+\code{FALSE}.}
 
-\item{shrink}{Should we use a shrinkage estimate of the residual variance? 
-Default value is \code{FALSE}..}
+\item{nperm}{The number of permutations to perform if \code{inference = "permutation"}}
 
-\item{nperm}{The number of permutations to perform if \code{inference = 
-"permutation"}}
-
-\item{Wilks}{Should we use a Wilks test instead of Roy's largest test? This 
-is only implemented for a single covariate.}
+\item{Wilks}{Should we use a Wilks test instead of Roy's largest test? This is only implemented 
+for a single covariate and with \code{estimation = "all"}.}
 }
 \value{
-An object of class \code{Pcev} containing the first PCEV, the 
-  p-value, the estimate of the shrinkage factor, etc.
+An object of class \code{Pcev} containing the first PCEV, the p-value, the estimate of 
+  the shrinkage factor, etc.
 }
 \description{
 \code{computePCEV} computes the first PCEV and tests its significance.
 }
 \details{
-This is the main function. It computes the PCEV using either the classical 
-method, block approach or singular .. (TODO). A p-value is also computed, testing the 
-significance of the PCEV.
+This is the main function. It computes the PCEV using either the classical method, block approach
+or singular. A p-value is also computed, testing the significance of the PCEV.
 
-The p-value is computed using either a permutation approach or an exact test.
-The implemented exact tests use Wilks' Lambda (only for a single covariate)
-or Roy's Largest Root. The latter uses Johnstone's approximation to the null
-distribution. Note that this test is also available for the block approach,
-but there is no theoretical guarantee that it works, and the resulting
-p-value should therefore be compared to that obtained using a permutation
-procedure.
+The p-value is computed using either a permutation approach or an exact test. The implemented 
+exact tests use Wilks' Lambda (only for a single covariate) or Roy's Largest Root. The latter 
+uses Johnstone's approximation to the null distribution. Note that this test is also available 
+for the block approach, but there is no theoretical guarantee that it works, and the resulting 
+p-value should therefore be compared to that obtained using a permutation procedure.
+
+When \code{estimation = "singular"}, the p-value is computed using a heuristic: using the method 
+of moments and a small number of permutations (i.e. 25), a location-scale family of the 
+Tracy-Widom distribution of order 1 is fitted to the null distribution. This fitted distribution 
+is then used to compute p-values.
+
+When \code{estimation = "block"}, there are three different ways of specifying the blocks: 1) if 
+\code{index} is a vector of the same length as the number of columns in \code{response}, then it 
+is used to match each response to a block. 2) If \code{index} is a single positive integer, it is
+understood as the number of blocks, and each response is matched to a block randomly. 3) If 
+\code{index = "adaptive"} (the default), the number of blocks is chosen so that there are about 
+n/2 responses per block, and each response is match to a block randomly. All other values of
+\code{index} should result in an error.
 }
 \examples{
 set.seed(12345)
@@ -66,4 +72,3 @@ pcev_out2 <- computePCEV(Y, X, shrink = TRUE)
 \seealso{
 \code{\link{estimatePcev}}
 }
-

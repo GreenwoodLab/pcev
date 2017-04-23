@@ -2,10 +2,10 @@
 % Please edit documentation in R/estimatePcev.R
 \name{estimatePcev}
 \alias{estimatePcev}
-\alias{estimatePcev.PcevBlock}
-\alias{estimatePcev.PcevClassical}
-\alias{estimatePcev.PcevSingular}
 \alias{estimatePcev.default}
+\alias{estimatePcev.PcevClassical}
+\alias{estimatePcev.PcevBlock}
+\alias{estimatePcev.PcevSingular}
 \title{Estimation of PCEV}
 \usage{
 estimatePcev(pcevObj, ...)
@@ -16,7 +16,7 @@ estimatePcev(pcevObj, ...)
 
 \method{estimatePcev}{PcevBlock}(pcevObj, shrink, index, ...)
 
-\method{estimatePcev}{PcevSingular}(pcevObj, shrink, distrib, index, ...)
+\method{estimatePcev}{PcevSingular}(pcevObj, shrink, index, ...)
 }
 \arguments{
 \item{pcevObj}{A pcev object of class \code{PcevClassical}, \code{PcevBlock} or
@@ -28,9 +28,6 @@ estimatePcev(pcevObj, ...)
 
 \item{index}{If \code{pcevObj} is of class \code{PcevBlock}, \code{index} is a vector
 describing the block to which individual response variables correspond.}
-
-\item{distrib}{If \code{estimation = "singular"}, choose one of two statistics,
-\code{"Wishart"} or \code{"TW"}.}
 }
 \value{
 A list containing the variance components, the first PCEV, the 
@@ -43,4 +40,3 @@ A list containing the variance components, the first PCEV, the
 \seealso{
 \code{\link{computePCEV}}
 }
-

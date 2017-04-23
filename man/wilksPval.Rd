@@ -2,10 +2,10 @@
 % Please edit documentation in R/methods.R
 \name{wilksPval}
 \alias{wilksPval}
-\alias{wilksPval.PcevBlock}
+\alias{wilksPval.default}
 \alias{wilksPval.PcevClassical}
 \alias{wilksPval.PcevSingular}
-\alias{wilksPval.default}
+\alias{wilksPval.PcevBlock}
 \title{Wilks' lambda exact test}
 \usage{
 wilksPval(pcevObj, ...)
@@ -37,4 +37,3 @@ Computes a p-value using Wilks' Lambda.
 The null distribution of this test statistic is only known in the case of a
 single covariate, and therefore this is the only case implemented.
 }
-
