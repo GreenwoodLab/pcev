@@ -2,38 +2,45 @@
 #' 
 #' \code{computePCEV} computes the first PCEV and tests its significance.
 #' 
-#' This is the main function. It computes the PCEV using either the classical 
-#' method, block approach or singular .. (TODO). A p-value is also computed, testing the 
-#' significance of the PCEV.
+#' This is the main function. It computes the PCEV using either the classical method, block approach
+#' or singular. A p-value is also computed, testing the significance of the PCEV.
 #' 
-#' The p-value is computed using either a permutation approach or an exact test.
-#' The implemented exact tests use Wilks' Lambda (only for a single covariate)
-#' or Roy's Largest Root. The latter uses Johnstone's approximation to the null
-#' distribution. Note that this test is also available for the block approach,
-#' but there is no theoretical guarantee that it works, and the resulting
-#' p-value should therefore be compared to that obtained using a permutation
-#' procedure.
+#' The p-value is computed using either a permutation approach or an exact test. The implemented 
+#' exact tests use Wilks' Lambda (only for a single covariate) or Roy's Largest Root. The latter 
+#' uses Johnstone's approximation to the null distribution. Note that this test is also available 
+#' for the block approach, but there is no theoretical guarantee that it works, and the resulting 
+#' p-value should therefore be compared to that obtained using a permutation procedure.
+#' 
+#' When \code{estimation = "singular"}, the p-value is computed using a heuristic: using the method 
+#' of moments and a small number of permutations (i.e. 25), a location-scale family of the 
+#' Tracy-Widom distribution of order 1 is fitted to the null distribution. This fitted distribution 
+#' is then used to compute p-values.
+#' 
+#' When \code{estimation = "block"}, there are three different ways of specifying the blocks: 1) if 
+#' \code{index} is a vector of the same length as the number of columns in \code{response}, then it 
+#' is used to match each response to a block. 2) If \code{index} is a single positive integer, it is
+#' understood as the number of blocks, and each response is matched to a block randomly. 3) If 
+#' \code{index = "adaptive"} (the default), the number of blocks is chosen so that there are about 
+#' n/2 responses per block, and each response is match to a block randomly. All other values of
+#' \code{index} should result in an error.
 #' 
 #' @seealso \code{\link{estimatePcev}}
 #' @param response A matrix of response variables.
 #' @param covariate An array or a data frame of covariates.
 #' @param confounder An array or data frame of confounders.
-#' @param estimation Character string specifying which estimation method to use:
-#'   \code{"all"}, \code{"block"} or \code{"singular"}. Default value is \code{"all"}.
-#' @param inference Character string specifying which inference method to use: 
-#'   \code{"exact"} or \code{"permutation"}. Default value is \code{"exact"}.
-#' @param index If \code{estimation = "block"}, \code{index} is a vector describing the
-#'   block to which individual response variables correspond.
-#' @param distrib If \code{estimation = "singular"}, choose one of the two statistics,
-#'   \code{"Wishart"} or \code{"TW"}.
-#' @param shrink Should we use a shrinkage estimate of the residual variance? 
-#'   Default value is \code{FALSE}..
-#' @param nperm The number of permutations to perform if \code{inference = 
-#'   "permutation"}
-#' @param Wilks Should we use a Wilks test instead of Roy's largest test? This 
-#'   is only implemented for a single covariate.
-#' @return An object of class \code{Pcev} containing the first PCEV, the 
-#'   p-value, the estimate of the shrinkage factor, etc.
+#' @param estimation Character string specifying which estimation method to use: \code{"all"}, 
+#'   \code{"block"} or \code{"singular"}. Default value is \code{"all"}.
+#' @param inference Character string specifying which inference method to use: \code{"exact"} or 
+#'   \code{"permutation"}. Default value is \code{"exact"}.
+#' @param index Only used if \code{estimation = "block"}. Default value is \code{"adapative"}. See 
+#'   details.
+#' @param shrink Should we use a shrinkage estimate of the residual variance? Default value is 
+#'   \code{FALSE}.
+#' @param nperm The number of permutations to perform if \code{inference = "permutation"}
+#' @param Wilks Should we use a Wilks test instead of Roy's largest test? This is only implemented 
+#'   for a single covariate and with \code{estimation = "all"}.
+#' @return An object of class \code{Pcev} containing the first PCEV, the p-value, the estimate of 
+#'   the shrinkage factor, etc.
 #' @examples 
 #' set.seed(12345)
 #' Y <- matrix(rnorm(100*20), nrow=100)
@@ -45,8 +52,7 @@
 computePCEV <- function(response, covariate, confounder, 
                         estimation = c("all", "block", "singular"), 
                         inference = c("exact", "permutation"), 
-                        distrib =  c('Wishart', 'TW'),
-                        index = NULL, shrink = FALSE, nperm = 1000, 
+                        index = "adaptive", shrink = FALSE, nperm = 1000, 
                         Wilks = FALSE) {
   # Check input
   estimation <- tryCatch(match.arg(estimation),
@@ -61,28 +67,40 @@ computePCEV <- function(response, covariate, confounder,
                                call. = FALSE)
                         })
   
-  distrib <- tryCatch(match.arg(distrib),
-                        error = function(c) {
-                          stop("Inference method should be \"Wishart\" or \"TW\"", 
-                               call. = FALSE)
-                        })
-  
   if (!is.matrix(response)) {
     stop("The response variables should be passed as a matrix.", call. = FALSE)
   }
-  if(missing(confounder)) confounder <- NULL
+  if (missing(confounder)) confounder <- NULL
   
   # We don't allow for missing values
-  if(anyNA(response) || anyNA(covariate) || anyNA(confounder)) {
+  if (anyNA(response) || anyNA(covariate) || anyNA(confounder)) {
     stop("Missing values are not allowed", call. = FALSE)
   }
   
-  if (!is.numeric(index)) index <- NULL
+  # If user gives index, we should do block estimation
+  if (index != "adaptive") {
+    estimation <- "block"
+    message("Selecting estimation by block.")
+  }
+  
+  # Adapative selection of blocks
+  if (estimation == "block") {
+    if (index == "adapative") {
+      b <- round(2*ncol(response)/nrow(response))
+    }
+    if (is.numeric(index) && length(index) == 1) {
+      b <- index
+      if (b < 0 || b > ncol(response)) {
+        stop("Invalid number of blocks", call. = FALSE)
+      }
+    }
+    if (!is.numeric(index) || length(index) == 1) {
+      index <- sample(1:b, ncol(response), replace = TRUE)
+    }
+  }
+  
   if (!is.logical(shrink)) shrink <- FALSE
   if (!is.logical(Wilks)) Wilks <- FALSE
-  
-  # If user gives index, we should do block estimation
-  if(!is.null(index)) estimation <- "block"
   
   # Create pcev objects
   if (estimation == "all") {
@@ -113,7 +131,7 @@ computePCEV <- function(response, covariate, confounder,
     if (Wilks) {
       pcevRes <- wilksPval(pcevObj, shrink, index)
     } else {
-      pcevRes <- roysPval(pcevObj, shrink, distrib, index)
+      pcevRes <- roysPval(pcevObj, shrink, index)
     }
   }
   
@@ -140,7 +158,7 @@ computePCEV <- function(response, covariate, confounder,
 computeVIMP <- function(pcevObj, list, signed=FALSE) {
   
   VIMP <- cor(pcevObj$Y, list$PCEV)[,1]
-  if(!signed) {
+  if (!signed) {
     VIMP <- abs(VIMP)
   }
   
@@ -159,9 +177,9 @@ shrink_est <- function(Vr, res){
   sample <- Vr/n
   
   # Compute prior
-  var <- matrix(diag(sample), ncol=1)
+  var <- matrix(diag(sample), ncol = 1)
   sqrtvar <- sqrt(var)
-  tmpMat <- matrix(rep(sqrtvar, p), nrow=p)
+  tmpMat <- matrix(rep(sqrtvar, p), nrow = p)
   rBar <- (sum(sum(sample / (tmpMat * t(tmpMat)))) - p) / (p * (p - 1))
   prior <- rBar * tmpMat * t(tmpMat)
   diag(prior) <- var
@@ -173,11 +191,11 @@ shrink_est <- function(Vr, res){
   
   # What is called rho-hat
   term1 <- crossprod(res^3, res) / n
-  help <- crossprod(res)/ n
-  helpDiag <- matrix(diag(help), ncol=1)
-  term2 <- matrix(rep(helpDiag, p), ncol=p, byrow=FALSE) * sample
-  term3 <- help * matrix(rep(var, p), ncol=p, byrow=FALSE)
-  term4 <- matrix(rep(var, p), ncol=p, byrow=FALSE) * sample
+  help <- crossprod(res)/n
+  helpDiag <- matrix(diag(help), ncol = 1)
+  term2 <- matrix(rep(helpDiag, p), ncol = p, byrow = FALSE) * sample
+  term3 <- help * matrix(rep(var, p), ncol = p, byrow = FALSE)
+  term4 <- matrix(rep(var, p), ncol = p, byrow = FALSE) * sample
   thetaMat <- term1 - term2 - term3 + term4
   diag(thetaMat) <- 0
   rho <- sum(diag(phiMat)) + rBar * sum(sum(tcrossprod(1 / sqrtvar, sqrtvar) * thetaMat))
@@ -192,43 +210,9 @@ shrink_est <- function(Vr, res){
   # Compute the estimator
   sigma <- shrinkage * prior + (1 - shrinkage) * sample
   sigma <- n * sigma
-  out <- list(cov=sigma, rho=shrinkage)
+  out <- list(cov = sigma, 
+              rho = shrinkage)
   return(out)
-}
-
-#Function to find the level in the factor variable X
-#having the strongest effect on Y.
-
-#Anova helper-function
-#' @importFrom stats anova as.formula fitted.values lm
-linregfn<- function(y, covars){
-  Dis <- covars
-  y<-unlist(y)
-  modelstring <- "y ~ covars"  
-  fit <- lm(as.formula(modelstring))
-  resid<-fitted.values(fit)
-  sfit <- summary(fit)
-  anovF <- anova(fit)
-  nc1 <- nrow(sfit$coefficients)
-  nc2 <- nrow(anovF) - 1
-  pvals <- c(sfit$coefficients[2:nc1, 1], sfit$coefficients[2:nc1,4], anovF[1:nc2,5])
-  names(pvals) <- c(paste0('c_', rownames(sfit$coefficients)[2:nc1]), rownames(sfit$coefficients)[2:nc1], rownames(anovF)[1:nc2])
-  return(list(pvals=pvals, resid=resid))
-}
-
-#function to find the most deviant subpopulation of samples
-# @export
-fimp<-function(data, covars){
-  pvals<-list()
-  l <- unique(covars)
-  for (i in l){
-    cnew <- ifelse(covars==i,1,0)
-    resFn <- linregfn(data, as.factor(cnew))
-    pvals <- c(pvals, resFn$pvals['covars'])
-  }
-  allp<-linregfn(data, as.factor(covars))$pvals['covars']
-  minp<-which(unlist(pvals)==min(unlist(pvals))); 
-  return(list(minp=minp, pval=pvals[minp], lev = l[minp], allp=allp))
 }
 
 ###########################
@@ -253,7 +237,7 @@ NULL
 #' @rdname PcevObj
 #' @export
 PcevClassical <- function(response, covariate, confounder) {
-  if(is.null(confounder)) {
+  if (is.null(confounder)) {
     structure(list(Y = response, 
                    X = model.matrix(~., as.data.frame(covariate)),
                    Z = c()), 
@@ -270,7 +254,7 @@ PcevClassical <- function(response, covariate, confounder) {
 #' @rdname PcevObj
 #' @export 
 PcevBlock <- function(response, covariate, confounder) {
-  if(is.null(confounder)) {
+  if (is.null(confounder)) {
     structure(list(Y = response, 
                    X = model.matrix(~., as.data.frame(covariate)), 
                    Z = c()), 
@@ -287,7 +271,7 @@ PcevBlock <- function(response, covariate, confounder) {
 #' @rdname PcevObj
 #' @export
 PcevSingular <- function(response, covariate, confounder) {
-  if(is.null(confounder)) {
+  if (is.null(confounder)) {
     structure(list(Y = response, 
                    X = model.matrix(~., as.data.frame(covariate)),
                    Z = c()), 

@@ -8,8 +8,6 @@
 #' @param shrink Should we use a shrinkage estimate of the residual variance? 
 #' @param index If \code{pcevObj} is of class \code{PcevBlock}, \code{index} is a vector
 #'   describing the block to which individual response variables correspond.
-#' @param distrib If \code{estimation = "singular"}, choose one of two statistics,
-#'   \code{"Wishart"} or \code{"TW"}.
 #' @param ... Extra parameters.
 #' @return A list containing the variance components, the first PCEV, the 
 #'   eigenvalues of \eqn{V_R^{-1}V_M} and the estimate of the shrinkage 
@@ -48,12 +46,12 @@ estimatePcev.PcevClassical <- function(pcevObj, shrink, index, ...) {
     rho <- out$rho
     
     # Computing PCEV
-    temp <- eigen(Vr, symmetric=TRUE)
+    temp <- eigen(Vr, symmetric = TRUE)
     Ur <- temp$vectors
-    diagD <- eigen(Vrs, symmetric=TRUE, only.values=TRUE)$values
+    diagD <- eigen(Vrs, symmetric = TRUE, only.values = TRUE)$values
   } else {
     # Computing PCEV
-    temp <- eigen(Vr, symmetric=TRUE)
+    temp <- eigen(Vr, symmetric = TRUE)
     Ur <- temp$vectors
     diagD <- temp$values
   }
@@ -64,17 +62,17 @@ estimatePcev.PcevClassical <- function(pcevObj, shrink, index, ...) {
   } 
   root_Vr <- Ur %*% diag(value, nrow = length(value)) %*% t(Ur)
   mainMatrix <- root_Vr %*% Vm %*% root_Vr
-  temp1 <- eigen(mainMatrix, symmetric=TRUE)
+  temp1 <- eigen(mainMatrix, symmetric = TRUE)
   weights <- root_Vr %*% temp1$vectors
   d <- temp1$values
   
   out <- list("residual" = Vr,
               "model" = Vm,
-              "weights" = weights[,1, drop=FALSE],
+              "weights" = weights[,1, drop = FALSE],
               "rootVr" = root_Vr,
               "largestRoot" = d[1],
               "rho" = rho)
-  if (ncol(pcevObj$X) > 2) out$otherWeights <- weights[,2:(ncol(pcevObj$X)-1), drop=FALSE]
+  if (ncol(pcevObj$X) > 2) out$otherWeights <- weights[,2:(ncol(pcevObj$X) - 1), drop = FALSE]
   
   return(out)
 }
@@ -89,7 +87,7 @@ estimatePcev.PcevBlock <- function(pcevObj, shrink, index, ...) {
   }
   
   d <- length(unique(index))
-  if(d > N && ncol(pcevObj$X) != 2) {
+  if (d > N && ncol(pcevObj$X) != 2) {
     warning("It is recommended to have a number of blocks smaller than the number of observations")
   }
   Ypcev <- matrix(NA, nrow = N, ncol = d)
@@ -104,8 +102,8 @@ estimatePcev.PcevBlock <- function(pcevObj, shrink, index, ...) {
     pcevObj_red$Y <- pcevObj$Y[, index == i, drop = FALSE]
     class(pcevObj_red) <- "PcevClassical"
     result <- estimatePcev(pcevObj_red, shrink)
-    weights[index==i] <- result$weights
-    Ypcev[,counter] <- pcevObj_red$Y %*% weights[index==i]
+    weights[index == i] <- result$weights
+    Ypcev[,counter] <- pcevObj_red$Y %*% weights[index == i]
     rootVr$first[[counter]] <- result$rootVr
   }
   
@@ -127,17 +125,16 @@ estimatePcev.PcevBlock <- function(pcevObj, shrink, index, ...) {
   counter <- 0
   for (i in unique(index)) {
     counter <- counter + 1
-    weights[index==i] <- weights[index==i]*weight_step2[counter]
+    weights[index == i] <- weights[index == i] * weight_step2[counter]
   }
   
-  # vipBlock <- VIMP <- abs(cor(Ypcev, Ypcev %*% weight_step2)[,1])
-  
   return(list("weights" = weights,
-              "rootVr" = rootVr))
+              "rootVr" = rootVr,
+              "index" = index))
 }
 
 #' @rdname estimatePcev
-estimatePcev.PcevSingular <- function(pcevObj, shrink, distrib, index, ...) {
+estimatePcev.PcevSingular <- function(pcevObj, shrink, index, ...) {
   #initializing parameters
   rho <- NULL
   Y <- pcevObj$Y
@@ -148,7 +145,7 @@ estimatePcev.PcevSingular <- function(pcevObj, shrink, distrib, index, ...) {
   # Variance decomposition
   fit <- lm.fit(cbind(pcevObj$X, pcevObj$Z), Y)
   Yfit <- fit$fitted.values
-  Intercepts<-fit$coefficients[1,]
+  Intercepts <- fit$coefficients[1,]
   res <- Y - Yfit
   fit_confounder <- lm.fit(cbind(rep_len(1, N), pcevObj$Z), Y)
   Yfit_confounder <- fit_confounder$fitted.values
@@ -156,16 +153,16 @@ estimatePcev.PcevSingular <- function(pcevObj, shrink, distrib, index, ...) {
   Vr <- crossprod(res)
   Vm <- crossprod(Yfit - Yfit_confounder, Y)
   
-  svdRes<-corpcor::fast.svd(res)
-  rankVr<-corpcor::rank.condition(res)$rank
-  eigVecVr<-svdRes$v[, 1:rankVr]
-  eigValVrInv<-1/svdRes$d[1:rankVr]
+  svdRes <- corpcor::fast.svd(res)
+  rankVr <- corpcor::rank.condition(res)$rank
+  eigVecVr <- svdRes$v[, 1:rankVr]
+  eigValVrInv <- 1/svdRes$d[1:rankVr]
   Xp <- eigVecVr %*% diag(eigValVrInv)
   C <- crossprod(Xp, Vm %*% Xp)
-  svdC<-corpcor::fast.svd(C)
+  svdC <- corpcor::fast.svd(C)
   Xpp <- svdC$u
   singWeights <- Xp %*% Xpp
-  largestRoot<- max(crossprod(singWeights,  Vm %*% singWeights))
+  largestRoot <- max(crossprod(singWeights,  Vm %*% singWeights))
   #singPCEV <- (Y) %*% singWeights[, 1] 
   
   #singVIMP <- unlist(lapply(1:ncol(Y), function(x) cor(singPCEV, (Y)[,x]))) 
@@ -174,7 +171,7 @@ estimatePcev.PcevSingular <- function(pcevObj, shrink, distrib, index, ...) {
   
   out <- list("residual" = Vr,
               "model" = Vm,
-              "weights" = singWeights[,1, drop=FALSE],
+              "weights" = singWeights[,1, drop = FALSE],
               "rootVr" = NULL,
               "largestRoot" = largestRoot,
               "rho" = rho,

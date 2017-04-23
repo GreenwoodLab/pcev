@@ -1,9 +1,13 @@
 language: r
-sudo: required
-dist: trusty
+r:
+  - release
+  - devel
+sudo: false
+cache: packages
 
-r_binary_packages:
+r_packages:
   - knitr
+  - devtools
 
 notifications:
   email:

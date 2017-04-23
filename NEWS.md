@@ -1,12 +1,24 @@
-# pcev 1.1.9000
+# pcev 2.2.9000
+
+* Added adaptive selection of blocks; see documentation for `computePCEV`.
+
+# pcev 2.1.1
+
+* Added `estimation = "singular"`; this option uses reduced-rank SVD for computing the component and the largest roo.
+
+* Added methods `roysPval.PcevSingular` and `permutePval.PcevSingular`
+
+* Expanded BLK data with multiple cell types.
+
+# pcev 1.1.2
 
 * Fixed the Johnstone approximation for Roy's largest root test.
 
 * Removed VIMPblock, as it is meaningless.
 
-* Added the possibility of computing multiple components (only for ```estimation = "all"```).
+* Added the possibility of computing multiple components (only for `estimation = "all"`).
 
-* Changed how default values for ```computePCEV``` are handled internally.
+* Changed how default values for `computePCEV` are handled internally.
 
 * Throw a meaningful error when there is missing data.
 

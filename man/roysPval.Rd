@@ -2,10 +2,10 @@
 % Please edit documentation in R/methods.R
 \name{roysPval}
 \alias{roysPval}
-\alias{roysPval.PcevBlock}
+\alias{roysPval.default}
 \alias{roysPval.PcevClassical}
 \alias{roysPval.PcevSingular}
-\alias{roysPval.default}
+\alias{roysPval.PcevBlock}
 \title{Roy's largest root exact test}
 \usage{
 roysPval(pcevObj, ...)
@@ -14,8 +14,7 @@ roysPval(pcevObj, ...)
 
 \method{roysPval}{PcevClassical}(pcevObj, shrink, index, ...)
 
-\method{roysPval}{PcevSingular}(pcevObj, shrink, distrib = c("Wishart", "TW"),
-  index, ...)
+\method{roysPval}{PcevSingular}(pcevObj, shrink, index, ...)
 
 \method{roysPval}{PcevBlock}(pcevObj, shrink, index, ...)
 }
@@ -30,9 +29,6 @@ roysPval(pcevObj, ...)
 \item{index}{If \code{pcevObj} is of class \code{PcevBlock}, \code{index} is
 a vector describing the block to which individual response variables 
 correspond}
-
-\item{distrib}{If \code{estimation = "singular"}, choose one of two statistics,
-\code{"Wishart"} or \code{"TW"}.}
 
 \item{method}{Method to use for the estimation of the location-scale
 parameters. The available methods are the method of moments (default) and
@@ -54,4 +50,3 @@ of these tests.
 Note that if \code{shrink} is set to \code{TRUE}, the location-scale 
 parameters are estimated using a small number of permutations.
 }
-

@@ -220,8 +220,6 @@ wilksPval.PcevBlock <- function(pcevObj, shrink, index, ...) {
 #' @param index If \code{pcevObj} is of class \code{PcevBlock}, \code{index} is
 #'   a vector describing the block to which individual response variables 
 #'   correspond
-#' @param distrib If \code{estimation = "singular"}, choose one of two statistics,
-#'   \code{"Wishart"} or \code{"TW"}.
 #' @param method Method to use for the estimation of the location-scale
 #'   parameters. The available methods are the method of moments (default) and
 #'   Maximum Likelihood Estimation.
@@ -232,7 +230,7 @@ roysPval <- function(pcevObj, ...) UseMethod("roysPval")
 #' @rdname roysPval
 roysPval.default <- function(pcevObj, ...) {
   stop(strwrap("This function should be used with a Pcev object of class 
-               PcevClassical"),
+               PcevClassical or PcevSingular"),
        call. = FALSE)
 }
 
@@ -244,22 +242,6 @@ roysPval.PcevClassical <- function(pcevObj, shrink, index, ...) {
   p <- ncol(pcevObj$Y)
   q <- ncol(pcevObj$X) - 1
   d <- results$largestRoot
-  # theta <- d / (1 + d)
-  
-  # nuH <- q
-  # nuE <- n - q - 1
-  # s <- min(p, nuH)
-  # m <- 0.5 * (abs(p - nuH) - 1)
-  # N <- 0.5 * (nuE - p - 1)
-  # one_third <- 1/3
-  # 
-  # N1 <- 2 * (s + m + N) + 1 
-  # gamma <- 2 * asin( sqrt( (s - 0.5)/N1 ) )
-  # phi <- 2*asin( sqrt( (s + 2*m + 0.5)/N1 ) )
-  # 
-  # mu <- 2 * log(tan( 0.5*(phi + gamma)))
-  # sigma <- (16/N^2)^one_third * ( sin(phi+gamma)^2*sin(phi)*sin(gamma)) ^(-1*one_third)
-  
   params <- JohnstoneParam(p, n-q, q)
   
   if(shrink) {
@@ -305,56 +287,42 @@ roysPval.PcevClassical <- function(pcevObj, shrink, index, ...) {
 }
 
 #' @rdname roysPval
-roysPval.PcevSingular <- function(pcevObj, shrink, distrib = c("Wishart", "TW"), index, ...) {
+roysPval.PcevSingular <- function(pcevObj, shrink, index, ...) {
   results <- estimatePcev(pcevObj, shrink)
   n <- nrow(pcevObj$Y)
   p <- ncol(pcevObj$Y)
   q <- ncol(pcevObj$X) 
   d <- results$largestRoot
-  distrib <- match.arg(distrib)
-  
-  if (distrib == 'Wishart'){
-    if(!requireNamespace("rootWishart")) {
-      stop("This requires the rootWishart package. You should use distrib = TW instead.")
+
+  null_dist <- replicate(25, expr = {
+    tmp <- pcevObj
+    tmp$Y <- tmp$Y[sample(n), ]
+    
+    tmpRes <- try(estimatePcev(tmp, shrink, index), silent=TRUE)
+    if(inherits(tmpRes, "try-error")) {
+      return(NA)
+    } else {
+      return(tmpRes$largestRoot)
     }
-    resid <- results$residual
-    s <- q - 1
-    r <- n - s
-    trRessq <- sum(resid ^ 2) 
-    trRes <- sum(diag(resid))
-    b <- (trRes/r/p)^2 / ((trRessq-trRes^2/r)/(r-1)/(r+2)/p)
-    pvalue <- 1-rootWishart::singleWishart(d*p*b, r, s, mprec = TRUE) 
-  } else {
-    null_dist <- replicate(25, expr = {
-      tmp <- pcevObj
-      tmp$Y <- tmp$Y[sample(n), ]
-      
-      tmpRes <- try(estimatePcev(tmp, shrink, index), silent=TRUE)
-      if(inherits(tmpRes, "try-error")) {
-        return(NA)
-      } else {
-        return(tmpRes$largestRoot)
-      }
-    })
-    
-    # Use method of moments
-    muTW <- -1.2065335745820
-    sigmaTW <- sqrt(1.607781034581)
-    
-    muS <- mean(log(null_dist))
-    sigmaS <- stats::sd(log(null_dist))
-    
-    sigma1 <- sigmaS/sigmaTW
-    mu1 <- muS - sigma1 * muTW
-    
-    TW <- (log(d) - mu1)/sigma1
-    pvalue <- RMTstat::ptw(TW, beta=1, lower.tail = FALSE, log.p = FALSE)
-  }
+  })
+  
+  # Use method of moments
+  muTW <- -1.2065335745820
+  sigmaTW <- sqrt(1.607781034581)
+  
+  muS <- mean(log(null_dist))
+  sigmaS <- stats::sd(log(null_dist))
+  
+  sigma1 <- sigmaS/sigmaTW
+  mu1 <- muS - sigma1 * muTW
+  
+  TW <- (log(d) - mu1)/sigma1
+  pvalue <- RMTstat::ptw(TW, beta=1, lower.tail = FALSE, log.p = FALSE)
+
   
   results$pvalue <- pvalue
   
   return(results)
-  
 }
 
 #' @rdname roysPval

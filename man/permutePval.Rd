@@ -2,10 +2,10 @@
 % Please edit documentation in R/methods.R
 \name{permutePval}
 \alias{permutePval}
-\alias{permutePval.PcevBlock}
-\alias{permutePval.PcevClassical}
-\alias{permutePval.PcevSingular}
 \alias{permutePval.default}
+\alias{permutePval.PcevClassical}
+\alias{permutePval.PcevBlock}
+\alias{permutePval.PcevSingular}
 \title{Permutation p-value}
 \usage{
 permutePval(pcevObj, ...)
@@ -35,4 +35,3 @@ correspond.}
 \description{
 Computes a p-value using a permutation procedure.
 }
-
