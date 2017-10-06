@@ -28,7 +28,7 @@ details.}
 \code{FALSE}.}
 
 \item{nperm}{The number of permutations to perform if \code{inference = "permutation"} or for the
-Tracy-Widom empirical estimate (if \code{estimation = "singular}).}
+Tracy-Widom empirical estimate (if \code{estimation = "singular"}).}
 
 \item{Wilks}{Should we use a Wilks test instead of Roy's largest test? This is only implemented 
 for a single covariate and with \code{estimation = "all"}.}

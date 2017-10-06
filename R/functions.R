@@ -36,7 +36,7 @@
 #' @param shrink Should we use a shrinkage estimate of the residual variance? Default value is 
 #'   \code{FALSE}.
 #' @param nperm The number of permutations to perform if \code{inference = "permutation"} or for the
-#'   Tracy-Widom empirical estimate (if \code{estimation = "singular}).
+#'   Tracy-Widom empirical estimate (if \code{estimation = "singular"}).
 #' @param Wilks Should we use a Wilks test instead of Roy's largest test? This is only implemented 
 #'   for a single covariate and with \code{estimation = "all"}.
 #' @return An object of class \code{Pcev} containing the first PCEV, the p-value, the estimate of 
