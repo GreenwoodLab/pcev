@@ -14,7 +14,7 @@ roysPval(pcevObj, ...)
 
 \method{roysPval}{PcevClassical}(pcevObj, shrink, index, ...)
 
-\method{roysPval}{PcevSingular}(pcevObj, shrink, index, ...)
+\method{roysPval}{PcevSingular}(pcevObj, shrink, index, nperm, ...)
 
 \method{roysPval}{PcevBlock}(pcevObj, shrink, index, ...)
 }
@@ -30,9 +30,7 @@ roysPval(pcevObj, ...)
 a vector describing the block to which individual response variables 
 correspond}
 
-\item{method}{Method to use for the estimation of the location-scale
-parameters. The available methods are the method of moments (default) and
-Maximum Likelihood Estimation.}
+\item{nperm}{Number of permutations for Tracy-Widom empirical estimate.}
 }
 \description{
 In the classical domain of PCEV applicability this function uses Johnstone's

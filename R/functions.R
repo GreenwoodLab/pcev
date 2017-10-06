@@ -7,7 +7,7 @@
 #' 
 #' The p-value is computed using either a permutation approach or an exact test. The implemented 
 #' exact tests use Wilks' Lambda (only for a single covariate) or Roy's Largest Root. The latter 
-#' uses Johnstone's approximation to the null distribution. Note that for the block approach, only
+#' uses Johnstone's approximation to the null distribution. Note that for the block approach, only 
 #' p-values obtained from a permutation procedure are available.
 #' 
 #' When \code{estimation = "singular"}, the p-value is computed using a heuristic: using the method 
@@ -35,7 +35,8 @@
 #'   details.
 #' @param shrink Should we use a shrinkage estimate of the residual variance? Default value is 
 #'   \code{FALSE}.
-#' @param nperm The number of permutations to perform if \code{inference = "permutation"}
+#' @param nperm The number of permutations to perform if \code{inference = "permutation"} or for the
+#'   Tracy-Widom empirical estimate (if \code{estimation = "singular}).
 #' @param Wilks Should we use a Wilks test instead of Roy's largest test? This is only implemented 
 #'   for a single covariate and with \code{estimation = "all"}.
 #' @return An object of class \code{Pcev} containing the first PCEV, the p-value, the estimate of 
@@ -130,7 +131,7 @@ computePCEV <- function(response, covariate, confounder,
     if (Wilks) {
       pcevRes <- wilksPval(pcevObj, shrink, index)
     } else {
-      pcevRes <- roysPval(pcevObj, shrink, index)
+      pcevRes <- roysPval(pcevObj, shrink, index, nperm)
     }
   }
   

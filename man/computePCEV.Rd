@@ -27,7 +27,8 @@ details.}
 \item{shrink}{Should we use a shrinkage estimate of the residual variance? Default value is 
 \code{FALSE}.}
 
-\item{nperm}{The number of permutations to perform if \code{inference = "permutation"}}
+\item{nperm}{The number of permutations to perform if \code{inference = "permutation"} or for the
+Tracy-Widom empirical estimate (if \code{estimation = "singular}).}
 
 \item{Wilks}{Should we use a Wilks test instead of Roy's largest test? This is only implemented 
 for a single covariate and with \code{estimation = "all"}.}
@@ -45,7 +46,7 @@ or singular. A p-value is also computed, testing the significance of the PCEV.
 
 The p-value is computed using either a permutation approach or an exact test. The implemented 
 exact tests use Wilks' Lambda (only for a single covariate) or Roy's Largest Root. The latter 
-uses Johnstone's approximation to the null distribution. Note that for the block approach, only
+uses Johnstone's approximation to the null distribution. Note that for the block approach, only 
 p-values obtained from a permutation procedure are available.
 
 When \code{estimation = "singular"}, the p-value is computed using a heuristic: using the method 

@@ -220,9 +220,7 @@ wilksPval.PcevBlock <- function(pcevObj, shrink, index, ...) {
 #' @param index If \code{pcevObj} is of class \code{PcevBlock}, \code{index} is
 #'   a vector describing the block to which individual response variables 
 #'   correspond
-#' @param method Method to use for the estimation of the location-scale
-#'   parameters. The available methods are the method of moments (default) and
-#'   Maximum Likelihood Estimation.
+#' @param nperm Number of permutations for Tracy-Widom empirical estimate.
 #' @param ... Extra parameters.
 #' @export
 roysPval <- function(pcevObj, ...) UseMethod("roysPval")
@@ -287,14 +285,15 @@ roysPval.PcevClassical <- function(pcevObj, shrink, index, ...) {
 }
 
 #' @rdname roysPval
-roysPval.PcevSingular <- function(pcevObj, shrink, index, ...) {
+roysPval.PcevSingular <- function(pcevObj, shrink, index, nperm, ...) {
   results <- estimatePcev(pcevObj, shrink)
   n <- nrow(pcevObj$Y)
   p <- ncol(pcevObj$Y)
   q <- ncol(pcevObj$X) 
   d <- results$largestRoot
+  if (missing(nperm)) nperm <- 50
 
-  null_dist <- replicate(25, expr = {
+  null_dist <- replicate(nperm, expr = {
     tmp <- pcevObj
     tmp$Y <- tmp$Y[sample(n), ]
     
