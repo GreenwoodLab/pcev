@@ -379,7 +379,7 @@ dtw_ls <- function(x, mu, sigma, beta=1, log=FALSE) {
   # values for dtw are only available for the 
   # interval -10 to 6
   x1 <- as.numeric(x1 >= -10)*x1 - 10*as.numeric(x1 < -10)
-  x1 <- as.numeric(x1 <= 6)*x1 - 6*as.numeric(x1 > 6)
+  x1 <- as.numeric(x1 <= 6)*x1 + 6*as.numeric(x1 > 6)
   return(RMTstat::dtw(x1, beta, log)/sigma)
 }
 
