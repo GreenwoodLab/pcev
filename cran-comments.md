@@ -1,11 +1,6 @@
-## Resubmission
-This is a resubmission. In this version I have:
-
-* Added the missing dependency to package 'stats'
-
 ## Test environments
-* local Ubuntu 14.04, R 3.2.2
-* Ubuntu 12.04 (on travis-ci), R 3.2.3
+* local Ubuntu 16.04, R 3.4.1
+* Ubuntu 12.04 (on travis-ci), (devel and release)
 * win-builder (devel and release)
   
 ## R CMD check results
