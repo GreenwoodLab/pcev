@@ -114,7 +114,7 @@ estimatePcev.PcevBlock <- function(pcevObj, shrink, index, ...) {
   if (ncol(pcevObj_total$X) == 2) {
     fit_total <- lm.fit(pcevObj_total$X, pcevObj_total$Y)
     beta_total <- coefficients(fit_total)[2,]
-    weight_step2 <- beta_total/crossprod(beta_total)
+    weight_step2 <- beta_total/c(crossprod(beta_total))
     
   } else {
     result <- estimatePcev(pcevObj_total, shrink)
