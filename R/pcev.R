@@ -1,6 +1,6 @@
 #' pcev: A package for computing principal components of explained variance.
 #'
-#' PCEV is a statistical tool for the analysis of a mutivariate response vector.
+#' PCEV is a statistical tool for the analysis of a multivariate response vector.
 #' It is a dimension-reduction technique, similar to Principal Components
 #' Analysis (PCA), which seeks the maximize the proportion of variance (in the
 #' response vector) being explained by a set of covariates.
@@ -46,7 +46,7 @@ NULL
 #'   samples} 
 #' \item{pheno2}{Vector of phenotype, indicating the cell type of the sample (B cell, T cell, or Monocyte)} 
 #' \item{position2}{Data frame recording the position of each CpG site along the chromosome} }
-#' @source Tomi Pastinen, McGill University, GEnome Quebec.
+#' @source Tomi Pastinen, McGill University, Genome Quebec.
 "methylation"
 
 #' @rdname methylation

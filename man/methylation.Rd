@@ -25,7 +25,7 @@
 \item{pheno2}{Vector of phenotype, indicating the cell type of the sample (B cell, T cell, or Monocyte)} 
 \item{position2}{Data frame recording the position of each CpG site along the chromosome} }}
 \source{
-Tomi Pastinen, McGill University, GEnome Quebec.
+Tomi Pastinen, McGill University, Genome Quebec.
 }
 \usage{
 methylation

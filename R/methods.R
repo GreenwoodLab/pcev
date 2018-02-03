@@ -200,16 +200,7 @@ wilksPval.PcevBlock <- function(pcevObj, shrink, index, ...) {
 #' 
 #' In the classical domain of PCEV applicability this function uses Johnstone's
 #' approximation to the null distribution of ' Roy's Largest Root statistic.
-#' It uses a location-scale variant of the Tracy-Wildom distribution of order 1.
-#' 
-#'For singular PCEV, where number of variables is higher than the number of observations,
-#'one can choose between two aprroximations. First one, called 'Wishart', is based
-#'on the first term of expansion of the joint distribution of roots for singular beta
-#'ensemble. Second version of test, \code{estimation = "TW"}, assumes that largest root statistics follows
-#'Tracy-Wildom as in classical case. See vignette for the domains of the applicability
-#'of these tests.
-#'    
-#'   
+#' It uses a location-scale variant of the Tracy-Widom distribution of order 1.
 #' 
 #' Note that if \code{shrink} is set to \code{TRUE}, the location-scale 
 #' parameters are estimated using a small number of permutations.
