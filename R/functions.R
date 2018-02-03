@@ -78,14 +78,14 @@ computePCEV <- function(response, covariate, confounder,
   }
   
   # If user gives index, we should do block estimation
-  if (index != "adaptive") {
+  if (!identical(index, "adaptive")) {
     estimation <- "block"
     message("Selecting estimation by block.")
   }
   
   # Adapative selection of blocks
   if (estimation == "block") {
-    if (index == "adapative") {
+    if (identical(index, "adaptive")) {
       b <- round(2*ncol(response)/nrow(response))
     }
     if (is.numeric(index) && length(index) == 1) {
