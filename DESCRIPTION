@@ -1,6 +1,6 @@
 Package: pcev
 Title: Principal Component of Explained Variance
-Version: 2.2.1.9000
+Version: 2.2.2
 Authors@R: c(
   person("Maxime", "Turgeon", email = "maxime.turgeon@mail.mcgill.ca",
   role = c("aut", "cre")),

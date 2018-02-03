@@ -169,11 +169,11 @@ table(table(index))
 
 As we can see, there are no more than 30 CpG sites per block, and we have a total of 980 blocks. We are now ready to compute the PCEV:
 
-<<output, cache=TRUE, tidy=TRUE>>=
+<<output, tidy=TRUE>>=
 pcev_out <- computePCEV(methylation, covariate = pheno,
                         estimation = "block", 
                         inference = "permutation",
-                        index = index, nperm=10)
+                        index = index, nperm = 10)
 pcev_out
 @
 

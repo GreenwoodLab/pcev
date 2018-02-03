@@ -1,6 +1,6 @@
 citHeader("To cite pcev in publications use:")
 
-citEntry(entry = "Article",
+citEntry(entry = "Unpublished",
   title        = "Principal component of explained variance: An efficient
   and optimal data dimension reduction framework for association studies.",
   author       = personList(as.person("Maxime Turgeon"),
@@ -14,16 +14,17 @@ citEntry(entry = "Article",
                    as.person("Aurelie Labbe"),
                    person("for the Alzheimer's Disease Neuroimaging Initiative", 
                    role = "aut")),
-  journal      = "",
+  journal      = "Statistical Methods in Medical Research",
   year         = "",
   volume       = "",
   number       = "",
   pages        = "",
   url          = "",
+  note         = "To Appear",
 
   textVersion  =
   paste("Turgeon M. et al.",
         "Principal component of explained variance: An efficient
   and optimal data dimension reduction framework for association studies.",
-        "Submitted")
+        "To appear in Statistical Methods in Medical Research.")
 )

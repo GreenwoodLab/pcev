@@ -1,6 +1,5 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
-^inst/CITATION$
 ^BLK3.pdf$
 ^analysisScript\.R$
 ^estimatePcev_red.R$
