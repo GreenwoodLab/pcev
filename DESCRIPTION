@@ -26,6 +26,7 @@ LazyData: true
 URL: http://github.com/GreenwoodLab/pcev
 BugReports: http://github.com/GreenwoodLab/pcev/issues
 Suggests:
-    knitr
+    knitr,
+    testthat
 VignetteBuilder: knitr
 RoxygenNote: 6.0.1
