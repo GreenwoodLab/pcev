@@ -31,13 +31,16 @@ estimatePcev.PcevClassical <- function(pcevObj, shrink, index, ...) {
 
   # Variance decomposition
   # fit <- lm.fit(cbind(pcevObj$X, pcevObj$Z), Y)
-  Yfit <- getFitted(cbind(pcevObj$X, pcevObj$Z), Y)
+  Yfit <- getFitted(cbind(pcevObj$X, pcevObj$Z), Y,
+                    overall = pcevObj$overall)
   res <- Y - Yfit
   # fit_confounder <- lm.fit(cbind(rep_len(1, N), pcevObj$Z), Y)
-  Yfit_confounder <- getFitted(cbind(rep_len(1, N), pcevObj$Z), Y)
+  Yfit_confounder <- getFitted(cbind(rep_len(1, N), pcevObj$Z), Y,
+                               overall = pcevObj$overall)
   
-  Vr <- crossprod(res)
-  Vm <- crossprod(Yfit - Yfit_confounder, Y)
+  Vr <- cov(res, use = "pairwise.complete.obs")
+  Vm <- cov(Yfit - Yfit_confounder, Y,
+            use = "pairwise.complete.obs")
   
   # Shrinkage estimate of Vr
   if (shrink) {

@@ -3,7 +3,8 @@
 ############################################
 computeVIMP <- function(pcevObj, list, signed=FALSE) {
   
-  VIMP <- cor(pcevObj$Y, list$PCEV)[,1]
+  VIMP <- cor(pcevObj$Y, list$PCEV, 
+              use = "pairwise.complete.obs")[,1]
   if (!signed) {
     VIMP <- abs(VIMP)
   }
@@ -111,15 +112,21 @@ JohnstoneParam <- function(p, m, n) {
   return(c(mu, sigma))
 }
 
-getFitted <- function(x, y) {
-  if (FALSE) {
+getFitted <- function(x, y, overall = TRUE) {
+  # Fit all columns at once? Or one at a time?
+  # One at a time allows for more efficient
+  # use of observations with some responses missing
+  if (overall) {
     return(lm.fit(x, y)$fitted.values)
   } else {
     coef <- matrix(NA, nrow = ncol(y),
                    ncol = ncol(x))
     for (i in seq_len(ncol(y))) {
-      # X_des <- model.matrix(y[,i] ~ x)
-      model <- lm.fit(x, na.omit(y[,i]))
+      y_na <- na.omit(y[,i,drop = FALSE])
+      x_na <- if (is.null(attr(y_na, "na.action"))) x else {
+          x[-attr(y_na, "na.action"), , drop = FALSE]
+        }
+      model <- lm.fit(x_na, y_na)
       coef[i,] <- model$coefficients
     }
     return(tcrossprod(x, coef))
