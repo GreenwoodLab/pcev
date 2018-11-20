@@ -31,4 +31,4 @@ The main function is ```computePCEV```, and indeed most users will only need thi
 
 ## References
 
-  - Turgeon, M., Oualkacha, K., Ciampi, A., Miftah, H., Dehghan, G., Zanke, B.W., Benedet, A.L., Rosa-Neto, P., Greenwood, C.M.T., Labbe, A., for the Alzheimer’s Disease Neuroimaging Initiative. “Principal component of explained variance: an efficient and optimal data dimension reduction framework for association studies”. To appear in [Statistical Methods in Medical Research](http://dx.doi.org/10.1177/0962280216660128).
+  - Turgeon, M., Oualkacha, K., Ciampi, A., Miftah, H., Dehghan, G., Zanke, B.W., Benedet, A.L., Rosa-Neto, P., Greenwood, C.M.T., Labbe, A., for the Alzheimer’s Disease Neuroimaging Initiative. “Principal component of explained variance: an efficient and optimal data dimension reduction framework for association studies”. [Statistical Methods in Medical Research](http://dx.doi.org/10.1177/0962280216660128), 27: 2018. 
