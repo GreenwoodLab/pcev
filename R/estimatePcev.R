@@ -22,6 +22,7 @@ estimatePcev.default <- function(pcevObj, ...) {
 }
 
 #' @rdname estimatePcev
+#' @importFrom stats cov na.omit
 estimatePcev.PcevClassical <- function(pcevObj, shrink, index, ...) {
   #initializing parameters
   rho <- NULL
@@ -30,14 +31,17 @@ estimatePcev.PcevClassical <- function(pcevObj, shrink, index, ...) {
   p <- ncol(Y)
 
   # Variance decomposition
-  fit <- lm.fit(cbind(pcevObj$X, pcevObj$Z), Y)
-  Yfit <- fit$fitted.values
+  # fit <- lm.fit(cbind(pcevObj$X, pcevObj$Z), Y)
+  Yfit <- getFitted(cbind(pcevObj$X, pcevObj$Z), Y,
+                    overall = pcevObj$overall)
   res <- Y - Yfit
-  fit_confounder <- lm.fit(cbind(rep_len(1, N), pcevObj$Z), Y)
-  Yfit_confounder <- fit_confounder$fitted.values
+  # fit_confounder <- lm.fit(cbind(rep_len(1, N), pcevObj$Z), Y)
+  Yfit_confounder <- getFitted(cbind(rep_len(1, N), pcevObj$Z), Y,
+                               overall = pcevObj$overall)
   
-  Vr <- crossprod(res)
-  Vm <- crossprod(Yfit - Yfit_confounder, Y)
+  Vr <- cov(res, use = "pairwise.complete.obs")
+  Vm <- cov(Yfit - Yfit_confounder, Y,
+            use = "pairwise.complete.obs")
   
   # Shrinkage estimate of Vr
   if (shrink) {
@@ -143,12 +147,12 @@ estimatePcev.PcevSingular <- function(pcevObj, shrink, index, ...) {
   
   
   # Variance decomposition
-  fit <- lm.fit(cbind(pcevObj$X, pcevObj$Z), Y)
-  Yfit <- fit$fitted.values
-  Intercepts <- fit$coefficients[1,]
+  # fit <- lm.fit(cbind(pcevObj$X, pcevObj$Z), Y)
+  Yfit <- getFitted(cbind(pcevObj$X, pcevObj$Z), Y)
+  # Intercepts <- fit$coefficients[1,]
   res <- Y - Yfit
-  fit_confounder <- lm.fit(cbind(rep_len(1, N), pcevObj$Z), Y)
-  Yfit_confounder <- fit_confounder$fitted.values
+  # fit_confounder <- lm.fit(cbind(rep_len(1, N), pcevObj$Z), Y)
+  Yfit_confounder <- getFitted(cbind(rep_len(1, N), pcevObj$Z), Y)
   
   Vr <- crossprod(res)
   Vm <- crossprod(Yfit - Yfit_confounder, Y)
@@ -163,11 +167,6 @@ estimatePcev.PcevSingular <- function(pcevObj, shrink, index, ...) {
   Xpp <- svdC$u
   singWeights <- Xp %*% Xpp
   largestRoot <- max(crossprod(singWeights,  Vm %*% singWeights))
-  #singPCEV <- (Y) %*% singWeights[, 1] 
-  
-  #singVIMP <- unlist(lapply(1:ncol(Y), function(x) cor(singPCEV, (Y)[,x]))) 
-  
-  
   
   out <- list("residual" = Vr,
               "model" = Vm,
