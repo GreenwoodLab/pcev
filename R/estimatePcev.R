@@ -22,6 +22,7 @@ estimatePcev.default <- function(pcevObj, ...) {
 }
 
 #' @rdname estimatePcev
+#' @importFrom stats cov na.omit
 estimatePcev.PcevClassical <- function(pcevObj, shrink, index, ...) {
   #initializing parameters
   rho <- NULL
