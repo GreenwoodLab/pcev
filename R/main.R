@@ -28,6 +28,14 @@
 #' is match to a block randomly. All other values of \code{index} should result
 #' in an error.
 #'
+#' By default, missing values are not allowed. This can be relaxed with
+#' \code{na_action}. If \code{na_action = "omit"}, then all rows with at least
+#' one missing value will be removed from \code{response} before computation. If
+#' \code{na_action = "column"}, then the estimation of the linear model
+#' parameters is done column-wise with the non-missing value. This approach
+#' maximises the information. Note that missing values are still not allowed in
+#' \code{covariate} and \code{confounder}.
+#'
 #' @seealso \code{\link{estimatePcev}}
 #' @param response A matrix of response variables.
 #' @param covariate An array or a data frame of covariates.
@@ -45,7 +53,7 @@
 #'   "permutation"} or for the Tracy-Widom empirical estimate (if
 #'   \code{estimation = "singular"}).
 #' @param na_action how NAs are treated. The default is to raise an error. See
-#'   details. Another possible value is NULL.
+#'   details.
 #' @param Wilks Should we use a Wilks test instead of Roy's largest test? This
 #'   is only implemented for a single covariate and with \code{estimation =
 #'   "all"}.

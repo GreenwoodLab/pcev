@@ -34,7 +34,7 @@ Default value is \code{FALSE}.}
 \code{estimation = "singular"}).}
 
 \item{na_action}{how NAs are treated. The default is to raise an error. See
-details. Another possible value is NULL.}
+details.}
 
 \item{Wilks}{Should we use a Wilks test instead of Roy's largest test? This
 is only implemented for a single covariate and with \code{estimation =
@@ -73,6 +73,14 @@ randomly. 3) If \code{index = "adaptive"} (the default), the number of blocks
 is chosen so that there are about n/2 responses per block, and each response
 is match to a block randomly. All other values of \code{index} should result
 in an error.
+
+By default, missing values are not allowed. This can be relaxed with
+\code{na_action}. If \code{na_action = "omit"}, then all rows with at least
+one missing value will be removed from \code{response} before computation. If
+\code{na_action = "column"}, then the estimation of the linear model
+parameters is done column-wise with the non-missing value. This approach
+maximises the information. Note that missing values are still not allowed in
+\code{covariate} and \code{confounder}.
 }
 \examples{
 set.seed(12345)
