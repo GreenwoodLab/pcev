@@ -1,5 +1,5 @@
 # PCEV
-[![Build Status](https://travis-ci.org/GreenwoodLab/pcev.svg?branch=master)](https://travis-ci.org/GreenwoodLab/pcev) [![CRAN](http://www.r-pkg.org/badges/version/pcev?color=blue)](https://cran.r-project.org/package=pcev) [![Downloads](http://cranlogs.r-pkg.org/badges/pcev?color=green)](https://cran.r-project.org/package=pcev)
+[![Build Status](https://travis-ci.org/GreenwoodLab/pcev.svg?branch=master)](https://travis-ci.org/GreenwoodLab/pcev) [![Coverage Status](https://img.shields.io/codecov/c/github/GreenwoodLab/pcev/master.svg)] [![CRAN](http://www.r-pkg.org/badges/version/pcev?color=blue)](https://cran.r-project.org/package=pcev) [![Downloads](http://cranlogs.r-pkg.org/badges/pcev?color=green)](https://cran.r-project.org/package=pcev)
 
 
 R package which implements Principal components of explained variance (PCEV).
@@ -31,4 +31,4 @@ The main function is ```computePCEV```, and indeed most users will only need thi
 
 ## References
 
-  - Turgeon, M., Oualkacha, K., Ciampi, A., Miftah, H., Dehghan, G., Zanke, B.W., Benedet, A.L., Rosa-Neto, P., Greenwood, C.M.T., Labbe, A., for the Alzheimer’s Disease Neuroimaging Initiative. “Principal component of explained variance: an efficient and optimal data dimension reduction framework for association studies”. To appear in [Statistical Methods in Medical Research](http://dx.doi.org/10.1177/0962280216660128).
+  - Turgeon, M., Oualkacha, K., Ciampi, A., Miftah, H., Dehghan, G., Zanke, B.W., Benedet, A.L., Rosa-Neto, P., Greenwood, C.M.T., Labbe, A., for the Alzheimer’s Disease Neuroimaging Initiative. “Principal component of explained variance: an efficient and optimal data dimension reduction framework for association studies”. [Statistical Methods in Medical Research](http://dx.doi.org/10.1177/0962280216660128), 27: 2018. 

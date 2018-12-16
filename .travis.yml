@@ -8,6 +8,10 @@ cache: packages
 r_packages:
   - knitr
   - devtools
+  - covr
+
+after_success:
+  - Rscript -e 'library(covr); codecov()'
 
 notifications:
   email:
