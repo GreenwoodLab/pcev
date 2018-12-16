@@ -132,3 +132,17 @@ getFitted <- function(x, y, overall = TRUE) {
     return(tcrossprod(x, coef))
   }
 }
+
+is_positiveSemiDefinite <- function(mat, tol = 1e-8) {
+  eigen_mat <- eigen(mat, symmetric = TRUE, only.values = TRUE)
+  
+  return(all(eigen_mat$values > -tol))
+}
+
+Frobenius_projection <- function(mat) {
+  eigen_decomp <- eigen(mat, symmetric = TRUE)
+  mat_proj <- tcrossprod(eigen_decomp$vectors %*% diag(pmax(eigen_decomp$values, 0)),
+                         eigen_decomp$vectors)
+  
+  return(mat_proj)
+}

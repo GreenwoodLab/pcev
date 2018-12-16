@@ -40,8 +40,10 @@ estimatePcev.PcevClassical <- function(pcevObj, shrink, index, ...) {
                                overall = pcevObj$overall)
   
   Vr <- cov(res, use = "pairwise.complete.obs")
+  if (!is_positiveSemiDefinite(Vr)) Vr <- Frobenius_projection(Vr)
   Vm <- cov(Yfit - Yfit_confounder, Y,
             use = "pairwise.complete.obs")
+  if (!is_positiveSemiDefinite(Vm)) Vm <- Frobenius_projection(Vm)
   
   # Shrinkage estimate of Vr
   if (shrink) {
@@ -154,8 +156,11 @@ estimatePcev.PcevSingular <- function(pcevObj, shrink, index, ...) {
   # fit_confounder <- lm.fit(cbind(rep_len(1, N), pcevObj$Z), Y)
   Yfit_confounder <- getFitted(cbind(rep_len(1, N), pcevObj$Z), Y)
   
-  Vr <- crossprod(res)
-  Vm <- crossprod(Yfit - Yfit_confounder, Y)
+  Vr <- cov(res, use = "pairwise.complete.obs")
+  if (!is_positiveSemiDefinite(Vr)) Vr <- Frobenius_projection(Vr)
+  Vm <- cov(Yfit - Yfit_confounder, Y,
+            use = "pairwise.complete.obs")
+  if (!is_positiveSemiDefinite(Vm)) Vm <- Frobenius_projection(Vm)
   
   svdRes <- corpcor::fast.svd(res)
   rankVr <- corpcor::rank.condition(res)$rank
